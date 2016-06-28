@@ -1477,9 +1477,25 @@ static void i40e_get_ethtool_stats(struct net_device *netdev,
 			data[i + 1] = tx_ring->stats.bytes;
 		} while (u64_stats_fetch_retry_irq(&tx_ring->syncp, start));
 		i += 2;
-
+		trace_printk("%-5s:TX %-2d) TX data: [%-12lld,%-12lld] TX frag [%-12lld, %-12lld], RX[%-12lld, %-12lld]\n",
+			     netdev->name, j,
+			     tx_ring->numa_stats.tx[0],
+			     tx_ring->numa_stats.tx[1],
+			     tx_ring->numa_stats.tx_frag[0],
+			     tx_ring->numa_stats.tx_frag[1],
+			     tx_ring->numa_stats.tx[0],
+			     tx_ring->numa_stats.tx[1]);
 		/* Rx ring is the 2nd half of the queue pair */
 		rx_ring = &tx_ring[1];
+		trace_printk("%-5s:RX %-2d) TX data: [%-12lld,%-12lld] TX frag [%-12lld, %-12lld], RX[%-12lld, %-12lld]\n",
+			     netdev->name, j,
+			     rx_ring->numa_stats.tx[0],
+			     rx_ring->numa_stats.tx[1],
+			     rx_ring->numa_stats.tx_frag[0],
+			     rx_ring->numa_stats.tx_frag[1],
+			     rx_ring->numa_stats.tx[0],
+			     rx_ring->numa_stats.tx[1]);
+
 		do {
 			start = u64_stats_fetch_begin_irq(&rx_ring->syncp);
 			data[i] = rx_ring->stats.packets;

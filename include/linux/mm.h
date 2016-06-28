@@ -342,7 +342,7 @@ struct fault_env {
 /*
  * These are the virtual MM functions - opening of an area, closing and
  * unmapping it (needed to keep files on disk up-to-date etc), pointer
- * to the functions called when a no-page or a wp-page exception occurs. 
+ * to the functions called when a no-page or a wp-page exception occurs.
  */
 struct vm_operations_struct {
 	void (*open)(struct vm_area_struct * area);
@@ -510,6 +510,15 @@ static inline int compound_mapcount(struct page *page)
 	page = compound_head(page);
 	return atomic_read(compound_mapcount_ptr(page)) + 1;
 }
+
+#define DMA_CACHE_POISON	((void *)0x0D1E7C0C0BADB105)
+static inline void page_dma_cache_reset(struct page *page)
+{
+	page->iova = 0;
+	page->device = DMA_CACHE_POISON;
+}
+
+#define is_dma_cache_page(page) ((page)->device != DMA_CACHE_POISON)
 
 /*
  * The atomic page->_mapcount, starts from -1: so that transitions

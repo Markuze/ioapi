@@ -860,6 +860,14 @@ append:
 				       (length - transhdrlen));
 }
 
+static inline struct device *dev_cork(struct inet_cork *cork)
+{
+	if (cork && cork->dst)
+		if (cork->dst->dev)
+			return cork->dst->dev->dev.parent;
+	return NULL;
+}
+
 static int __ip_append_data(struct sock *sk,
 			    struct flowi4 *fl4,
 			    struct sk_buff_head *queue,
@@ -883,6 +891,7 @@ static int __ip_append_data(struct sock *sk,
 	unsigned int maxfraglen, fragheaderlen, maxnonfragsize;
 	int csummode = CHECKSUM_NONE;
 	struct rtable *rt = (struct rtable *)cork->dst;
+	struct device *device = dev_cork(cork);
 	u32 tskey = 0;
 
 	skb = skb_peek_tail(queue);
@@ -984,14 +993,14 @@ alloc_new_skb:
 				alloclen += rt->dst.trailer_len;
 
 			if (transhdrlen) {
-				skb = sock_alloc_send_skb(sk,
-						alloclen + hh_len + 15,
-						(flags & MSG_DONTWAIT), &err);
+				skb = sock_dev_alloc_send_skb(sk, device,
+							      alloclen + hh_len + 15,
+							      (flags & MSG_DONTWAIT), &err);
 			} else {
 				skb = NULL;
 				if (atomic_read(&sk->sk_wmem_alloc) <=
 				    2 * sk->sk_sndbuf)
-					skb = sock_wmalloc(sk,
+					skb = sock_dev_wmalloc(sk, device,
 							   alloclen + hh_len + 15, 1,
 							   sk->sk_allocation);
 				if (unlikely(!skb))
@@ -1506,6 +1515,7 @@ struct sk_buff *ip_make_skb(struct sock *sk,
 	if (err)
 		return ERR_PTR(err);
 
+	/* EXTRACT dest here !!*/
 	err = __ip_append_data(sk, fl4, &queue, &cork,
 			       &current->task_frag, getfrag,
 			       from, length, transhdrlen, flags);
