@@ -1,0 +1,58 @@
+#ifndef _DMA_BOUNCE_
+#define _DMA_BOUNCE_
+
+#include <asm/page.h>
+#include <linux/kernel.h>
+#include <linux/spinlock.h>
+#include <linux/device.h>
+#include <linux/types.h>
+#include <linux/dma-direction.h>
+#include <linux/gfp.h>
+#include <linux/types.h>
+#include <linux/magazine.h>
+#include <linux/mm_types.h>
+
+#define BITS_IN_IOVA		48
+
+#define CORES			NR_CPUS
+#define PERMISSIONS		2
+#define CORE_BITS		(ilog2(CORES))
+#define PERMISSION_BITS		(ilog2(PERMISSIONS))
+
+#define PERM_SHIFT		0
+#define CORE_SHIFT		(PERM_SHIFT + PERMISSION_BITS)
+#define IOVA_ENCODING_BITS	(1 + CORE_BITS + PERMISSION_BITS)
+#define IOVA_INVALID_BITS	(IOVA_ENCODING_BITS + 1)
+#define DMA_CACHE_FLAG		BIT(IOVA_ENCODING_BITS)
+#define DMA_CACHE_FLAG_INVALID	BIT(IOVA_INVALID_BITS)
+#define IOVA_RANGE_SHIFT	(BITS_IN_IOVA - (IOVA_ENCODING_BITS + 1))
+
+#define DMA_CACHE_CORE_MASK	((BIT(CORE_BITS) -1) << CORE_SHIFT)
+#define DMA_CACHE_SHIFT		15	/* 32K */ /*Due to skb lim*/
+#define DMA_CACHE_ELEM_SIZE	(BIT(DMA_CACHE_SHIFT))
+#define NUM_ALLOCATORS		(BIT(IOVA_ENCODING_BITS - 1))
+#define DMA_CACHE_MAX_ORDER	get_order(DMA_CACHE_ELEM_SIZE)
+
+enum dma_cache_frag_type {
+	DMA_CACHE_FRAG_PARTIAL_R,
+	DMA_CACHE_FRAG_PARTIAL_W,
+	DMA_CACHE_FRAG_FULL_R,
+	DMA_CACHE_FRAG_FULL_W,
+	DMA_CACHE_FRAG_TYPES
+};
+
+struct dev_iova_mag {
+	struct	mag_allocator allocator[NUM_ALLOCATORS];
+	atomic64_t last_idx[NUM_ALLOCATORS];
+	struct page_frag_cache frag_cache[NR_CPUS * 2][DMA_CACHE_FRAG_TYPES];
+};
+
+size_t dma_cache_size(void *);
+void *dma_cache_alloc(struct device *, size_t,
+		      enum dma_data_direction dir);
+struct page *dma_cache_alloc_page(struct device *dev, enum dma_data_direction dir);
+struct page *dma_cache_alloc_pages(struct device *dev, int order, enum dma_data_direction dir);
+void dma_cache_free(struct device *dev, struct page *);
+
+int	register_iova_map(struct device *);
+#endif /*_DMA_BOUNCE_*/

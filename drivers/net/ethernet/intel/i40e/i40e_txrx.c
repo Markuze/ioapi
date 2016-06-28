@@ -1164,6 +1164,7 @@ static bool i40e_alloc_mapped_page(struct i40e_ring *rx_ring,
 	}
 
 	/* alloc new page for storage */
+	/*TODO: DMA cache pages if relevant */
 	page = dev_alloc_page();
 	if (unlikely(!page)) {
 		rx_ring->rx_stats.alloc_page_failed++;
@@ -1205,6 +1206,23 @@ static void i40e_receive_skb(struct i40e_ring *rx_ring,
 		__vlan_hwaccel_put_tag(skb, htons(ETH_P_8021Q), vlan_tag);
 
 	napi_gro_receive(&q_vector->napi, skb);
+}
+
+static inline  void update_tx_data(struct i40e_ring *ring, void *data)
+{
+	struct page *page = virt_to_head_page(data);
+	++ring->numa_stats.tx[page_to_nid(page)];
+}
+
+static inline void update_tx_frag(struct i40e_ring *ring, struct page *page)
+{
+	++ring->numa_stats.tx_frag[page_to_nid(page)];
+}
+
+static inline void update_rx(struct i40e_ring *ring, void *data)
+{
+	struct page *page = virt_to_head_page(data);
+	++ring->numa_stats.rx[page_to_nid(page)];
 }
 
 /**
@@ -2716,6 +2734,8 @@ static inline void i40e_tx_map(struct i40e_ring *tx_ring, struct sk_buff *skb,
 	first->skb = skb;
 	first->tx_flags = tx_flags;
 
+
+	update_tx_data(tx_ring, skb->data);
 	dma = dma_map_single(tx_ring->dev, skb->data, size, DMA_TO_DEVICE);
 
 	tx_desc = I40E_TX_DESC(tx_ring, i);
@@ -2773,7 +2793,7 @@ static inline void i40e_tx_map(struct i40e_ring *tx_ring, struct sk_buff *skb,
 
 		size = skb_frag_size(frag);
 		data_len -= size;
-
+		update_tx_frag(tx_ring, skb_frag_page(frag));
 		dma = skb_frag_dma_map(tx_ring->dev, frag, 0, size,
 				       DMA_TO_DEVICE);
 
