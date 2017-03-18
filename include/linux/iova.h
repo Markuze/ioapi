@@ -16,6 +16,8 @@
 #include <linux/rbtree.h>
 #include <linux/dma-mapping.h>
 
+#define IOVA_INVALID ((unsigned long)(-1))
+
 /* iova structure */
 struct iova {
 	struct rb_node	node;
