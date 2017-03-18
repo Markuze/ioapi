@@ -466,11 +466,11 @@ struct sk_buff *__netdev_alloc_skb(struct net_device *dev, unsigned int len,
 /*	Due to skb_shared_info being mapped by the device
 *	we should consider avoiding cached DMA!!
 */
-	if (device && device->iova_mag) {
-		data = dma_cache_alloc(device, len, DMA_FROM_DEVICE);
-	} else {
+//if (device && device->iova_mag) {
+//	data = dma_cache_alloc(device, len, DMA_FROM_DEVICE);
+//} else {
 		data = __alloc_page_frag(nc, len, gfp_mask);
-	}
+//	}
 
 	pfmemalloc = nc->pfmemalloc;
 
