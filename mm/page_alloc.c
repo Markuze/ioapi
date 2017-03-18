@@ -919,6 +919,8 @@ static void free_pages_check_bad(struct page *page)
 		bad_reason = "PAGE_FLAGS_CHECK_AT_FREE flag(s) set";
 		bad_flags = PAGE_FLAGS_CHECK_AT_FREE;
 	}
+	if (unlikely(is_dma_cache_page(page)))
+		bad_reason = "Freeing DMA Pages";
 #ifdef CONFIG_MEMCG
 	if (unlikely(page->mem_cgroup))
 		bad_reason = "page still charged to cgroup";
@@ -1162,6 +1164,7 @@ static void __meminit __init_single_page(struct page *page, unsigned long pfn,
 	page_cpupid_reset_last(page);
 
 	INIT_LIST_HEAD(&page->lru);
+	page_dma_cache_reset(page);
 #ifdef WANT_PAGE_VIRTUAL
 	/* The shift won't overflow because ZONE_NORMAL is below 4G. */
 	if (!is_highmem_idx(zone))
@@ -1664,6 +1667,8 @@ static void check_new_page_bad(struct page *page)
 		bad_reason = "PAGE_FLAGS_CHECK_AT_PREP flag set";
 		bad_flags = PAGE_FLAGS_CHECK_AT_PREP;
 	}
+	if (unlikely(is_dma_cache_page(page)))
+		bad_reason = "Freeing DMA Pages";
 #ifdef CONFIG_MEMCG
 	if (unlikely(page->mem_cgroup))
 		bad_reason = "page still charged to cgroup";
@@ -3906,7 +3911,9 @@ EXPORT_SYMBOL(get_zeroed_page);
 void __free_pages(struct page *page, unsigned int order)
 {
 	if (put_page_testzero(page)) {
-		if (order == 0)
+		if (is_dma_cache_page(page))
+			dma_cache_free(page->device, page);
+		else if (order == 0)
 			free_hot_cold_page(page, false);
 		else
 			__free_pages_ok(page, order);
@@ -4018,8 +4025,12 @@ void __free_page_frag(void *addr)
 {
 	struct page *page = virt_to_head_page(addr);
 
-	if (unlikely(put_page_testzero(page)))
-		__free_pages_ok(page, compound_order(page));
+	if (unlikely(put_page_testzero(page))) {
+		if (is_dma_cache_page(page))
+			dma_cache_free(page->device, page);
+		else
+			__free_pages_ok(page, compound_order(page));
+	}
 }
 EXPORT_SYMBOL(__free_page_frag);
 
