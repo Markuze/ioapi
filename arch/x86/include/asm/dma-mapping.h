@@ -29,6 +29,9 @@ extern struct dma_map_ops *dma_ops;
 
 static inline struct dma_map_ops *get_dma_ops(struct device *dev)
 {
+	if (dev->copy) {
+		return dev->copy->dma_ops;
+	}
 #ifndef CONFIG_X86_DEV_DMA_OPS
 	return dma_ops;
 #else

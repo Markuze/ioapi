@@ -1595,6 +1595,8 @@ static int dmar_fault_do_one(struct intel_iommu *iommu, int type,
 		       type ? "DMA Read" : "DMA Write",
 		       source_id >> 8, PCI_SLOT(source_id & 0xFF),
 		       PCI_FUNC(source_id & 0xFF), addr, fault_reason, reason);
+		iova_decode(addr);
+	}
 	return 0;
 }
 
