@@ -28,7 +28,8 @@
 #define IOVA_RANGE_SHIFT	(BITS_IN_IOVA - (IOVA_ENCODING_BITS + 1))
 
 #define DMA_CACHE_CORE_MASK	((BIT(CORE_BITS) -1) << CORE_SHIFT)
-#define DMA_CACHE_SHIFT		15	/* 32K */ /*Due to skb lim*/
+#define DMA_CACHE_SHIFT		15	/* 32K */ /*Due to skb lim + compound page size.*/
+#define PAGES_IN_DMA_CACHE_ELEM (BIT(DMA_CACHE_SHIFT - PAGE_SHIFT))
 #define DMA_CACHE_ELEM_SIZE	(BIT(DMA_CACHE_SHIFT))
 #define NUM_ALLOCATORS		(BIT(IOVA_ENCODING_BITS - 1))
 #define DMA_CACHE_MAX_ORDER	get_order(DMA_CACHE_ELEM_SIZE)
@@ -46,6 +47,13 @@ struct dev_iova_mag {
 	atomic64_t last_idx[NUM_ALLOCATORS];
 	struct page_frag_cache frag_cache[NR_CPUS * 2][DMA_CACHE_FRAG_TYPES];
 };
+
+u64 dma_cache_iova_key(u64);
+u64 dma_cache_iova_idx(u64);
+u64 virt_to_iova(void *);
+void iova_format(u64);
+void iova_decode(u64);
+enum dma_data_direction iova_perm(u64);
 
 size_t dma_cache_size(void *);
 void *dma_cache_alloc(struct device *, size_t,

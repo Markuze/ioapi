@@ -12,6 +12,12 @@
 
 #endif
 
+static inline enum dma_data_direction idx2perm(u64 idx)
+{
+	assert(idx < 2);
+	return idx + 1;
+}
+
 static inline u64 perm2idx(enum dma_data_direction permission)
 {
 	if (unlikely(!((permission == DMA_FROM_DEVICE) || (permission == DMA_TO_DEVICE))))
@@ -25,8 +31,9 @@ static inline u64 perm2idx(enum dma_data_direction permission)
 */
 static inline u64 	iova_encoding(enum dma_data_direction permission)
 {
-	return	((smp_processor_id() << CORE_SHIFT) |
-		 (perm2idx(permission) << PERM_SHIFT));
+	return	DMA_CACHE_FLAG |
+		((smp_processor_id() << CORE_SHIFT) |
+		(perm2idx(permission) << PERM_SHIFT));
 }
 
 static inline u64	alloc_key(enum dma_data_direction permission)
@@ -35,22 +42,106 @@ static inline u64	alloc_key(enum dma_data_direction permission)
 		 (perm2idx(permission) << PERM_SHIFT));
 }
 
+//Watch for the assymetry with iova_encoding;
+static inline u64	iova_get_encoding(u64 iova)
+{
+	return ((iova >> IOVA_RANGE_SHIFT) & ~DMA_CACHE_FLAG);
+}
+
 static inline u64 iova_key(u64 iova)
 {
-	u64 encoding = (iova & ~PAGE_MASK);
+	u64 encoding = iova_get_encoding(iova);
 	u64 node = cpu_to_node(encoding >> CORE_SHIFT);
 	u64 perm = ((encoding & ~DMA_CACHE_CORE_MASK) >> PERM_SHIFT);
 	return (node  << CORE_SHIFT|perm << PERM_SHIFT);
 }
 
+enum dma_data_direction iova_perm(u64 iova)
+{
+	u64 encoding = iova_get_encoding(iova);
+	u64 perm = ((encoding & ~DMA_CACHE_CORE_MASK) >> PERM_SHIFT);
+	return idx2perm(perm);
+}
+
+u64 dma_cache_iova_key(u64 iova)
+{
+	u64 encoding = iova_get_encoding(iova);
+	u64 core = encoding >> CORE_SHIFT;
+	u64 perm = ((encoding & ~DMA_CACHE_CORE_MASK) >> PERM_SHIFT);
+	return (core  << CORE_SHIFT|perm << PERM_SHIFT);
+}
+
+u64 dma_cache_iova_idx(u64 iova)
+{
+	return (iova & (BIT(IOVA_RANGE_SHIFT) - 1)) >> DMA_CACHE_SHIFT;
+}
+
+void iova_format(u64 iova)
+{
+	u64 encoding = iova_get_encoding(iova);
+	u64 core = encoding >> CORE_SHIFT;
+	u64 perm = ((encoding & ~DMA_CACHE_CORE_MASK) >> PERM_SHIFT);
+	trace_printk("iova %llx: key %llx core %llx dir %s idx %llx\n", iova, iova_key(iova),
+		     core , (perm) ? "RX" : "TX", dma_cache_iova_idx(iova));
+	assert(perm < 2);
+}
+
+void iova_decode(u64 iova)
+{
+	u64 encoding = iova_get_encoding(iova);
+	u64 core = encoding >> CORE_SHIFT;
+	u64 perm = ((encoding & ~DMA_CACHE_CORE_MASK) >> PERM_SHIFT);
+	pr_err("iova %llx: key %llx core %llx dir %s idx %llx\n", iova, iova_key(iova),
+		     core , (perm) ? "RX" : "TX", dma_cache_iova_idx(iova));
+	assert(perm < 2);
+}
+
+u64 virt_to_iova(void *virt)
+{
+	u64 iova;
+	struct page *page = virt_to_page(virt);
+	struct page *head = compound_head(page);
+
+	if (!head->iova)
+		return IOVA_INVALID;
+
+	iova = head->iova + ((page - head) * PAGE_SIZE) + ((u64)virt & (PAGE_SIZE -1));
+	return iova;
+}
 
 static inline void validate_iova(u64 iova)
 {
-	u64 encoding = (iova & ~PAGE_MASK);
+	u64 encoding = iova_get_encoding(iova);
 	u64 perm = ((encoding & ~DMA_CACHE_CORE_MASK) >> PERM_SHIFT);
+
 	assert((encoding >> CORE_SHIFT) == smp_processor_id());
 	assert(cpu_to_node((encoding >> CORE_SHIFT)) == numa_mem_id());
-	assert(alloc_key(perm + 1) == iova_key(iova));
+
+	assert(alloc_key(idx2perm(perm)) == iova_key(iova));
+}
+
+static inline u64 alloc_new_iova(struct device	*dev,
+				 enum dma_data_direction	dir)
+{
+	u64 iova = iova_encoding(dir) << IOVA_RANGE_SHIFT;
+	u64 idx = atomic64_inc_return(&dev->iova_mag->last_idx[alloc_key(dir)]);
+
+	return (iova | (idx -1) << DMA_CACHE_SHIFT);
+}
+
+static inline void map_each_page(struct device *dev, struct page *page,
+				 enum dma_data_direction dir, u64 iova)
+{
+	int i;
+	struct dma_map_ops *ops = dev->copy->orig_dma_ops;
+
+	for (i = 0; i < PAGES_IN_DMA_CACHE_ELEM; i++) {
+		if (ops->map_page(dev, page, 0, PAGE_SIZE, dir, 0, iova) != iova) {
+			panic("Couldnt MAP page %llx (%d)", iova, i);
+		}
+		page++;
+		iova += PAGE_SIZE;
+	}
 }
 
 static inline struct page *inc_mapping(struct device	*dev,
@@ -67,11 +158,11 @@ static inline struct page *inc_mapping(struct device	*dev,
 		return ERR_PTR(-ENOMEM);
 	}
 
-	iova = dma_map_page(dev, page, 0, DMA_CACHE_ELEM_SIZE, dir);
-	if (!iova) {
-		panic("Couldnt MAP page %llx", iova);
-	}
-	page->iova	= iova|iova_encoding(dir);
+	iova = alloc_new_iova(dev, dir);
+
+	map_each_page(dev, page, dir, iova);
+
+	page->iova	= iova;
 	validate_iova(page->iova);
 	page->device	= dev;
 
@@ -89,7 +180,7 @@ struct page *alloc_mapped_pages(struct device *dev, enum dma_data_direction dir)
 		elem = inc_mapping(dev, dir);
 	}
 
-	atomic_set(&elem->_count, 1);
+	init_page_count(elem);
 	assert(numa_mem_id() == numa_node_id());
 	assert(page_to_nid(elem) == numa_mem_id());
 
@@ -142,7 +233,7 @@ void *dma_cache_alloc(struct device *dev, size_t size, enum dma_data_direction d
 	void *va;
 	struct page_frag_cache *nc = get_frag_cache(dev->iova_mag,
 						    (dir == DMA_TO_DEVICE) ? DMA_CACHE_FRAG_PARTIAL_R : DMA_CACHE_FRAG_PARTIAL_W);
-	assert(size < PAGE_SIZE);
+	//assert(size < PAGE_SIZE);
 	va = alloc_mapped_frag(dev, nc, size, dir);
 	return va;
 }
