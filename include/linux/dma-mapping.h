@@ -193,9 +193,9 @@ static inline dma_addr_t dma_map_single_attrs(struct device *dev, void *ptr,
 		struct page *page = virt_to_head_page(ptr);
 
 		if (page->iova) {
-			size_t offset = ptr - page_address(page);
-
-			return (page->iova & PAGE_MASK) + offset;
+			//size_t offset = ptr - page_address(page);
+			//return (page->iova & PAGE_MASK) + offset; //<-- not a bug :)
+			return virt_to_iova(ptr);
 		}
 	}
 
@@ -273,7 +273,9 @@ static inline dma_addr_t dma_map_page(struct device *dev, struct page *page,
 	if (dev->iova_mag) {
 		struct page *head = compound_head(page);
 		if (head->iova) {
-			return (head->iova & PAGE_MASK) + offset;
+			//return (head->iova & PAGE_MASK) + offset;
+			void *ptr = page_address(page) + offset;
+			return virt_to_iova(ptr);
 		}
 	}
 

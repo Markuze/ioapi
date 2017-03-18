@@ -108,6 +108,7 @@ u64 virt_to_iova(void *virt)
 	iova = head->iova + ((page - head) * PAGE_SIZE) + ((u64)virt & (PAGE_SIZE -1));
 	return iova;
 }
+EXPORT_SYMBOL(virt_to_iova);
 
 static inline void validate_iova(u64 iova)
 {
@@ -133,7 +134,7 @@ static inline void map_each_page(struct device *dev, struct page *page,
 				 enum dma_data_direction dir, u64 iova)
 {
 	int i;
-	struct dma_map_ops *ops = dev->copy->orig_dma_ops;
+	struct dma_map_ops *ops = get_dma_ops(dev);
 
 	for (i = 0; i < PAGES_IN_DMA_CACHE_ELEM; i++) {
 		if (ops->map_page(dev, page, 0, PAGE_SIZE, dir, 0, iova) != iova) {
