@@ -3553,8 +3553,9 @@ static dma_addr_t __intel_map_single(struct device *dev, phys_addr_t paddr,
 error:
 	pr_err("Device %s request: %zx@%llx dir %d --- failed\n",
 		dev_name(dev), size, (unsigned long long)paddr, dir);
+
 	if (iova_pfn && (iova_in != IOVA_INVALID))
-		__free_iova(&domain->iovad, iova);
+		free_iova_fast(&domain->iovad, iova_pfn, dma_to_mm_pfn(size));
 	return 0;
 }
 
