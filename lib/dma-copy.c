@@ -198,6 +198,8 @@ static void dma_copy_sync_single_range_for_cpu(struct device *dev, dma_addr_t ad
 
 	if (dir == DMA_BIDIRECTIONAL || dir == DMA_FROM_DEVICE) {
 		entry = get_shadow_entry(dev, addr);
+		assert(entry->shadow);
+		assert(entry->real);
 		//real sync for cpu
 		dma_copy_sync(entry->real + offset, entry->shadow + offset, size);
 		//real sync for device
@@ -216,6 +218,8 @@ static void dma_copy_sync_single_range_for_device(struct device *dev, dma_addr_t
 
 	if (dir == DMA_BIDIRECTIONAL || dir == DMA_FROM_DEVICE) {
 		entry = get_shadow_entry(dev, addr);
+		assert(entry->shadow);
+		assert(entry->real);
 		//real sync for cpu
 		dma_copy_sync(entry->shadow + offset, entry->real + offset, size);
 		//real sync for device
