@@ -150,7 +150,7 @@ static inline struct page *inc_mapping(struct device	*dev,
 	dma_addr_t	iova = 0;
 	struct page	*page;
 
-	page = alloc_pages( __GFP_COMP | __GFP_NOWARN |
+	page = alloc_pages( __GFP_COMP | __GFP_NOWARN | __GFP_THISNODE | __GFP_REPEAT |
 			   __GFP_NORETRY | GFP_ATOMIC | __GFP_IO
 			   , get_order(DMA_CACHE_ELEM_SIZE));
 	if (!page) {

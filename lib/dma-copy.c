@@ -126,11 +126,12 @@ static dma_addr_t dma_copy_map_page(struct device *dev, struct page *page,
 
 	if (dir == DMA_BIDIRECTIONAL || dir == DMA_TO_DEVICE) {
 		//real sync for cpu
-		dma_copy_sync(shadow, page_address(page) + offset, size);
+		dma_copy_sync(shadow, entry->real, size);
 		//real sync for device
-	} else {
-		get_page(page);
 	}
+	//else {
+	//	get_page(page);
+	//}
 	assert(dir == iova_perm(addr));
 	//trace();
 	return addr;
@@ -145,16 +146,16 @@ static void dma_copy_unmap(struct device *dev, dma_addr_t addr,
 	assert(dir == iova_perm(addr));
 
 	//trace_debug("addr %llx [%d] %zd :: %p -> %p \n", addr, dir, size, entry->shadow, entry->real);
-	if (dir == DMA_BIDIRECTIONAL || dir == DMA_FROM_DEVICE) {
+	//if (dir == DMA_BIDIRECTIONAL || dir == DMA_FROM_DEVICE) {
 		//real sync for cpu
 		//TODO: [2] get filterred packet size
 		//dma_copy_sync(entry->real, entry->shadow, size);
-		put_page(virt_to_page(entry->real));
+		//put_page(virt_to_page(entry->real));
 
 		//real sync for device
-	}
-	put_page(virt_to_page(entry->shadow));
+	//}
 	memset(entry, 0, sizeof(*entry));
+	put_page(virt_to_page(entry->shadow));
 }
 
 static int dma_copy_map_sg(struct device *dev, struct scatterlist *sgl,
