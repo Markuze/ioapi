@@ -115,7 +115,7 @@ static inline void validate_iova(u64 iova)
 	u64 perm = ((encoding & ~DMA_CACHE_CORE_MASK) >> PERM_SHIFT);
 
 	assert((encoding >> CORE_SHIFT) == smp_processor_id());
-	assert(cpu_to_node((encoding >> CORE_SHIFT)) == numa_mem_id());
+	//assert(cpu_to_node((encoding >> CORE_SHIFT)) == numa_mem_id());
 
 	assert(alloc_key(idx2perm(perm)) == iova_key(iova));
 }
@@ -150,7 +150,7 @@ static inline struct page *inc_mapping(struct device	*dev,
 	dma_addr_t	iova = 0;
 	struct page	*page;
 
-	page = alloc_pages( __GFP_COMP | __GFP_NOWARN | __GFP_THISNODE | __GFP_REPEAT |
+	page = alloc_pages( __GFP_COMP | __GFP_NOWARN |
 			   __GFP_NORETRY | GFP_ATOMIC | __GFP_IO
 			   , get_order(DMA_CACHE_ELEM_SIZE));
 	if (!page) {
@@ -181,8 +181,8 @@ struct page *alloc_mapped_pages(struct device *dev, enum dma_data_direction dir)
 	}
 
 	init_page_count(elem);
-	assert(numa_mem_id() == numa_node_id());
-	assert(page_to_nid(elem) == numa_mem_id());
+	//assert(numa_mem_id() == numa_node_id());
+	//assert(page_to_nid(elem) == numa_mem_id());
 
 	return elem;
 }
@@ -268,7 +268,7 @@ void dma_cache_free(struct device *dev, struct page *elem)
 	int	idx = iova_key(elem->iova);
 	struct  mag_allocator *allocator = &dev->iova_mag->allocator[idx];
 
-	assert(page_to_nid(elem) == (idx >>1));
+	//assert(page_to_nid(elem) == (idx >>1));
 	assert(idx < NUM_ALLOCATORS);
 	mag_free_elem(allocator, elem);
 	//mag_free_elem(allocator, elem, iova_core(elem->iova)); // When maga support available
