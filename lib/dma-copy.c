@@ -142,6 +142,7 @@ static void dma_copy_unmap(struct device *dev, dma_addr_t addr,
 			   DMA_ATTRS attrs)
 {
 	struct shadow_entry *entry = get_shadow_entry(dev, addr);
+	struct page *shadow = virt_to_page(entry->shadow);
 
 	assert(dir == iova_perm(addr));
 
@@ -154,8 +155,9 @@ static void dma_copy_unmap(struct device *dev, dma_addr_t addr,
 
 		//real sync for device
 	//}
+
 	memset(entry, 0, sizeof(*entry));
-	put_page(virt_to_page(entry->shadow));
+	put_page(shadow);
 }
 
 static int dma_copy_map_sg(struct device *dev, struct scatterlist *sgl,
