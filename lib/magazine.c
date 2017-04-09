@@ -157,6 +157,7 @@ static inline void init_mag_pair(struct mag_pair *pair)
 {
 	int i;
 	struct magazine *mag = kzalloc((sizeof(struct magazine) * MAG_COUNT) + L1_CACHE_BYTES -1, __GFP_COMP|__GFP_NOWARN);
+	assert(mag);
 
 	mag = (void *)ALIGN((u64)mag, L1_CACHE_BYTES);
 	for (i = 0; i < MAG_COUNT; i++) {
