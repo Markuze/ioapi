@@ -378,7 +378,8 @@ EXPORT_SYMBOL_GPL(xen_swiotlb_free_coherent);
 dma_addr_t xen_swiotlb_map_page(struct device *dev, struct page *page,
 				unsigned long offset, size_t size,
 				enum dma_data_direction dir,
-				unsigned long attrs)
+				unsigned long attrs,
+				dma_addr_t unused)
 {
 	phys_addr_t map, phys = page_to_phys(page) + offset;
 	dma_addr_t dev_addr = xen_phys_to_bus(phys);
