@@ -5,7 +5,7 @@
 #include <linux/spinlock.h>
 #include <linux/types.h>
 
-#define MAG_DEPTH	8
+#define MAG_DEPTH	4
 #define MAG_COUNT	2
 
 struct magazine {
