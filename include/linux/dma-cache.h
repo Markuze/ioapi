@@ -28,7 +28,7 @@
 #define IOVA_RANGE_SHIFT	(BITS_IN_IOVA - (IOVA_ENCODING_BITS + 1))
 
 #define DMA_CACHE_CORE_MASK	((BIT(CORE_BITS) -1) << CORE_SHIFT)
-#define DMA_CACHE_SHIFT		15	/* 32K */ /*Due to skb lim + compound page size.*/
+#define DMA_CACHE_SHIFT		18	/* 32K */ /*Due to skb lim + compound page size.*/
 #define PAGES_IN_DMA_CACHE_ELEM (BIT(DMA_CACHE_SHIFT - PAGE_SHIFT))
 #define DMA_CACHE_ELEM_SIZE	(BIT(DMA_CACHE_SHIFT))
 #define NUM_ALLOCATORS		(BIT(IOVA_ENCODING_BITS - 1))
