@@ -1,8 +1,10 @@
 #ifndef DMA_CHOPY_H
 #define DMA_CHOPY_H
 
+#include <linux/threads.h>
+
 #define MAX_COMPOUND_SHADOW_PER_NODE	(16 * 1024)
-#define COPY_CORES			16
+#define COPY_CORES			NR_CPUS
 #define COPY_HASHES			(COPY_CORES * 2)
 #define MIN_COPY_ALLOC_SZ		64
 #define MIN_COPY_ALLOC_MASK		(MIN_COPY_ALLOC_SZ -1)

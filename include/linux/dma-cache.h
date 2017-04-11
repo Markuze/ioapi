@@ -15,7 +15,7 @@
 #define BITS_IN_IOVA		48
 
 #define CORES			NR_CPUS
-#define PERMISSIONS		2
+#define PERMISSIONS		4
 #define CORE_BITS		(ilog2(CORES))
 #define PERMISSION_BITS		(ilog2(PERMISSIONS))
 

@@ -111,6 +111,7 @@ static dma_addr_t dma_copy_map_page(struct device *dev, struct page *page,
 
 	//TODO: Check size and use real copy on big buffers.
 	size = __ALIGN_MASK(size, MIN_COPY_ALLOC_MASK);
+	//trace_printk("mapping with %d (%zu)\n", dir, size);
 	shadow = dma_cache_alloc(dev, size, dir);
 	if (!shadow) {
 		panic("failed to dma_cache_alloc %s\n", __FUNCTION__);
@@ -132,7 +133,10 @@ static dma_addr_t dma_copy_map_page(struct device *dev, struct page *page,
 	//else {
 	//	get_page(page);
 	//}
-	assert(dir == iova_perm(addr));
+	if (unlikely(dir != iova_perm(addr))) {
+		pr_err("%d != %d\n", dir, iova_perm(addr));
+		iova_decode(addr);
+	}
 	//trace();
 	return addr;
 }
