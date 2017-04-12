@@ -14,16 +14,16 @@
 
 static inline enum dma_data_direction idx2perm(u64 idx)
 {
-	assert(idx < 2);
-	return idx + 1;
+	assert(idx < 3);
+	return idx;
 }
 
 static inline u64 perm2idx(enum dma_data_direction permission)
 {
-	if (unlikely(!((permission == DMA_FROM_DEVICE) || (permission == DMA_TO_DEVICE))))
-		panic("Permission unaccaptable %d\n", permission);
+	//if (unlikely(!((permission == DMA_FROM_DEVICE) || (permission == DMA_TO_DEVICE))))
+	//	panic("Permission unaccaptable %d\n", permission);
 
-	return (permission -1);
+	return permission;
 }
 
 /* IOVA: 48 bits:
@@ -83,7 +83,7 @@ void iova_format(u64 iova)
 	u64 perm = ((encoding & ~DMA_CACHE_CORE_MASK) >> PERM_SHIFT);
 	trace_printk("iova %llx: key %llx core %llx dir %s idx %llx\n", iova, iova_key(iova),
 		     core , (perm) ? "RX" : "TX", dma_cache_iova_idx(iova));
-	assert(perm < 2);
+	assert(perm < 3);
 }
 
 void iova_decode(u64 iova)
@@ -93,7 +93,7 @@ void iova_decode(u64 iova)
 	u64 perm = ((encoding & ~DMA_CACHE_CORE_MASK) >> PERM_SHIFT);
 	pr_err("iova %llx: key %llx core %llx dir %s idx %llx\n", iova, iova_key(iova),
 		     core , (perm) ? "RX" : "TX", dma_cache_iova_idx(iova));
-	assert(perm < 2);
+	assert(perm < 3);
 }
 
 u64 virt_to_iova(void *virt)
@@ -270,6 +270,9 @@ void dma_cache_free(struct device *dev, struct page *elem)
 
 	//assert(page_to_nid(elem) == (idx >>1));
 	assert(idx < NUM_ALLOCATORS);
+	elem = compound_head(elem);
+	assert(elem->iova != IOVA_INVALID);
+	assert(elem->device ==  dev);
 	mag_free_elem(allocator, elem);
 	//mag_free_elem(allocator, elem, iova_core(elem->iova)); // When maga support available
 }
