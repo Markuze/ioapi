@@ -1979,6 +1979,9 @@ static int nvme_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	dev_info(dev->ctrl.device, "pci function %s\n", dev_name(&pdev->dev));
 
+	if (dma_copy_register_dev(&pdev->dev))
+		dev_err(&pdev->dev, "Failed to Initilize iova_map");
+
 	queue_work(nvme_workq, &dev->reset_work);
 	return 0;
 
