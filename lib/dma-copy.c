@@ -57,7 +57,7 @@ static inline struct shadow_entry *get_shadow_entry(struct device *dev, dma_addr
 		compound_entry = page_to_virt(page);
 	}
 	e_idx = ((iova & (BIT(DMA_CACHE_SHIFT) -1))/ MIN_COPY_ALLOC_SZ);
-	assert(e_idx < 512);
+	assert(e_idx < COMPOUND_SHADOW_ENTRY_CNT);
 
 	//if (verbosity)
 	//	iova_format(iova);
@@ -109,9 +109,9 @@ static dma_addr_t dma_copy_map_page(struct device *dev, struct page *page,
 	u64 addr;
 	void *shadow = NULL;
 
+	assert(get_order(size) <= DMA_CACHE_MAX_ORDER);
 	//TODO: Check size and use real copy on big buffers.
 	size = __ALIGN_MASK(size, MIN_COPY_ALLOC_MASK);
-	//trace_printk("mapping with %d (%zu)\n", dir, size);
 	shadow = dma_cache_alloc(dev, size, dir);
 	if (!shadow) {
 		panic("failed to dma_cache_alloc %s\n", __FUNCTION__);

@@ -270,6 +270,9 @@ void dma_cache_free(struct device *dev, struct page *elem)
 
 	//assert(page_to_nid(elem) == (idx >>1));
 	assert(idx < NUM_ALLOCATORS);
+	elem = compound_head(elem);
+	assert(elem->iova != IOVA_INVALID);
+	assert(elem->device ==  dev);
 	mag_free_elem(allocator, elem);
 	//mag_free_elem(allocator, elem, iova_core(elem->iova)); // When maga support available
 }
