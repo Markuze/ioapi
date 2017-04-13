@@ -10794,6 +10794,9 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	pci_enable_pcie_error_reporting(pdev);
 	pci_set_master(pdev);
 
+	if (register_iova_map(&pdev->dev))
+		dev_err(&pdev->dev, "Failed to Initialize iova_map");
+
 	/* Now that we have a PCI connection, we need to do the
 	 * low level device setup.  This is primarily setting up
 	 * the Admin Queue structures and then querying for the

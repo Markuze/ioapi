@@ -2716,7 +2716,8 @@ static void __unmap_single(struct dma_ops_domain *dma_dom,
 static dma_addr_t map_page(struct device *dev, struct page *page,
 			   unsigned long offset, size_t size,
 			   enum dma_data_direction dir,
-			   struct dma_attrs *attrs)
+			   struct dma_attrs *attrs,
+			   dma_addr_t unused)
 {
 	phys_addr_t paddr = page_to_phys(page) + offset;
 	struct protection_domain *domain;

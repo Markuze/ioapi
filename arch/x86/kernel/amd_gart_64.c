@@ -242,7 +242,7 @@ static dma_addr_t dma_map_area(struct device *dev, dma_addr_t phys_mem,
 static dma_addr_t gart_map_page(struct device *dev, struct page *page,
 				unsigned long offset, size_t size,
 				enum dma_data_direction dir,
-				struct dma_attrs *attrs)
+				struct dma_attrs *attrs, dma_addr_t unused)
 {
 	unsigned long bus;
 	phys_addr_t paddr = page_to_phys(page) + offset;

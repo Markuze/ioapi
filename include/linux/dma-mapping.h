@@ -34,7 +34,8 @@ struct dma_map_ops {
 	dma_addr_t (*map_page)(struct device *dev, struct page *page,
 			       unsigned long offset, size_t size,
 			       enum dma_data_direction dir,
-			       struct dma_attrs *attrs);
+			       struct dma_attrs *attrs,
+			       dma_addr_t iova);
 	void (*unmap_page)(struct device *dev, dma_addr_t dma_handle,
 			   size_t size, enum dma_data_direction dir,
 			   struct dma_attrs *attrs);
@@ -55,6 +56,15 @@ struct dma_map_ops {
 	void (*sync_single_for_device)(struct device *dev,
 				       dma_addr_t dma_handle, size_t size,
 				       enum dma_data_direction dir);
+	void (*sync_single_range_for_cpu)(struct device *dev,
+					  dma_addr_t dma_handle, unsigned long offset,
+					  size_t size,
+					  enum dma_data_direction dir);
+	void (*sync_single_range_for_device)(struct device *dev,
+					     dma_addr_t dma_handle,
+					     unsigned long offset,
+					     size_t size,
+					     enum dma_data_direction dir);
 	void (*sync_sg_for_cpu)(struct device *dev,
 				struct scatterlist *sg, int nents,
 				enum dma_data_direction dir);
@@ -120,6 +130,8 @@ static inline struct dma_map_ops *get_dma_ops(struct device *dev)
 }
 #endif
 
+#define IOVA_INVALID ((unsigned long)(-1))
+
 static inline dma_addr_t dma_map_single_attrs(struct device *dev, void *ptr,
 					      size_t size,
 					      enum dma_data_direction dir,
@@ -130,9 +142,20 @@ static inline dma_addr_t dma_map_single_attrs(struct device *dev, void *ptr,
 
 	kmemcheck_mark_initialized(ptr, size);
 	BUG_ON(!valid_dma_direction(dir));
+
+	if (dev->iova_mag) {
+		struct page *page = virt_to_head_page(ptr);
+
+		if (page->iova) {
+			//size_t offset = ptr - page_address(page);
+			//return (page->iova & PAGE_MASK) + offset; //<-- not a bug :)
+			return virt_to_iova(ptr);
+		}
+	}
+
 	addr = ops->map_page(dev, virt_to_page(ptr),
 			     offset_in_page(ptr), size,
-			     dir, attrs);
+			     dir, attrs, IOVA_INVALID);
 	debug_dma_map_page(dev, virt_to_page(ptr),
 			   offset_in_page(ptr), size,
 			   dir, addr, true);
@@ -147,6 +170,11 @@ static inline void dma_unmap_single_attrs(struct device *dev, dma_addr_t addr,
 	struct dma_map_ops *ops = get_dma_ops(dev);
 
 	BUG_ON(!valid_dma_direction(dir));
+
+	if (dev->iova_mag) {
+		return;
+	}
+
 	if (ops->unmap_page)
 		ops->unmap_page(dev, addr, size, dir, attrs);
 	debug_dma_unmap_page(dev, addr, size, dir, true);
@@ -195,7 +223,17 @@ static inline dma_addr_t dma_map_page(struct device *dev, struct page *page,
 
 	kmemcheck_mark_initialized(page_address(page) + offset, size);
 	BUG_ON(!valid_dma_direction(dir));
-	addr = ops->map_page(dev, page, offset, size, dir, NULL);
+
+	if (dev->iova_mag) {
+		struct page *head = compound_head(page);
+		if (head->iova) {
+			//return (head->iova & PAGE_MASK) + offset;
+			void *ptr = page_address(page) + offset;
+			return virt_to_iova(ptr);
+		}
+	}
+
+	addr = ops->map_page(dev, page, offset, size, dir, NULL, IOVA_INVALID);
 	debug_dma_map_page(dev, page, offset, size, dir, addr, false);
 
 	return addr;
@@ -207,6 +245,11 @@ static inline void dma_unmap_page(struct device *dev, dma_addr_t addr,
 	struct dma_map_ops *ops = get_dma_ops(dev);
 
 	BUG_ON(!valid_dma_direction(dir));
+
+	if (dev->iova_mag) {
+		return;
+	}
+
 	if (ops->unmap_page)
 		ops->unmap_page(dev, addr, size, dir, NULL);
 	debug_dma_unmap_page(dev, addr, size, dir, false);
@@ -245,7 +288,9 @@ static inline void dma_sync_single_range_for_cpu(struct device *dev,
 	const struct dma_map_ops *ops = get_dma_ops(dev);
 
 	BUG_ON(!valid_dma_direction(dir));
-	if (ops->sync_single_for_cpu)
+	if (ops->sync_single_range_for_cpu)
+		ops->sync_single_range_for_cpu(dev, addr, offset, size, dir);
+	else if (ops->sync_single_for_cpu)
 		ops->sync_single_for_cpu(dev, addr + offset, size, dir);
 	debug_dma_sync_single_range_for_cpu(dev, addr, offset, size, dir);
 }
@@ -259,7 +304,9 @@ static inline void dma_sync_single_range_for_device(struct device *dev,
 	const struct dma_map_ops *ops = get_dma_ops(dev);
 
 	BUG_ON(!valid_dma_direction(dir));
-	if (ops->sync_single_for_device)
+	if (ops->sync_single_range_for_device)
+		ops->sync_single_range_for_device(dev, addr, offset, size, dir);
+	else if (ops->sync_single_for_device)
 		ops->sync_single_for_device(dev, addr + offset, size, dir);
 	debug_dma_sync_single_range_for_device(dev, addr, offset, size, dir);
 }
@@ -363,13 +410,17 @@ static inline void *dma_alloc_attrs(struct device *dev, size_t size,
 
 	BUG_ON(!ops);
 
-	if (dma_alloc_from_coherent(dev, size, dma_handle, &cpu_addr))
+	if (dma_alloc_from_coherent(dev, size, dma_handle, &cpu_addr)) {
 		return cpu_addr;
+	}
 
-	if (!arch_dma_alloc_attrs(&dev, &flag))
+	if (!arch_dma_alloc_attrs(&dev, &flag)) {
 		return NULL;
-	if (!ops->alloc)
+	}
+
+	if (!ops->alloc) {
 		return NULL;
+	}
 
 	cpu_addr = ops->alloc(dev, size, dma_handle, flag, attrs);
 	debug_dma_alloc_coherent(dev, size, *dma_handle, cpu_addr);

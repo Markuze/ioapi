@@ -919,6 +919,8 @@ static void free_pages_check_bad(struct page *page)
 		bad_reason = "PAGE_FLAGS_CHECK_AT_FREE flag(s) set";
 		bad_flags = PAGE_FLAGS_CHECK_AT_FREE;
 	}
+	if (unlikely(is_dma_cache_page(page)))
+		bad_reason = "Freeing DMA Pages";
 #ifdef CONFIG_MEMCG
 	if (unlikely(page->mem_cgroup))
 		bad_reason = "page still charged to cgroup";
@@ -975,6 +977,12 @@ static int free_tail_pages_check(struct page *head_page, struct page *page)
 		bad_page(page, "PageTail not set", 0);
 		goto out;
 	}
+
+	if (unlikely(is_dma_cache_page(page))) {
+		bad_page(page, "Freeing DMA Pages", 0);
+		goto out;
+	}
+
 	if (unlikely(compound_head(page) != head_page)) {
 		bad_page(page, "compound_head not consistent", 0);
 		goto out;
@@ -1664,6 +1672,8 @@ static void check_new_page_bad(struct page *page)
 		bad_reason = "PAGE_FLAGS_CHECK_AT_PREP flag set";
 		bad_flags = PAGE_FLAGS_CHECK_AT_PREP;
 	}
+	if (unlikely(is_dma_cache_page(page)))
+		bad_reason = "Freeing DMA Pages";
 #ifdef CONFIG_MEMCG
 	if (unlikely(page->mem_cgroup))
 		bad_reason = "page still charged to cgroup";
@@ -3906,7 +3916,9 @@ EXPORT_SYMBOL(get_zeroed_page);
 void __free_pages(struct page *page, unsigned int order)
 {
 	if (put_page_testzero(page)) {
-		if (order == 0)
+		if (is_dma_cache_page(page))
+			dma_cache_free(page->device, page);
+		else if (order == 0)
 			free_hot_cold_page(page, false);
 		else
 			__free_pages_ok(page, order);
@@ -4018,8 +4030,12 @@ void __free_page_frag(void *addr)
 {
 	struct page *page = virt_to_head_page(addr);
 
-	if (unlikely(put_page_testzero(page)))
-		__free_pages_ok(page, compound_order(page));
+	if (unlikely(put_page_testzero(page))) {
+		if (is_dma_cache_page(page))
+			dma_cache_free(page->device, page);
+		else
+			__free_pages_ok(page, compound_order(page));
+	}
 }
 EXPORT_SYMBOL(__free_page_frag);
 
