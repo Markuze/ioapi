@@ -279,11 +279,7 @@ static inline dma_addr_t dma_map_page(struct device *dev, struct page *page,
 		}
 	}
 
-<<<<<<< 863670d6d0a9e464303664b1057537af9ef035f7
-	addr = ops->map_page(dev, page, offset, size, dir, 0);
-=======
-	addr = ops->map_page(dev, page, offset, size, dir, NULL, IOVA_INVALID);
->>>>>>> iova patch
+	addr = ops->map_page(dev, page, offset, size, dir, 0, IOVA_INVALID);
 	debug_dma_map_page(dev, page, offset, size, dir, addr, false);
 
 	return addr;
