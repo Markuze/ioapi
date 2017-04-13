@@ -126,16 +126,24 @@ static inline dma_addr_t dma_map_single_attrs(struct device *dev, void *ptr,
 					      struct dma_attrs *attrs)
 {
 	struct dma_map_ops *ops = get_dma_ops(dev);
+	struct page *page = virt_to_page(ptr);
+	int idx = dir -1;
 	dma_addr_t addr;
 
 	kmemcheck_mark_initialized(ptr, size);
 	BUG_ON(!valid_dma_direction(dir));
+
+	if (likely(dir && page->iova[idx] && (size + offset_in_page(ptr)) < PAGE_SIZE))
+		return page->iova[idx] + offset_in_page(ptr);
+
 	addr = ops->map_page(dev, virt_to_page(ptr),
 			     offset_in_page(ptr), size,
 			     dir, attrs);
 	debug_dma_map_page(dev, virt_to_page(ptr),
 			   offset_in_page(ptr), size,
 			   dir, addr, true);
+	if (likely(dir))
+		page->iova[idx] = addr - offset_in_page(ptr);
 	return addr;
 }
 
@@ -145,6 +153,9 @@ static inline void dma_unmap_single_attrs(struct device *dev, dma_addr_t addr,
 					  struct dma_attrs *attrs)
 {
 	struct dma_map_ops *ops = get_dma_ops(dev);
+
+	if (likely(dir && (size) < PAGE_SIZE))
+		return;
 
 	BUG_ON(!valid_dma_direction(dir));
 	if (ops->unmap_page)
@@ -192,12 +203,18 @@ static inline dma_addr_t dma_map_page(struct device *dev, struct page *page,
 {
 	struct dma_map_ops *ops = get_dma_ops(dev);
 	dma_addr_t addr;
+	int idx = dir -1;
 
 	kmemcheck_mark_initialized(page_address(page) + offset, size);
 	BUG_ON(!valid_dma_direction(dir));
+
+	if (likely(dir && page->iova[idx] && (size + offset) < PAGE_SIZE))
+		return page->iova[idx] + offset;
 	addr = ops->map_page(dev, page, offset, size, dir, NULL);
 	debug_dma_map_page(dev, page, offset, size, dir, addr, false);
 
+	if (likely(dir))
+		page->iova[idx] = addr - offset;
 	return addr;
 }
 
@@ -205,6 +222,9 @@ static inline void dma_unmap_page(struct device *dev, dma_addr_t addr,
 				  size_t size, enum dma_data_direction dir)
 {
 	struct dma_map_ops *ops = get_dma_ops(dev);
+
+	if (likely(dir && (size) < PAGE_SIZE))
+		return;
 
 	BUG_ON(!valid_dma_direction(dir));
 	if (ops->unmap_page)

@@ -210,11 +210,12 @@ struct page {
 #endif /* WANT_PAGE_VIRTUAL */
 
 	/* For Cached DMA pages */
-	u64 iova;
-	union {
-		struct device	*device;
-		struct page	*cache_next;
-	};
+	u64 iova[2];
+//union {
+//	struct device	*device;
+//	struct page	*cache_next;
+//	u64 iova_rx;
+//};
 
 #ifdef CONFIG_KMEMCHECK
 	/*
