@@ -63,4 +63,5 @@ struct page *dma_cache_alloc_pages(struct device *dev, int order, enum dma_data_
 void dma_cache_free(struct device *dev, struct page *);
 
 int	register_iova_map(struct device *);
+void	unregister_iova_map(struct device *dev);
 #endif /*_DMA_BOUNCE_*/

@@ -290,3 +290,15 @@ int	register_iova_map(struct device *dev)
 	return 0;
 }
 EXPORT_SYMBOL(register_iova_map);
+
+void	unregister_iova_map(struct device *dev)
+{
+	dev->iova_mag = NULL;
+
+//page_address(page);
+//
+//for (i = 0; i < NUM_ALLOCATORS; i++) {
+//	mag_allocator_init(&dev->iova_mag->allocator[i]);
+//}
+}
+EXPORT_SYMBOL(unregister_iova_map);
