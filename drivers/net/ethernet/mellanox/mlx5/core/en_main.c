@@ -2858,11 +2858,6 @@ static void mlx5e_build_netdev_priv(struct mlx5_core_dev *mdev,
 		MLX5_WQ_TYPE_LINKED_LIST_STRIDING_RQ :
 		MLX5_WQ_TYPE_LINKED_LIST;
 
-	mlx5_core_err(mdev, "WQ type %s\n", mlx5e_check_fragmented_striding_rq_cap(mdev) ?
-		"MLX5_WQ_TYPE_LINKED_LIST_STRIDING_RQ" :
-		"MLX5_WQ_TYPE_LINKED_LIST"
-		);
-
 	/* set CQE compression */
 	priv->params.rx_cqe_compress_admin = false;
 	if (MLX5_CAP_GEN(mdev, cqe_compression) &&

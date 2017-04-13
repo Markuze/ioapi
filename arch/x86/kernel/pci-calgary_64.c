@@ -407,8 +407,7 @@ error:
 static dma_addr_t calgary_map_page(struct device *dev, struct page *page,
 				   unsigned long offset, size_t size,
 				   enum dma_data_direction dir,
-				   struct dma_attrs *attrs,
-				   dma_addr_t unused)
+				   struct dma_attrs *attrs)
 {
 	void *vaddr = page_address(page) + offset;
 	unsigned long uaddr;
@@ -820,7 +819,7 @@ static void __init calgary_free_bus(struct pci_dev *dev)
 	tbl->it_map = NULL;
 
 	kfree(tbl);
-
+	
 	set_pci_iommu(dev->bus, NULL);
 
 	/* Can't free bootmem allocated memory after system is up :-( */

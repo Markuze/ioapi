@@ -29,10 +29,6 @@ copy_user_generic(void *to, const void *from, unsigned len)
 {
 	unsigned ret;
 
-//if (page_to_nid(virt_to_head_page(from)) != page_to_nid(virt_to_head_page(to)) {
-//
-//}
-
 	/*
 	 * If CPU has ERMS feature, use copy_user_enhanced_fast_string.
 	 * Otherwise, if CPU has rep_good feature, use copy_user_generic_string.

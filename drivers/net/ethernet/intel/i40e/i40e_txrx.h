@@ -333,12 +333,6 @@ struct i40e_ring {
 
 	struct rcu_head rcu;		/* to avoid race on free */
 	u16 next_to_alloc;
-
-	struct {
-		u64	tx[2];
-		u64	tx_frag[2];
-		u64	rx[2];
-	} numa_stats;
 } ____cacheline_internodealigned_in_smp;
 
 enum i40e_latency_range {

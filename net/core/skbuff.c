@@ -77,8 +77,6 @@
 #include <linux/capability.h>
 #include <linux/user_namespace.h>
 
-#include <linux/dma-cache.h>
-
 struct kmem_cache *skbuff_head_cache __read_mostly;
 static struct kmem_cache *skbuff_fclone_cache __read_mostly;
 int sysctl_max_skb_frags __read_mostly = MAX_SKB_FRAGS;
@@ -201,26 +199,20 @@ out:
  *	Buffers may only be allocated from interrupts using a @gfp_mask of
  *	%GFP_ATOMIC.
  */
-struct sk_buff *__alloc_skb(struct device *device,
-			    unsigned int size, gfp_t gfp_mask,
+struct sk_buff *__alloc_skb(unsigned int size, gfp_t gfp_mask,
 			    int flags, int node)
 {
 	struct kmem_cache *cache;
 	struct skb_shared_info *shinfo;
 	struct sk_buff *skb;
-	enum dma_data_direction dir = DMA_TO_DEVICE;
 	u8 *data;
-	u8 head_frag = 0;
 	bool pfmemalloc;
 
 	cache = (flags & SKB_ALLOC_FCLONE)
 		? skbuff_fclone_cache : skbuff_head_cache;
 
-	if (flags & SKB_ALLOC_RX) {
-		dir = DMA_FROM_DEVICE;
-		if (sk_memalloc_socks())
-			gfp_mask |= __GFP_MEMALLOC;
-	}
+	if (sk_memalloc_socks() && (flags & SKB_ALLOC_RX))
+		gfp_mask |= __GFP_MEMALLOC;
 
 	/* Get the HEAD */
 	skb = kmem_cache_alloc_node(cache, gfp_mask & ~__GFP_DMA, node);
@@ -235,24 +227,14 @@ struct sk_buff *__alloc_skb(struct device *device,
 	 */
 	size = SKB_DATA_ALIGN(size);
 	size += SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-
-	if (device && device->iova_mag) {
-		data = dma_cache_alloc(device, size, dir);
-		if (!data)
-			goto nodata;
-		head_frag = 1;
-		size = SKB_WITH_OVERHEAD(size);
-	} else {
-		data = kmalloc_reserve(size, gfp_mask, node, &pfmemalloc);
-		if (!data)
-			goto nodata;
-		/* kmalloc(size) might give us more room than requested.
-		 * Put skb_shared_info exactly at the end of allocated zone,
-		 * to allow max possible filling before reallocation.
-		 */
-		size = SKB_WITH_OVERHEAD(ksize(data));
-	}
-
+	data = kmalloc_reserve(size, gfp_mask, node, &pfmemalloc);
+	if (!data)
+		goto nodata;
+	/* kmalloc(size) might give us more room than requested.
+	 * Put skb_shared_info exactly at the end of allocated zone,
+	 * to allow max possible filling before reallocation.
+	 */
+	size = SKB_WITH_OVERHEAD(ksize(data));
 	prefetchw(data + size);
 
 	/*
@@ -262,7 +244,6 @@ struct sk_buff *__alloc_skb(struct device *device,
 	 */
 	memset(skb, 0, offsetof(struct sk_buff, tail));
 	/* Account for allocated memory : skb + skb->head */
-	skb->head_frag = head_frag;
 	skb->truesize = SKB_TRUESIZE(size);
 	skb->pfmemalloc = pfmemalloc;
 	atomic_set(&skb->users, 1);
@@ -436,17 +417,15 @@ struct sk_buff *__netdev_alloc_skb(struct net_device *dev, unsigned int len,
 {
 	struct page_frag_cache *nc;
 	unsigned long flags;
-	struct sk_buff *skb = NULL;
+	struct sk_buff *skb;
 	bool pfmemalloc;
 	void *data;
-	struct device *device = dev->dev.parent;
 
 	len += NET_SKB_PAD;
 
 	if ((len > SKB_WITH_OVERHEAD(PAGE_SIZE)) ||
 	    (gfp_mask & (__GFP_DIRECT_RECLAIM | GFP_DMA))) {
-		skb = __alloc_skb(device, len, gfp_mask, SKB_ALLOC_RX,
-				  NUMA_NO_NODE);
+		skb = __alloc_skb(len, gfp_mask, SKB_ALLOC_RX, NUMA_NO_NODE);
 		if (!skb)
 			goto skb_fail;
 		goto skb_success;
@@ -461,16 +440,7 @@ struct sk_buff *__netdev_alloc_skb(struct net_device *dev, unsigned int len,
 	local_irq_save(flags);
 
 	nc = this_cpu_ptr(&netdev_alloc_cache);
-
-/*	Due to skb_shared_info being mapped by the device
-*	we should consider avoiding cached DMA!!
-*/
-//if (device && device->iova_mag) {
-//	data = dma_cache_alloc(device, len, DMA_FROM_DEVICE);
-//} else {
-		data = __alloc_page_frag(nc, len, gfp_mask);
-//	}
-
+	data = __alloc_page_frag(nc, len, gfp_mask);
 	pfmemalloc = nc->pfmemalloc;
 
 	local_irq_restore(flags);
@@ -516,16 +486,13 @@ struct sk_buff *__napi_alloc_skb(struct napi_struct *napi, unsigned int len,
 {
 	struct napi_alloc_cache *nc = this_cpu_ptr(&napi_alloc_cache);
 	struct sk_buff *skb;
-	struct net_device *netdev = napi->dev;
-	struct device *dev = (netdev) ? netdev->dev.parent : NULL;
 	void *data;
 
 	len += NET_SKB_PAD + NET_IP_ALIGN;
 
 	if ((len > SKB_WITH_OVERHEAD(PAGE_SIZE)) ||
 	    (gfp_mask & (__GFP_DIRECT_RECLAIM | GFP_DMA))) {
-		skb = __alloc_skb(dev, len, gfp_mask, SKB_ALLOC_RX,
-				  NUMA_NO_NODE);
+		skb = __alloc_skb(len, gfp_mask, SKB_ALLOC_RX, NUMA_NO_NODE);
 		if (!skb)
 			goto skb_fail;
 		goto skb_success;
@@ -537,12 +504,7 @@ struct sk_buff *__napi_alloc_skb(struct napi_struct *napi, unsigned int len,
 	if (sk_memalloc_socks())
 		gfp_mask |= __GFP_MEMALLOC;
 
-	if (dev && dev->iova_mag) {
-		data = dma_cache_alloc(dev, len, DMA_TO_DEVICE);
-	} else {
-		data = __alloc_page_frag(&nc->page, len, gfp_mask);
-	}
-
+	data = __alloc_page_frag(&nc->page, len, gfp_mask);
 	if (unlikely(!data))
 		return NULL;
 
@@ -1130,9 +1092,7 @@ struct sk_buff *skb_copy(const struct sk_buff *skb, gfp_t gfp_mask)
 {
 	int headerlen = skb_headroom(skb);
 	unsigned int size = skb_end_offset(skb) + skb->data_len;
-	struct net_device *netdev = skb->dev;
-	struct device *dev = (netdev) ? netdev->dev.parent : NULL;
-	struct sk_buff *n = __alloc_skb(dev, size, gfp_mask,
+	struct sk_buff *n = __alloc_skb(size, gfp_mask,
 					skb_alloc_rx_flag(skb), NUMA_NO_NODE);
 
 	if (!n)
@@ -1173,10 +1133,7 @@ struct sk_buff *__pskb_copy_fclone(struct sk_buff *skb, int headroom,
 {
 	unsigned int size = skb_headlen(skb) + headroom;
 	int flags = skb_alloc_rx_flag(skb) | (fclone ? SKB_ALLOC_FCLONE : 0);
-	struct net_device *netdev = skb->dev;
-	struct device *dev = (netdev) ? netdev->dev.parent : NULL;
-	struct sk_buff *n = __alloc_skb(dev, size, gfp_mask, flags,
-					NUMA_NO_NODE);
+	struct sk_buff *n = __alloc_skb(size, gfp_mask, flags, NUMA_NO_NODE);
 
 	if (!n)
 		goto out;
@@ -1357,11 +1314,7 @@ struct sk_buff *skb_copy_expand(const struct sk_buff *skb,
 	/*
 	 *	Allocate the copy buffer
 	 */
-
-	struct net_device *netdev = skb->dev;
-	struct device *dev = (netdev) ? netdev->dev.parent : NULL;
-	struct sk_buff *n = __alloc_skb(dev,
-					newheadroom + skb->len + newtailroom,
+	struct sk_buff *n = __alloc_skb(newheadroom + skb->len + newtailroom,
 					gfp_mask, skb_alloc_rx_flag(skb),
 					NUMA_NO_NODE);
 	int oldheadroom = skb_headroom(skb);
@@ -3198,12 +3151,8 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
 			skb_release_head_state(nskb);
 			__skb_push(nskb, doffset);
 		} else {
-			struct net_device *netdev = head_skb->dev;
-			struct device *dev = (netdev) ? netdev->dev.parent : NULL;
-
-			nskb = __alloc_skb(dev, hsize + doffset + headroom,
-					   GFP_ATOMIC,
-					   skb_alloc_rx_flag(head_skb),
+			nskb = __alloc_skb(hsize + doffset + headroom,
+					   GFP_ATOMIC, skb_alloc_rx_flag(head_skb),
 					   NUMA_NO_NODE);
 
 			if (unlikely(!nskb))
@@ -4592,8 +4541,7 @@ EXPORT_SYMBOL(skb_vlan_push);
  *
  * This can be used to allocate a paged skb, given a maximal order for frags.
  */
-struct sk_buff *alloc_skb_with_frags(struct sock *sk, struct device *dev,
-				     unsigned long header_len,
+struct sk_buff *alloc_skb_with_frags(unsigned long header_len,
 				     unsigned long data_len,
 				     int max_page_order,
 				     int *errcode,
@@ -4618,8 +4566,7 @@ struct sk_buff *alloc_skb_with_frags(struct sock *sk, struct device *dev,
 		gfp_head |= __GFP_REPEAT;
 
 	*errcode = -ENOBUFS;
-
-	skb = __alloc_skb(dev, header_len, gfp_head, 0, NUMA_NO_NODE);
+	skb = alloc_skb(header_len, gfp_head);
 	if (!skb)
 		return NULL;
 
@@ -4630,14 +4577,11 @@ struct sk_buff *alloc_skb_with_frags(struct sock *sk, struct device *dev,
 
 		while (order) {
 			if (npages >= 1 << order) {
-				if (dev && dev->iova_mag)
-					page = dma_cache_alloc_pages(dev, order, DMA_TO_DEVICE);
-				else
-					page = alloc_pages((gfp_mask & ~__GFP_DIRECT_RECLAIM) |
-							   __GFP_COMP |
-							   __GFP_NOWARN |
-							   __GFP_NORETRY,
-							   order);
+				page = alloc_pages((gfp_mask & ~__GFP_DIRECT_RECLAIM) |
+						   __GFP_COMP |
+						   __GFP_NOWARN |
+						   __GFP_NORETRY,
+						   order);
 				if (page)
 					goto fill_page;
 				/* Do not retry other high order allocations */

@@ -627,7 +627,7 @@ static int add_recvbuf_mergeable(struct receive_queue *rq, gfp_t gfp)
 	unsigned int len, hole;
 
 	len = get_mergeable_buf_len(&rq->mrg_avg_pkt_len);
-	if (unlikely(!skb_page_frag_refill(NULL, len, alloc_frag, gfp)))
+	if (unlikely(!skb_page_frag_refill(len, alloc_frag, gfp)))
 		return -ENOMEM;
 
 	buf = (char *)page_address(alloc_frag->page) + alloc_frag->offset;

@@ -28,8 +28,7 @@ check_addr(char *name, struct device *hwdev, dma_addr_t bus, size_t size)
 static dma_addr_t nommu_map_page(struct device *dev, struct page *page,
 				 unsigned long offset, size_t size,
 				 enum dma_data_direction dir,
-				 struct dma_attrs *attrs,
-				 dma_addr_t unused)
+				 struct dma_attrs *attrs)
 {
 	dma_addr_t bus = page_to_phys(page) + offset;
 	WARN_ON(size == 0);

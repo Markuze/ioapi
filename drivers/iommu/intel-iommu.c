@@ -2174,7 +2174,6 @@ static inline int hardware_largepage_caps(struct dmar_domain *domain,
 	return level;
 }
 
-/* WTF is going on here (no sg)*/
 static int __domain_mapping(struct dmar_domain *domain, unsigned long iov_pfn,
 			    struct scatterlist *sg, unsigned long phys_pfn,
 			    unsigned long nr_pages, int prot)
@@ -3483,10 +3482,8 @@ static int iommu_no_mapping(struct device *dev)
 	return 0;
 }
 
-/* TODO: Register range...*/
 static dma_addr_t __intel_map_single(struct device *dev, phys_addr_t paddr,
-				     size_t size, int dir, u64 dma_mask,
-				     dma_addr_t iova_in)
+				     size_t size, int dir, u64 dma_mask)
 {
 	struct dmar_domain *domain;
 	phys_addr_t start_paddr;
@@ -3508,13 +3505,9 @@ static dma_addr_t __intel_map_single(struct device *dev, phys_addr_t paddr,
 	iommu = domain_get_iommu(domain);
 	size = aligned_nrpages(paddr, size);
 
-	if (iova_in == IOVA_INVALID) {
-		iova_pfn = intel_alloc_iova(dev, domain, dma_to_mm_pfn(size), dma_mask);
-		if (!iova_pfn)
-			goto error;
-	} else {
-		iova_pfn = iova_in >> PAGE_SHIFT;
-	}
+	iova_pfn = intel_alloc_iova(dev, domain, dma_to_mm_pfn(size), dma_mask);
+	if (!iova_pfn)
+		goto error;
 
 	/*
 	 * Check if DMAR supports zero-length reads on write only
@@ -3525,7 +3518,6 @@ static dma_addr_t __intel_map_single(struct device *dev, phys_addr_t paddr,
 		prot |= DMA_PTE_READ;
 	if (dir == DMA_FROM_DEVICE || dir == DMA_BIDIRECTIONAL)
 		prot |= DMA_PTE_WRITE;
-
 	/*
 	 * paddr - (paddr + size) might be partial page, we should map the whole
 	 * page.  Note: if two part of one page are separately mapped, we
@@ -3547,11 +3539,10 @@ static dma_addr_t __intel_map_single(struct device *dev, phys_addr_t paddr,
 
 	start_paddr = (phys_addr_t)iova_pfn << PAGE_SHIFT;
 	start_paddr += paddr & ~PAGE_MASK;
-
 	return start_paddr;
 
 error:
-	if (iova_pfn && iova_in == IOVA_INVALID)
+	if (iova_pfn)
 		free_iova_fast(&domain->iovad, iova_pfn, dma_to_mm_pfn(size));
 	pr_err("Device %s request: %zx@%llx dir %d --- failed\n",
 		dev_name(dev), size, (unsigned long long)paddr, dir);
@@ -3561,10 +3552,10 @@ error:
 static dma_addr_t intel_map_page(struct device *dev, struct page *page,
 				 unsigned long offset, size_t size,
 				 enum dma_data_direction dir,
-				 struct dma_attrs *attrs, dma_addr_t iova)
+				 struct dma_attrs *attrs)
 {
 	return __intel_map_single(dev, page_to_phys(page) + offset, size,
-				  dir, *dev->dma_mask, iova);
+				  dir, *dev->dma_mask);
 }
 
 static void flush_unmaps(struct deferred_flush_data *flush_data)
@@ -3763,7 +3754,7 @@ static void *intel_alloc_coherent(struct device *dev, size_t size,
 
 	*dma_handle = __intel_map_single(dev, page_to_phys(page), size,
 					 DMA_BIDIRECTIONAL,
-					 dev->coherent_dma_mask, IOVA_INVALID);
+					 dev->coherent_dma_mask);
 	if (*dma_handle)
 		return page_address(page);
 	if (!dma_release_from_contiguous(dev, page, size >> PAGE_SHIFT))
@@ -4046,7 +4037,7 @@ static int init_iommu_hw(void)
 				iommu_disable_protect_mem_regions(iommu);
 			continue;
 		}
-
+	
 		iommu_flush_write_buffer(iommu);
 
 		iommu_set_root_entry(iommu);
