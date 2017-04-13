@@ -209,6 +209,13 @@ struct page {
 					   not kmapped, ie. highmem) */
 #endif /* WANT_PAGE_VIRTUAL */
 
+	/* For Cached DMA pages */
+	u64 iova;
+	union {
+		struct device	*device;
+		struct page	*cache_next;
+	};
+
 #ifdef CONFIG_KMEMCHECK
 	/*
 	 * kmemcheck wants to track the status of each byte in a page; this
