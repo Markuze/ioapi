@@ -851,7 +851,9 @@ struct device {
 	void	(*release)(struct device *dev);
 	struct iommu_group	*iommu_group;
 
+
 	struct dev_iova_mag	*iova_mag;
+	enum  mag_status	iova_mag_status;
 	bool			offline_disabled:1;
 	bool			offline:1;
 };

@@ -4,7 +4,6 @@
 #include <asm/page.h>
 #include <linux/kernel.h>
 #include <linux/spinlock.h>
-#include <linux/device.h>
 #include <linux/types.h>
 #include <linux/dma-direction.h>
 #include <linux/gfp.h>
@@ -33,6 +32,14 @@
 #define DMA_CACHE_ELEM_SIZE	(BIT(DMA_CACHE_SHIFT))
 #define NUM_ALLOCATORS		(BIT(IOVA_ENCODING_BITS - 1))
 #define DMA_CACHE_MAX_ORDER	get_order(DMA_CACHE_ELEM_SIZE)
+
+enum mag_status {
+	DMA_CACHE_STATUS_ACTIVE = 0xbabe,
+	DMA_CACHE_STATUS_INITALIZED = 0xd1e7,
+	DMA_CACHE_STATUS_UNINIT = 0xdead,
+};
+
+#include <linux/device.h>
 
 enum dma_cache_frag_type {
 	DMA_CACHE_FRAG_PARTIAL_R,

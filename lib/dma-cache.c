@@ -279,7 +279,14 @@ EXPORT_SYMBOL(dma_cache_free);
 int	register_iova_map(struct device *dev)
 {
 	uint64_t i;
-	struct page *page = alloc_pages(__GFP_COMP | __GFP_ZERO,
+	struct page *page;
+
+	if (dev->iova_mag_status == DMA_CACHE_STATUS_INITALIZED) {
+		dev->iova_mag_status = DMA_CACHE_STATUS_ACTIVE;
+		return 0;
+	}
+
+	page = alloc_pages(__GFP_COMP | __GFP_ZERO,
                                         get_order(sizeof(struct dev_iova_mag)));
 
 	dev->iova_mag = page_address(page);
@@ -287,14 +294,15 @@ int	register_iova_map(struct device *dev)
 	for (i = 0; i < NUM_ALLOCATORS; i++) {
 		mag_allocator_init(&dev->iova_mag->allocator[i]);
 	}
+	dev->iova_mag_status = DMA_CACHE_STATUS_ACTIVE;
 	return 0;
 }
 EXPORT_SYMBOL(register_iova_map);
 
+//dma_map_page
 void	unregister_iova_map(struct device *dev)
 {
-	dev->iova_mag = NULL;
-
+	dev->iova_mag_status = DMA_CACHE_STATUS_INITALIZED;
 //page_address(page);
 //
 //for (i = 0; i < NUM_ALLOCATORS; i++) {

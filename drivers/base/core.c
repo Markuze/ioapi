@@ -701,6 +701,7 @@ void device_initialize(struct device *dev)
 {
 	dev->kobj.kset = devices_kset;
 	dev->iova_mag = NULL;
+	dev->iova_mag_status = DMA_CACHE_STATUS_UNINIT;
 	kobject_init(&dev->kobj, &device_ktype);
 	INIT_LIST_HEAD(&dev->dma_pools);
 	mutex_init(&dev->mutex);
