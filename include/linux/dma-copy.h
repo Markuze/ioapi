@@ -9,7 +9,7 @@
 #define COPY_HASHES			(COPY_CORES * 2)
 //#define MIN_COPY_ALLOC_SZ		64
 #define MIN_COPY_ALLOC_SZ		PAGE_SIZE  /* shouldn't we use vtd page size? */
-#define MIN_COPY_ALLOC_MASK		(MIN_COPY_ALLOC_SZ -1)
+#define MIN_COPY_ALLOC_MASK		(MIN_COPY_ALLOC_SZ - 1)
 
 #define DMA_CACHE_SHIFT_COPY		18	/* 32K */ /*Due to skb lim + compound page size.*/
 #define DMA_CACHE_ELEM_SIZE_COPY	(BIT(DMA_CACHE_SHIFT_COPY))
