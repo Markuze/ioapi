@@ -17,6 +17,7 @@
 #endif
 
 #define	trace()		if (verbosity && dir == DMA_TO_DEVICE) {trace_printk("%s:%d) addr %llx\n", __FUNCTION__, __LINE__, addr);}
+#define	trace2()		if (verbosity) {trace_printk(" (%s:%d) \n", __FUNCTION__, __LINE__);}
 #define	trace_debug(...)	if (verbosity) trace_printk(__VA_ARGS__)
 
 #ifndef page_to_virt
@@ -25,6 +26,9 @@
 #endif
 
 #define DMA_ATTRS struct dma_attrs *
+
+#define DEBUG_START verbosity=1
+#define DEBUG_END verbosity=0
 
 static int verbosity;
 static inline void set_copy_ops(struct dma_map_ops *target);
@@ -55,7 +59,7 @@ static inline struct shadow_entry *get_shadow_entry(struct device *dev, dma_addr
 		unsigned long flags;
 		spin_lock_irqsave(&mdata->inc_lock, flags);
 		//Someone may have allocated the entry since the last check irq/_bh/..
-		if (compound_entry != mdata->compound_entry[key][idx]) {
+		if (!mdata->compound_entry[key][idx]) {
 			struct page *page = alloc_pages(__GFP_ZERO, get_order(sizeof(struct compound_shadow)));
 			assert(page);
 			mdata->compound_entry[key][idx] = page_to_virt(page);
@@ -123,7 +127,6 @@ static dma_addr_t dma_copy_map_page(struct device *dev, struct page *page,
 	if (!shadow) {
 		panic("failed to dma_cache_alloc %s\n", __FUNCTION__);
 	}
-
 	addr = virt_to_iova(shadow);
 	assert(addr != IOVA_INVALID);
 
