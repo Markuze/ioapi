@@ -127,6 +127,8 @@ static dma_addr_t dma_copy_map_page(struct device *dev, struct page *page,
 
 	if (dir == DMA_BIDIRECTIONAL || dir == DMA_TO_DEVICE) {
 		//real sync for cpu
+		//TODO: aren't we copying too much: size+offset? 
+		//TODO: entry->real starts at page adress + offset
 		dma_copy_sync(shadow, entry->real, size);
 		//real sync for device
 	}
