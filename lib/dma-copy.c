@@ -59,7 +59,7 @@ static inline struct shadow_entry *get_shadow_entry(struct device *dev, dma_addr
 		unsigned long flags;
 		spin_lock_irqsave(&mdata->inc_lock, flags);
 		//Someone may have allocated the entry since the last check irq/_bh/..
-		if (!mdata->compound_entry[key][idx]) {
+		if (!(compound_entry = mdata->compound_entry[key][idx])) {
 			struct page *page = alloc_pages(__GFP_ZERO, get_order(sizeof(struct compound_shadow)));
 			assert(page);
 			mdata->compound_entry[key][idx] = page_to_virt(page);
@@ -137,7 +137,7 @@ static dma_addr_t dma_copy_map_page(struct device *dev, struct page *page,
 
 	if (dir == DMA_BIDIRECTIONAL || dir == DMA_TO_DEVICE) {
 		//real sync for cpu
-		//TODO: aren't we copying too much: size+offset? 
+		//TODO: aren't we copying too much: size+offset?
 		//TODO: entry->real starts at page adress + offset
 		dma_copy_sync(shadow, entry->real, size);
 		//real sync for device
