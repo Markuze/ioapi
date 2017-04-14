@@ -49,12 +49,19 @@ static inline struct shadow_entry *get_shadow_entry(struct device *dev, dma_addr
 	assert(idx < MAX_COMPOUND_SHADOW_PER_NODE);
 	assert(mdata->compound_entry[key]);
 	compound_entry = mdata->compound_entry[key][idx];
+	//Not thread safe
 	if (unlikely(!compound_entry))
 	{
-		struct page *page = alloc_pages(__GFP_ZERO, get_order(sizeof(struct compound_shadow)));
-		assert(page);
-		mdata->compound_entry[key][idx] = page_to_virt(page);
-		compound_entry = page_to_virt(page);
+		unsigned long flags;
+		spin_lock_irqsave(&mdata->inc_lock, flags);
+		//Someone may have allocated the entry since the last check irq/_bh/..
+		if (compound_entry != mdata->compound_entry[key][idx]) {
+			struct page *page = alloc_pages(__GFP_ZERO, get_order(sizeof(struct compound_shadow)));
+			assert(page);
+			mdata->compound_entry[key][idx] = page_to_virt(page);
+			compound_entry = page_to_virt(page);
+		}
+		spin_unlock_irqrestore(&mdata->inc_lock, flags);
 	}
 	e_idx = ((iova & (BIT(DMA_CACHE_SHIFT) -1))/ MIN_COPY_ALLOC_SZ);
 	assert(e_idx < COMPOUND_SHADOW_ENTRY_CNT);
@@ -76,9 +83,9 @@ int dma_copy_register_dev(struct device *dev)
 
 	trace_debug("Allocated order %d of pages [%p] orig ops %p\n", get_order(sizeof(struct copy_mdata)), page, dma_ops);
 	dev->copy = page_address(page);
-
+	spin_lock_init(&dev->copy->inc_lock);
 	for (; i < COPY_HASHES; i++) {
-		 struct page *page = alloc_pages(__GFP_ZERO,
+		 struct page *page = alloc_pages(__GFP_ZERO | GFP_ATOMIC,
 						 get_order(sizeof(struct compound_shadow *) * MAX_COMPOUND_SHADOW_PER_NODE));
 		trace_debug("%d: Allocating order %d  [%p]pages\n", i, get_order(sizeof(struct compound_shadow *) * MAX_COMPOUND_SHADOW_PER_NODE), page);
 		dev->copy->compound_entry[i] = page_to_virt(page);

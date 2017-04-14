@@ -29,6 +29,7 @@ struct copy_mdata {
 	struct dma_map_ops *orig_dma_ops;
 	struct dma_map_ops *dma_ops;
 	struct compound_shadow **compound_entry[COPY_CORES * 2]; //tx and rx
+	spinlock_t	inc_lock;
 };
 //[MAX_COMPOUND_SHADOW_PER_NODE]
 
