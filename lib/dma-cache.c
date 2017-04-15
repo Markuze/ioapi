@@ -48,6 +48,12 @@ static inline u64	iova_get_encoding(u64 iova)
 	return ((iova >> IOVA_RANGE_SHIFT) & ~DMA_CACHE_FLAG);
 }
 
+static inline u64 iova_core(u64 iova)
+{
+	u64 encoding = iova_get_encoding(iova);
+	return (encoding >> CORE_SHIFT);
+}
+
 static inline u64 iova_key(u64 iova)
 {
 	u64 encoding = iova_get_encoding(iova);
@@ -273,8 +279,8 @@ void dma_cache_free(struct device *dev, struct page *elem)
 
 	assert(page_to_nid(elem) == (idx >> CORE_SHIFT));
 	assert(idx < NUM_ALLOCATORS);
-	mag_free_elem(allocator, elem);
-	//mag_free_elem(allocator, elem, iova_core(elem->iova)); // When maga support available
+	//mag_free_elem(allocator, elem);
+	mag_free_elem(allocator, elem, iova_core(elem->iova)); // When maga support available
 }
 EXPORT_SYMBOL(dma_cache_free);
 
