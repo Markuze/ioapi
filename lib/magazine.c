@@ -18,14 +18,14 @@
 
 // page_to_nid - validate copy and mag alloc/free.
 
-static inline void mag_lock(struct per_core_cache *cache)
+static inline void mag_lock(struct mag_allocator *allocator)
 {
-	spin_lock_bh(&cache->lock);
+	spin_lock_bh(&allocator->lock);
 }
 
-static inline void mag_unlock(struct per_core_cache *cache)
+static inline void mag_unlock(struct mag_allocator *allocator)
 {
-	spin_unlock_bh(&cache->lock);
+	spin_unlock_bh(&allocator->lock);
 }
 
 static inline u32 mag_pair_count(struct mag_pair *pair)
@@ -83,45 +83,45 @@ static void mag_pair_free(struct mag_pair *pair, void *elem)
 	++pair->count[idx];
 }
 
-static void mag_cache_switch_full(struct per_core_cache *cache, struct mag_pair *pair)
+static void mag_allocator_switch_full(struct mag_allocator *allocator, struct mag_pair *pair)
 {
 	u32 idx = (pair->count[1] == MAG_DEPTH) ? 1 : 0;
 	assert(pair->count[idx] == MAG_DEPTH);
 
-	mag_lock(cache);
+	mag_lock(allocator);
 
-	list_add(&pair->mags[idx]->list, &cache->full_list);
-	++cache->full_count;
+	list_add(&pair->mags[idx]->list, &allocator->full_list);
+	++allocator->full_count;
 
-	if (cache->empty_count) {
-		pair->mags[idx] = list_entry(cache->empty_list.next, struct magazine, list);
-		list_del_init(cache->empty_list.next);
-		--cache->empty_count;
+	if (allocator->empty_count) {
+		pair->mags[idx] = list_entry(allocator->empty_list.next, struct magazine, list);
+		list_del_init(allocator->empty_list.next);
+		--allocator->empty_count;
 	} else {
 		void *ptr = kzalloc(sizeof(struct magazine) + L1_CACHE_BYTES -1, GFP_ATOMIC|__GFP_COMP|__GFP_NOWARN);
 
 		pair->mags[idx]	= (void *)ALIGN((u64)ptr, L1_CACHE_BYTES);
 	}
-	mag_unlock(cache);
+	mag_unlock(allocator);
 
 	pair->count[idx] = 0;
 }
 
-static void mag_cache_switch_empty(struct per_core_cache *cache, struct mag_pair *pair)
+static void mag_allocator_switch_empty(struct mag_allocator *allocator, struct mag_pair *pair)
 {
 	int idx = (pair->count[0]) ? 1 : 0;
 
-	mag_lock(cache);
-	if (cache->full_count) {
-		list_add(&pair->mags[idx]->list, &cache->empty_list);
-		++cache->empty_count;
+	mag_lock(allocator);
+	if (allocator->full_count) {
+		list_add(&pair->mags[idx]->list, &allocator->empty_list);
+		++allocator->empty_count;
 
-		pair->mags[idx] = list_entry(cache->full_list.next, struct magazine, list);
-		list_del_init(cache->full_list.next);
+		pair->mags[idx] = list_entry(allocator->full_list.next, struct magazine, list);
+		list_del_init(allocator->full_list.next);
 		pair->count[idx] = MAG_DEPTH;
-		--cache->full_count;
+		--allocator->full_count;
 	}
-	mag_unlock(cache);
+	mag_unlock(allocator);
 }
 
 void *mag_alloc_elem(struct mag_allocator *allocator)
@@ -131,7 +131,7 @@ void *mag_alloc_elem(struct mag_allocator *allocator)
 
 	if (unlikely(mag_pair_count(pair) == 0 )) {
 		/*may fail, it's ok.*/
-		mag_cache_switch_empty(&allocator->cache[smp_processor_id()], pair);
+		mag_allocator_switch_empty(allocator, pair);
 	}
 
 	elem = mag_pair_alloc(pair);
@@ -139,31 +139,7 @@ void *mag_alloc_elem(struct mag_allocator *allocator)
 	return elem;
 }
 
-struct mag_pair *get_cpu_mag_pair_remote(struct mag_allocator *allocator, u64 core)
-{
-	spin_lock_bh(&allocator->per_core_pair[core].lock);
-	return  &allocator->per_core_pair[core].pair;
-}
-
-void put_cpu_mag_pair_remote(struct mag_allocator *allocator, u64 core)
-{
-	spin_unlock_bh(&allocator->per_core_pair[core].lock);
-}
-
-void mag_free_elem_remote(struct mag_allocator *allocator, void *elem, u64 core)
-{
-	struct mag_pair	*pair = get_cpu_mag_pair_remote(allocator, core);
-
-	mag_pair_free(pair, elem);
-
-	/* If both mags are full */
-	if (unlikely(mag_pair_count(pair) == (MAG_DEPTH << 1))) {
-		mag_cache_switch_full(&allocator->cache[core], pair);
-	}
-	put_cpu_mag_pair_remote(allocator, core);
-}
-
-void mag_free_elem_local(struct mag_allocator *allocator, void *elem)
+void mag_free_elem(struct mag_allocator *allocator, void *elem)
 {
 	struct mag_pair	*pair = get_cpu_mag_pair(allocator);
 
@@ -171,18 +147,7 @@ void mag_free_elem_local(struct mag_allocator *allocator, void *elem)
 
 	/* If both mags are full */
 	if (unlikely(mag_pair_count(pair) == (MAG_DEPTH << 1))) {
-		mag_cache_switch_full(&allocator->cache[smp_processor_id()], pair);
-	}
-	put_cpu();
-}
-
-void mag_free_elem(struct mag_allocator *allocator, void *elem, u64 core)
-{
-	u64 smp_id = get_cpu();
-	if (core != smp_id) {
-		mag_free_elem_remote(allocator, elem, core);
-	} else {
-		mag_free_elem_local(allocator, elem);
+		mag_allocator_switch_full(allocator, pair);
 	}
 	put_cpu();
 }
@@ -210,18 +175,14 @@ void mag_allocator_init(struct mag_allocator *allocator)
 	for (idx = 0 ; idx < num_online_cpus() * 2; idx++) {
 		assert(idx < NR_CPUS);
 		init_mag_pair(&allocator->pair[idx]);
-		init_mag_pair(&allocator->per_core_pair[idx].pair);
+	}
 
 //3.	init spin lock.
-		//sync remote producers and local core // protecting local cache
-		spin_lock_init(&allocator->cache[idx].lock);
-		//sync remote producers // protecting per_core_mag
-		spin_lock_init(&allocator->per_core_pair[idx].lock);
+	spin_lock_init(&allocator->lock);
 
 //4. 	init all lists.
-		INIT_LIST_HEAD(&allocator->cache[idx].empty_list);
-		INIT_LIST_HEAD(&allocator->cache[idx].full_list);
-	}
+	INIT_LIST_HEAD(&allocator->empty_list);
+	INIT_LIST_HEAD(&allocator->full_list);
 //5. 	init all alloc func. /* Removed untill last_idx removed */
 //6.    Counters allocated.
 /* Noop */
