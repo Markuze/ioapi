@@ -28,7 +28,7 @@
 #define IOVA_RANGE_SHIFT	(BITS_IN_IOVA - (IOVA_ENCODING_BITS + 1))
 
 #define DMA_CACHE_CORE_MASK	((BIT(CORE_BITS) -1) << CORE_SHIFT)
-#define DMA_CACHE_SHIFT		16	/* 32K */ /*Due to skb lim + compound page size.*/
+#define DMA_CACHE_SHIFT		21	/* 32K */ /*Due to skb lim + compound page size.*/
 #define PAGES_IN_DMA_CACHE_ELEM (BIT(DMA_CACHE_SHIFT - PAGE_SHIFT))
 #define DMA_CACHE_ELEM_SIZE	(BIT(DMA_CACHE_SHIFT))
 #define NUM_ALLOCATORS		(BIT(IOVA_ENCODING_BITS - 1))
@@ -39,13 +39,23 @@ enum dma_cache_frag_type {
 	DMA_CACHE_FRAG_PARTIAL_W,
 	DMA_CACHE_FRAG_FULL_R,
 	DMA_CACHE_FRAG_FULL_W,
+	DMA_CACHE_FRAG_FULL_4_R,
+	DMA_CACHE_FRAG_FULL_4_W,
+	DMA_CACHE_FRAG_FULL_3_R,
+	DMA_CACHE_FRAG_FULL_3_W,
 	DMA_CACHE_FRAG_TYPES
 };
+
+struct page_frag_dma_cache {
+	void * va;
+	__u32 offset;
+};
+
 
 struct dev_iova_mag {
 	struct	mag_allocator allocator[NUM_ALLOCATORS];
 	atomic64_t last_idx[NUM_ALLOCATORS];
-	struct page_frag_cache frag_cache[NR_CPUS * 2][DMA_CACHE_FRAG_TYPES];
+	struct page_frag_dma_cache frag_cache[NR_CPUS][DMA_CACHE_FRAG_TYPES];
 };
 
 u64 dma_cache_iova_key(u64);
