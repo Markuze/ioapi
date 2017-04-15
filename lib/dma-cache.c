@@ -196,12 +196,14 @@ struct page_frag_cache *get_frag_cache(struct dev_iova_mag *iova_mag, enum dma_c
 	return &iova_mag->frag_cache[idx][frag_type];
 }
 
+#define MIN_COPY_ALLOC_MASK (64 - 1)
 void *alloc_mapped_frag(struct device *dev, struct page_frag_cache *nc, size_t fragsz, enum dma_data_direction dir)
 {
 	unsigned int size = DMA_CACHE_ELEM_SIZE;
 	struct page *page;
 	int offset;
 
+	fragsz = __ALIGN_MASK(size, MIN_COPY_ALLOC_MASK);
 	offset = nc->offset - fragsz;
 
 	if (unlikely(offset < 0)) {
