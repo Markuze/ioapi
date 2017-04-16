@@ -595,6 +595,7 @@ static inline void set_compound_order(struct page *page, unsigned int order)
 }
 
 void free_compound_page(struct page *page);
+void prep_compound_page(struct page *page, unsigned int order);
 
 #ifdef CONFIG_MMU
 /*

@@ -1,5 +1,6 @@
 #include <linux/dma-cache.h>
 #include <linux/dma-mapping.h>
+#include <linux/hugetlb.h>
 
 #ifndef assert
 #define assert(expr) 	do { \
@@ -127,21 +128,33 @@ static inline u64 alloc_new_iova(struct device	*dev,
 	u64 iova = iova_encoding(dir) << IOVA_RANGE_SHIFT;
 	u64 idx = atomic64_inc_return(&dev->iova_mag->last_idx[alloc_key(dir)]);
 
-	return (iova | (idx -1) << DMA_CACHE_SHIFT);
+	return (iova | (idx -1) << HUGE_PAGE_ELEM_SHIFT);
 }
 
-static inline void map_each_page(struct device *dev, struct page *page,
+static inline void prep_elem(struct device *dev, struct page *page,
 				 enum dma_data_direction dir, u64 iova)
 {
 	int i;
 	struct dma_map_ops *ops = get_dma_ops(dev);
 
-	for (i = 0; i < PAGES_IN_DMA_CACHE_ELEM; i++) {
-		if (ops->map_page(dev, page, 0, PAGE_SIZE, dir, 0, iova) != iova) {
-			panic("Couldnt MAP page %llx (%d)", iova, i);
+	assert(!((unsigned long)page_address(page) & HUGE_PAGE_ELEM_MASK));
+	assert(!(iova & HUGE_PAGE_ELEM_MASK));
+
+	if (ops->map_page(dev, page, 0, HUGE_PAGE_ELEM_SIZE, dir, 0, iova) != iova) {
+		panic("Couldnt MAP page %llx", iova);
+	}
+
+	for (i = 0; i < ELEM_CNT_IN_HUGE; i++) {
+		assert(!((unsigned long)page_address(page) & DMA_CACHE_ELEM_MASK));
+		prep_compound_page(page, DMA_CACHE_MAX_ORDER);
+		//page_count will be set on alloc_mapped_pages
+		page += PAGES_IN_DMA_CACHE_ELEM;
+		iova += DMA_CACHE_ELEM_SIZE;
+
+		//Free elems into mags, first elem will be used
+		if (likely(i)) {
+			dma_cache_free(dev, page);
 		}
-		page++;
-		iova += PAGE_SIZE;
 	}
 }
 
@@ -151,17 +164,19 @@ static inline struct page *inc_mapping(struct device	*dev,
 	dma_addr_t	iova = 0;
 	struct page	*page;
 
-	page = alloc_pages( __GFP_COMP | __GFP_NOWARN |
+/*
+	page = alloc_pages( __GFP_COMP | __GFP_NOWARN | __GFP_THISNODE |
 			   __GFP_NORETRY | GFP_ATOMIC | __GFP_IO
 			   , get_order(DMA_CACHE_ELEM_SIZE));
+*/
+	page = alloc_huge_page_node(size_to_hstate(HUGE_PAGE_ELEM_SIZE), numa_node_id());
 	if (!page) {
 		panic("Couldnt alloc pages\n");
 		return ERR_PTR(-ENOMEM);
 	}
-
 	iova = alloc_new_iova(dev, dir);
 
-	map_each_page(dev, page, dir, iova);
+	prep_elem(dev, page, dir, iova);
 
 	page->iova	= iova;
 	validate_iova(page->iova);
