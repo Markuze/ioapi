@@ -392,6 +392,7 @@ struct dmar_domain {
 					 * to VT-d spec, section 9.3 */
 
 	bool has_iotlb_device;
+	bool verbose;
 	struct list_head devices;	/* all devices' list */
 	struct iova_domain iovad;	/* iova's that belong to this domain */
 
@@ -1774,6 +1775,7 @@ static struct dmar_domain *alloc_domain(int flags)
 	domain->nid = -1;
 	domain->flags = flags;
 	domain->has_iotlb_device = false;
+	domain->verbose = 0;
 	INIT_LIST_HEAD(&domain->devices);
 
 	return domain;
@@ -1934,6 +1936,7 @@ static int domain_init(struct dmar_domain *domain, struct intel_iommu *iommu,
 	else
 		domain->iommu_snooping = 0;
 
+	pr_err("super page is %s and set to %d\n", intel_iommu_superpage ? "ON" : "OFF", fls(cap_super_page_val(iommu->cap)));
 	if (intel_iommu_superpage)
 		domain->iommu_superpage = fls(cap_super_page_val(iommu->cap));
 	else
@@ -2210,6 +2213,8 @@ static int __domain_mapping(struct dmar_domain *domain, unsigned long iov_pfn,
 
 		if (!pte) {
 			largepage_lvl = hardware_largepage_caps(domain, iov_pfn, phys_pfn, sg_res);
+			if (domain->verbose)
+				trace_printk("domain %p should use large pages %lx %lx [%lu]\n", domain, iov_pfn, phys_pfn, sg_res);
 
 			first_pte = pte = pfn_to_dma_pte(domain, iov_pfn, &largepage_lvl);
 			if (!pte)
@@ -2218,6 +2223,8 @@ static int __domain_mapping(struct dmar_domain *domain, unsigned long iov_pfn,
 			if (largepage_lvl > 1) {
 				unsigned long nr_superpages, end_pfn;
 
+				if (domain->verbose)
+					trace_printk("domain %p is using large pages %d\n", domain, largepage_lvl);
 				pteval |= DMA_PTE_LARGE_PAGE;
 				lvl_pages = lvl_to_nr_pages(largepage_lvl);
 
