@@ -1,6 +1,7 @@
 #include <linux/dma-cache.h>
 #include <linux/dma-mapping.h>
 #include <linux/hugetlb.h>
+#include <linux/mm.h>
 
 #ifndef assert
 #define assert(expr) 	do { \
@@ -97,19 +98,14 @@ void iova_decode(u64 iova)
 	assert(perm < 2);
 }
 
-u64 virt_to_iova(void *virt)
+u64 page_to_iova(struct page *page, size_t offset)
 {
 	u64 iova;
-	struct page *page = virt_to_page(virt);
 	struct page *head = compound_head(page);
-
-	if (!head->iova)
-		return IOVA_INVALID;
-
-	iova = head->iova + ((page - head) * PAGE_SIZE) + ((u64)virt & (PAGE_SIZE -1));
+	iova = head[2]._iova + ((page - head) * PAGE_SIZE) + offset;
 	return iova;
 }
-EXPORT_SYMBOL(virt_to_iova);
+EXPORT_SYMBOL(page_to_iova);
 
 static inline void validate_iova(u64 iova)
 {
@@ -147,13 +143,18 @@ static inline void prep_elem(struct device *dev, struct page *page,
 	for (i = 0; i < ELEM_CNT_IN_HUGE; i++) {
 		assert(!((unsigned long)page_address(page) & DMA_CACHE_ELEM_MASK));
 		prep_compound_page(page, DMA_CACHE_MAX_ORDER);
+		set_dma_cache(page);
+
+		//should be in set_dma_cache
+		page[2]._iova	= iova;
+		page[2]._device	= dev;
 		//page_count will be set on alloc_mapped_pages
 		page += PAGES_IN_DMA_CACHE_ELEM;
 		iova += DMA_CACHE_ELEM_SIZE;
 
 		//Free elems into mags, first elem will be used
 		if (likely(i)) {
-			dma_cache_free(dev, page);
+			dma_cache_free(page);
 		}
 	}
 }
@@ -174,13 +175,11 @@ static inline struct page *inc_mapping(struct device	*dev,
 		panic("Couldnt alloc pages\n");
 		return ERR_PTR(-ENOMEM);
 	}
-	iova = alloc_new_iova(dev, dir);
 
+	iova = alloc_new_iova(dev, dir);
 	prep_elem(dev, page, dir, iova);
 
-	page->iova	= iova;
-	validate_iova(page->iova);
-	page->device	= dev;
+	validate_iova(page_to_iova(page, 0));
 
 	return page;
 }
@@ -281,9 +280,10 @@ struct page *dma_cache_alloc_pages(struct device *dev, int order, enum dma_data_
 }
 EXPORT_SYMBOL(dma_cache_alloc_pages);
 
-void dma_cache_free(struct device *dev, struct page *elem)
+void dma_cache_free(struct page *elem)
 {
-	int	idx = iova_key(elem->iova);
+	struct device *dev = dma_cache_device(elem);
+	int	idx = iova_key(dma_cache_iova(elem));
 	struct  mag_allocator *allocator = &dev->iova_mag->allocator[idx];
 
 	assert(page_to_nid(elem) == (idx >> CORE_SHIFT));

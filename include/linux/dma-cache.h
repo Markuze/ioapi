@@ -56,17 +56,30 @@ struct dev_iova_mag {
 
 u64 dma_cache_iova_key(u64);
 u64 dma_cache_iova_idx(u64);
-u64 virt_to_iova(void *);
+u64 page_to_iova(struct page *, size_t offset);
 void iova_format(u64);
 void iova_decode(u64);
 enum dma_data_direction iova_perm(u64);
+
+#include <linux/page-flags.h>
+static inline dma_addr_t dma_cache_iova(struct page *page)
+{
+	page = compound_head(page);
+	return page[2]._iova;
+}
+
+static inline void *dma_cache_device(struct page *page)
+{
+	page = compound_head(page);
+	return page[2]._device;
+}
 
 size_t dma_cache_size(void *);
 void *dma_cache_alloc(struct device *, size_t,
 		      enum dma_data_direction dir);
 struct page *dma_cache_alloc_page(struct device *dev, enum dma_data_direction dir);
 struct page *dma_cache_alloc_pages(struct device *dev, int order, enum dma_data_direction dir);
-void dma_cache_free(struct device *dev, struct page *);
+void dma_cache_free(struct page *);
 
 int	register_iova_map(struct device *);
 void	unregister_iova_map(struct device *dev);

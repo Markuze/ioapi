@@ -1170,7 +1170,6 @@ static void __meminit __init_single_page(struct page *page, unsigned long pfn,
 	page_cpupid_reset_last(page);
 
 	INIT_LIST_HEAD(&page->lru);
-	page_dma_cache_reset(page);
 #ifdef WANT_PAGE_VIRTUAL
 	/* The shift won't overflow because ZONE_NORMAL is below 4G. */
 	if (!is_highmem_idx(zone))
@@ -3918,7 +3917,7 @@ void __free_pages(struct page *page, unsigned int order)
 {
 	if (put_page_testzero(page)) {
 		if (is_dma_cache_page(page))
-			dma_cache_free(page->device, page);
+			dma_cache_free(page);
 		else if (order == 0)
 			free_hot_cold_page(page, false);
 		else
@@ -4033,7 +4032,7 @@ void __free_page_frag(void *addr)
 
 	if (unlikely(put_page_testzero(page))) {
 		if (is_dma_cache_page(page))
-			dma_cache_free(page->device, page);
+			dma_cache_free(page);
 		else
 			__free_pages_ok(page, compound_order(page));
 	}

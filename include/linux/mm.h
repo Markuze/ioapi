@@ -486,14 +486,23 @@ static inline int compound_mapcount(struct page *page)
 	return atomic_read(compound_mapcount_ptr(page)) + 1;
 }
 
-#define DMA_CACHE_POISON	((void *)0x0D1E7C0C0BADB105)
-static inline void page_dma_cache_reset(struct page *page)
+static inline void set_dma_cache_page(struct page *page)
 {
-	page->iova = 0;
-	page->device = DMA_CACHE_POISON;
+	VM_BUG_ON_PAGE(!PageCompound(page), page);
+	page = compound_head(page);
+	page[1].compound_head &= 2;
 }
 
-#define is_dma_cache_page(page) ((page)->device != DMA_CACHE_POISON)
+static inline int is_dma_cache_page(struct page *page)
+{
+	if (PageCompound(page)) {
+		unsigned long head;
+		page = compound_head(page);
+		head = READ_ONCE(page[1].compound_head);
+		return head & 2;
+	}
+	return 0;
+}
 
 /*
  * The atomic page->_mapcount, starts from -1: so that transitions

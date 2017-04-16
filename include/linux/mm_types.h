@@ -56,6 +56,12 @@ struct page {
 						 */
 		void *s_mem;			/* slab first object */
 		atomic_t compound_mapcount;	/* first tail page */
+
+		/* second tail page in dma-cachae, ocupying same space as THP */
+		union {
+			struct device	*_device;
+			struct page	*_cache_next;
+		};
 		/* page_deferred_list().next	 -- second tail page */
 	};
 
@@ -152,9 +158,15 @@ struct page {
 			 * unsigned int. It can help compiler generate better or
 			 * smaller code on some archtectures.
 			 */
-			unsigned int compound_dtor;
-			unsigned int compound_order;
+			union {
+				struct {
+					unsigned int compound_dtor;
+					unsigned int compound_order;
+				};
+				u64 _iova;
+			};
 #else
+			//If we ever get here, we need 48-16 = 32 bits to store the iova
 			unsigned short int compound_dtor;
 			unsigned short int compound_order;
 #endif
@@ -208,13 +220,6 @@ struct page {
 	void *virtual;			/* Kernel virtual address (NULL if
 					   not kmapped, ie. highmem) */
 #endif /* WANT_PAGE_VIRTUAL */
-
-	/* For Cached DMA pages */
-	u64 iova;
-	union {
-		struct device	*device;
-		struct page	*cache_next;
-	};
 
 #ifdef CONFIG_KMEMCHECK
 	/*

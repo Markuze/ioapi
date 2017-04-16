@@ -138,19 +138,14 @@ static inline dma_addr_t dma_map_single_attrs(struct device *dev, void *ptr,
 					      struct dma_attrs *attrs)
 {
 	struct dma_map_ops *ops = get_dma_ops(dev);
+	struct page *page = virt_to_page(ptr);
 	dma_addr_t addr;
 
 	kmemcheck_mark_initialized(ptr, size);
 	BUG_ON(!valid_dma_direction(dir));
 
-	if (dev->iova_mag) {
-		struct page *page = virt_to_head_page(ptr);
-
-		if (page->iova) {
-			//size_t offset = ptr - page_address(page);
-			//return (page->iova & PAGE_MASK) + offset; //<-- not a bug :)
-			return virt_to_iova(ptr);
-		}
+	if (is_dma_cache_page(page)) {
+		return page_to_iova(page, offset_in_page(page));
 	}
 
 	addr = ops->map_page(dev, virt_to_page(ptr),
@@ -171,6 +166,7 @@ static inline void dma_unmap_single_attrs(struct device *dev, dma_addr_t addr,
 
 	BUG_ON(!valid_dma_direction(dir));
 
+	//Bug Check IOVA, you are leaking iovas
 	if (dev->iova_mag) {
 		return;
 	}
@@ -224,13 +220,8 @@ static inline dma_addr_t dma_map_page(struct device *dev, struct page *page,
 	kmemcheck_mark_initialized(page_address(page) + offset, size);
 	BUG_ON(!valid_dma_direction(dir));
 
-	if (dev->iova_mag) {
-		struct page *head = compound_head(page);
-		if (head->iova) {
-			//return (head->iova & PAGE_MASK) + offset;
-			void *ptr = page_address(page) + offset;
-			return virt_to_iova(ptr);
-		}
+	if (is_dma_cache_page(page)) {
+		return page_to_iova(page, offset);
 	}
 
 	addr = ops->map_page(dev, page, offset, size, dir, NULL, IOVA_INVALID);

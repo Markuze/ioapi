@@ -140,7 +140,8 @@ static inline struct page *compound_head(struct page *page)
 	unsigned long head = READ_ONCE(page->compound_head);
 
 	if (unlikely(head & 1))
-		return (struct page *) (head - 1);
+		return (struct page *) (head & ~3);
+	//We are using BIT(2) to signal that this compound page is dma-cache
 	return page;
 }
 

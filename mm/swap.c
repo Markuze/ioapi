@@ -75,7 +75,7 @@ static void __page_cache_release(struct page *page)
 static void __put_single_page(struct page *page)
 {
 	if (unlikely(is_dma_cache_page(page))) {
-		dma_cache_free(page->device, page);
+		dma_cache_free(page);
 	} else {
 		__page_cache_release(page);
 		free_hot_cold_page(page, false);
@@ -87,7 +87,7 @@ static void __put_compound_page(struct page *page)
 	compound_page_dtor *dtor;
 
 	if (unlikely(is_dma_cache_page(page))) {
-		dma_cache_free(page->device, page);
+		dma_cache_free(page);
 		return;
 	}
 	/*
