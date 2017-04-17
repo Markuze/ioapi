@@ -1,6 +1,5 @@
 #include <linux/dma-cache.h>
 #include <linux/dma-mapping.h>
-#include <linux/hugetlb.h>
 
 #ifndef assert
 #define assert(expr) 	do { \
@@ -137,8 +136,12 @@ static inline void map_each_page(struct device *dev, struct page *page,
 	int i;
 	struct dma_map_ops *ops = get_dma_ops(dev);
 
-	if (ops->map_page(dev, page, 0, DMA_CACHE_ELEM_SIZE, dir, 0, iova) != iova) {
-		panic("Couldnt MAP page %llx (%d)", iova, i);
+	for (i = 0; i < PAGES_IN_DMA_CACHE_ELEM; i++) {
+		if (ops->map_page(dev, page, 0, PAGE_SIZE, dir, 0, iova) != iova) {
+			panic("Couldnt MAP page %llx (%d)", iova, i);
+		}
+		page++;
+		iova += PAGE_SIZE;
 	}
 }
 
@@ -148,7 +151,9 @@ static inline struct page *inc_mapping(struct device	*dev,
 	dma_addr_t	iova = 0;
 	struct page	*page;
 
-	page = alloc_huge_page_node(size_to_hstate(DMA_CACHE_ELEM_SIZE), numa_node_id());
+	page = alloc_pages( __GFP_COMP | __GFP_NOWARN |
+			   __GFP_NORETRY | GFP_ATOMIC | __GFP_IO
+			   , get_order(DMA_CACHE_ELEM_SIZE));
 	if (!page) {
 		panic("Couldnt alloc pages\n");
 		return ERR_PTR(-ENOMEM);
@@ -183,7 +188,7 @@ struct page *alloc_mapped_pages(struct device *dev, enum dma_data_direction dir)
 	return elem;
 }
 
-struct page_frag_dma_cache *get_frag_cache(struct dev_iova_mag *iova_mag, enum dma_cache_frag_type frag_type)
+struct page_frag_cache *get_frag_cache(struct dev_iova_mag *iova_mag, enum dma_cache_frag_type frag_type)
 {
 	int cpu	= get_cpu();
 	int idx = cpu << 1| ((in_softirq()) ? 1 : 0);
@@ -191,13 +196,12 @@ struct page_frag_dma_cache *get_frag_cache(struct dev_iova_mag *iova_mag, enum d
 	return &iova_mag->frag_cache[idx][frag_type];
 }
 
-#define MIN_COPY_ALLOC_MASK (64 - 1)
-void *alloc_mapped_frag(struct device *dev, struct page_frag_dma_cache *nc, size_t fragsz, enum dma_data_direction dir)
+void *alloc_mapped_frag(struct device *dev, struct page_frag_cache *nc, size_t fragsz, enum dma_data_direction dir)
 {
+	unsigned int size = DMA_CACHE_ELEM_SIZE;
 	struct page *page;
 	int offset;
 
-	fragsz = __ALIGN_MASK(fragsz, MIN_COPY_ALLOC_MASK);
 	offset = nc->offset - fragsz;
 
 	if (unlikely(offset < 0)) {
@@ -214,7 +218,7 @@ void *alloc_mapped_frag(struct device *dev, struct page_frag_dma_cache *nc, size
 			return NULL;
 
 		nc->va = page_address(page);
-		offset = DMA_CACHE_ELEM_SIZE - fragsz;
+		offset = size - fragsz;
 	}
 	/* We need to make sure the page is not free before its replased in the cache */
 	get_page(virt_to_page(nc->va));
@@ -228,7 +232,7 @@ void *alloc_mapped_frag(struct device *dev, struct page_frag_dma_cache *nc, size
 void *dma_cache_alloc(struct device *dev, size_t size, enum dma_data_direction dir)
 {
 	void *va;
-	struct page_frag_dma_cache *nc = get_frag_cache(dev->iova_mag,
+	struct page_frag_cache *nc = get_frag_cache(dev->iova_mag,
 						    (dir == DMA_TO_DEVICE) ? DMA_CACHE_FRAG_PARTIAL_R : DMA_CACHE_FRAG_PARTIAL_W);
 	assert(size <= DMA_CACHE_ELEM_SIZE);
 	va = alloc_mapped_frag(dev, nc, size, dir);
@@ -238,7 +242,7 @@ EXPORT_SYMBOL(dma_cache_alloc);
 
 struct page *dma_cache_alloc_page(struct device *dev, enum dma_data_direction dir)
 {
-	struct page_frag_dma_cache *nc = get_frag_cache(dev->iova_mag,
+	struct page_frag_cache *nc = get_frag_cache(dev->iova_mag,
 						    (dir == DMA_TO_DEVICE) ? DMA_CACHE_FRAG_FULL_R : DMA_CACHE_FRAG_FULL_W);
 
 	void *va = alloc_mapped_frag(dev, nc, PAGE_SIZE, dir);
@@ -248,34 +252,12 @@ struct page *dma_cache_alloc_page(struct device *dev, enum dma_data_direction di
 }
 EXPORT_SYMBOL(dma_cache_alloc_page);
 
-struct page *__dma_cache_alloc_pages(struct device *dev, enum dma_data_direction dir, int order)
-{
-	struct page_frag_dma_cache *nc;
-	size_t size;
-	void *va;
-
-	assert(order <= 4);
-	if (order == 4) {
-		nc = get_frag_cache(dev->iova_mag,
-					(dir == DMA_TO_DEVICE) ? DMA_CACHE_FRAG_FULL_4_R : DMA_CACHE_FRAG_FULL_4_W);
-		size = PAGE_SIZE * 16;
-	} else {
-		nc = get_frag_cache(dev->iova_mag,
-					(dir == DMA_TO_DEVICE) ? DMA_CACHE_FRAG_FULL_3_R : DMA_CACHE_FRAG_FULL_3_W);
-		size = PAGE_SIZE * 8;
-	}
-
-	va = alloc_mapped_frag(dev, nc, size, dir);
-
-	assert(virt_addr_valid(va));
-	return virt_to_page(va);
-}
-
 struct page *dma_cache_alloc_pages(struct device *dev, int order, enum dma_data_direction dir)
 {
 	assert(order <= DMA_CACHE_MAX_ORDER);
 	if (order) {
-		return __dma_cache_alloc_pages(dev, dir, order);
+		WARN_ONCE((order != DMA_CACHE_MAX_ORDER), "order is %d", order);
+		return alloc_mapped_pages(dev, dir);
 	} else {
 		return dma_cache_alloc_page(dev, dir);
 	}
