@@ -149,6 +149,17 @@ static inline void map_each_page(struct device *dev, struct page *page,
 	}
 }
 
+#define DMA_CACHE_ELEM_MASK (DMA_CACHE_ELEM_SIZE - 1)
+static inline void check_allignment(struct page *page)
+{
+	u64 va = (u64) page_address(page);
+	u64 pa = __pa(va);
+
+	if ((va|pa) & DMA_CACHE_ELEM_MASK) {
+		pr_err("alloc pages are not alligned %lx : va %llx pa %llx\n", DMA_CACHE_ELEM_SIZE, va, pa);
+	}
+}
+
 static inline struct page *inc_mapping(struct device	*dev,
 				       enum dma_data_direction	dir)
 {
@@ -162,6 +173,7 @@ static inline struct page *inc_mapping(struct device	*dev,
 		panic("Couldnt alloc pages\n");
 		return ERR_PTR(-ENOMEM);
 	}
+	check_allignment(page);
 
 	iova = alloc_new_iova(dev, dir);
 
@@ -224,7 +236,7 @@ void *alloc_mapped_frag(struct device *dev, struct page_frag_dma_cache *nc, size
 		nc->va = page_address(page);
 		offset = DMA_CACHE_ELEM_SIZE - fragsz;
 	}
-	/* We need to make sure the page is not free before its replased in the cache */
+	/* We need to make sure the page is not free before its replaced in the cache */
 	get_page(virt_to_page(nc->va));
 
 	nc->offset = offset;
