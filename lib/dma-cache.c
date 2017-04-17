@@ -115,6 +115,10 @@ static inline void validate_iova(u64 iova)
 	u64 encoding = iova_get_encoding(iova);
 	u64 perm = ((encoding & ~DMA_CACHE_CORE_MASK) >> PERM_SHIFT);
 
+	if (unlikely(!is_dma_cache_iova(iova))) {
+		pr_err("Not DMA cache IOVA %llx\n", iova);
+	}
+	assert(is_dma_cache_iova(iova));
 	assert((encoding >> CORE_SHIFT) == smp_processor_id());
 	assert(cpu_to_node((encoding >> CORE_SHIFT)) == numa_mem_id());
 
@@ -264,8 +268,9 @@ struct page *dma_cache_alloc_pages(struct device *dev, int order, enum dma_data_
 }
 EXPORT_SYMBOL(dma_cache_alloc_pages);
 
-void dma_cache_free(struct device *dev, struct page *elem)
+void dma_cache_free(struct device *dev, struct page *page)
 {
+	struct page *elem = compound_head(page);
 	int	idx = iova_key(elem->iova);
 	struct  mag_allocator *allocator = &dev->iova_mag->allocator[idx];
 

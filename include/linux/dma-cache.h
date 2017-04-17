@@ -48,6 +48,11 @@ struct dev_iova_mag {
 	struct page_frag_cache frag_cache[NR_CPUS * 2][DMA_CACHE_FRAG_TYPES];
 };
 
+static inline int is_dma_cache_iova(u64 addr)
+{
+	return !!((addr >> IOVA_RANGE_SHIFT) & DMA_CACHE_FLAG);
+}
+
 u64 dma_cache_iova_key(u64);
 u64 dma_cache_iova_idx(u64);
 u64 virt_to_iova(void *);
