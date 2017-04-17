@@ -32,20 +32,27 @@
 #define PAGES_IN_DMA_CACHE_ELEM (BIT(DMA_CACHE_SHIFT - PAGE_SHIFT))
 #define DMA_CACHE_ELEM_SIZE	(BIT(DMA_CACHE_SHIFT))
 #define NUM_ALLOCATORS		(BIT(IOVA_ENCODING_BITS - 1))
-#define DMA_CACHE_MAX_ORDER	get_order(DMA_CACHE_ELEM_SIZE)
+#define DMA_CACHE_MAX_ORDER	4//get_order(DMA_CACHE_ELEM_SIZE)
 
 enum dma_cache_frag_type {
 	DMA_CACHE_FRAG_PARTIAL_R,
 	DMA_CACHE_FRAG_PARTIAL_W,
 	DMA_CACHE_FRAG_FULL_R,
 	DMA_CACHE_FRAG_FULL_W,
+	DMA_CACHE_FRAG_FULL_4_R,
+	DMA_CACHE_FRAG_FULL_4_W,
 	DMA_CACHE_FRAG_TYPES
+};
+
+struct page_frag_dma_cache {
+	void * va;
+	__u32 offset;
 };
 
 struct dev_iova_mag {
 	struct	mag_allocator allocator[NUM_ALLOCATORS];
 	atomic64_t last_idx[NUM_ALLOCATORS];
-	struct page_frag_cache frag_cache[NR_CPUS * 2][DMA_CACHE_FRAG_TYPES];
+	struct page_frag_dma_cache frag_cache[NR_CPUS * 2][DMA_CACHE_FRAG_TYPES];
 };
 
 static inline int is_dma_cache_iova(u64 addr)
