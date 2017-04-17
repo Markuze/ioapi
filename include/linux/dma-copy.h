@@ -10,7 +10,7 @@
 #define MIN_COPY_ALLOC_SZ		64
 #define MIN_COPY_ALLOC_MASK		(MIN_COPY_ALLOC_SZ -1)
 
-#define DMA_CACHE_SHIFT_COPY		18	/* 32K */ /*Due to skb lim + compound page size.*/
+#define DMA_CACHE_SHIFT_COPY		21	/* 32K */ /*Due to skb lim + compound page size.*/
 #define DMA_CACHE_ELEM_SIZE_COPY	(BIT(DMA_CACHE_SHIFT_COPY))
 #define COMPOUND_SHADOW_ENTRY_CNT	(DMA_CACHE_ELEM_SIZE_COPY/MIN_COPY_ALLOC_SZ)
 

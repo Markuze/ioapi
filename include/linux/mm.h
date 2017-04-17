@@ -493,7 +493,7 @@ static inline void page_dma_cache_reset(struct page *page)
 	page->device = DMA_CACHE_POISON;
 }
 
-#define is_dma_cache_page(page) ((page)->device != DMA_CACHE_POISON)
+#define is_dma_cache_page(page) ((compound_head(page))->device != DMA_CACHE_POISON)
 
 /*
  * The atomic page->_mapcount, starts from -1: so that transitions
