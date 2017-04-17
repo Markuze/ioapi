@@ -147,8 +147,6 @@ static inline dma_addr_t dma_map_single_attrs(struct device *dev, void *ptr,
 		struct page *page = virt_to_head_page(ptr);
 
 		if (page->iova) {
-			//size_t offset = ptr - page_address(page);
-			//return (page->iova & PAGE_MASK) + offset; //<-- not a bug :)
 			return virt_to_iova(ptr);
 		}
 	}
@@ -171,7 +169,7 @@ static inline void dma_unmap_single_attrs(struct device *dev, dma_addr_t addr,
 
 	BUG_ON(!valid_dma_direction(dir));
 
-	if (dev->iova_mag) {
+	if (is_dma_cache_iova(addr)) {
 		return;
 	}
 
@@ -246,7 +244,7 @@ static inline void dma_unmap_page(struct device *dev, dma_addr_t addr,
 
 	BUG_ON(!valid_dma_direction(dir));
 
-	if (dev->iova_mag) {
+	if (is_dma_cache_iova(addr)) {
 		return;
 	}
 

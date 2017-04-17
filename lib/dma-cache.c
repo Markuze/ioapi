@@ -115,6 +115,10 @@ static inline void validate_iova(u64 iova)
 	u64 encoding = iova_get_encoding(iova);
 	u64 perm = ((encoding & ~DMA_CACHE_CORE_MASK) >> PERM_SHIFT);
 
+	if (unlikely(!is_dma_cache_iova(iova))) {
+		pr_err("Not DMA cache IOVA %llx\n", iova);
+	}
+	assert(is_dma_cache_iova(iova));
 	assert((encoding >> CORE_SHIFT) == smp_processor_id());
 	assert(cpu_to_node((encoding >> CORE_SHIFT)) == numa_mem_id());
 
@@ -136,12 +140,19 @@ static inline void map_each_page(struct device *dev, struct page *page,
 	int i;
 	struct dma_map_ops *ops = get_dma_ops(dev);
 
-	for (i = 0; i < PAGES_IN_DMA_CACHE_ELEM; i++) {
-		if (ops->map_page(dev, page, 0, PAGE_SIZE, dir, 0, iova) != iova) {
-			panic("Couldnt MAP page %llx (%d)", iova, i);
-		}
-		page++;
-		iova += PAGE_SIZE;
+	if (ops->map_page(dev, page, 0, DMA_CACHE_ELEM_SIZE, dir, 0, iova) != iova) {
+		panic("Couldnt MAP page %llx (%d)", iova, i);
+	}
+}
+
+#define DMA_CACHE_ELEM_MASK (DMA_CACHE_ELEM_SIZE - 1)
+static inline void check_allignment(struct page *page)
+{
+	u64 va = (u64) page_address(page);
+	u64 pa = __pa(va);
+
+	if ((va|pa) & DMA_CACHE_ELEM_MASK) {
+		pr_err("alloc pages are not alligned %lx : va %llx pa %llx\n", DMA_CACHE_ELEM_SIZE, va, pa);
 	}
 }
 
@@ -158,6 +169,7 @@ static inline struct page *inc_mapping(struct device	*dev,
 		panic("Couldnt alloc pages\n");
 		return ERR_PTR(-ENOMEM);
 	}
+	check_allignment(page);
 
 	iova = alloc_new_iova(dev, dir);
 
@@ -188,20 +200,20 @@ struct page *alloc_mapped_pages(struct device *dev, enum dma_data_direction dir)
 	return elem;
 }
 
-struct page_frag_cache *get_frag_cache(struct dev_iova_mag *iova_mag, enum dma_cache_frag_type frag_type)
+struct page_frag_dma_cache *get_frag_cache(struct dev_iova_mag *iova_mag, enum dma_cache_frag_type frag_type)
 {
-	int cpu	= get_cpu();
+	int cpu	= smp_processor_id(); //BUG: Must get_cpu when preemption enabled + put later
 	int idx = cpu << 1| ((in_softirq()) ? 1 : 0);
 
 	return &iova_mag->frag_cache[idx][frag_type];
 }
 
-void *alloc_mapped_frag(struct device *dev, struct page_frag_cache *nc, size_t fragsz, enum dma_data_direction dir)
+void *alloc_mapped_frag(struct device *dev, struct page_frag_dma_cache *nc, size_t fragsz, enum dma_data_direction dir)
 {
-	unsigned int size = DMA_CACHE_ELEM_SIZE;
 	struct page *page;
 	int offset;
 
+	fragsz = __ALIGN_MASK(fragsz, L1_CACHE_BYTES - 1);
 	offset = nc->offset - fragsz;
 
 	if (unlikely(offset < 0)) {
@@ -218,9 +230,9 @@ void *alloc_mapped_frag(struct device *dev, struct page_frag_cache *nc, size_t f
 			return NULL;
 
 		nc->va = page_address(page);
-		offset = size - fragsz;
+		offset = DMA_CACHE_ELEM_SIZE - fragsz;
 	}
-	/* We need to make sure the page is not free before its replased in the cache */
+	/* We need to make sure the page is not free before its replaced in the cache */
 	get_page(virt_to_page(nc->va));
 
 	nc->offset = offset;
@@ -232,7 +244,7 @@ void *alloc_mapped_frag(struct device *dev, struct page_frag_cache *nc, size_t f
 void *dma_cache_alloc(struct device *dev, size_t size, enum dma_data_direction dir)
 {
 	void *va;
-	struct page_frag_cache *nc = get_frag_cache(dev->iova_mag,
+	struct page_frag_dma_cache *nc = get_frag_cache(dev->iova_mag,
 						    (dir == DMA_TO_DEVICE) ? DMA_CACHE_FRAG_PARTIAL_R : DMA_CACHE_FRAG_PARTIAL_W);
 	assert(size <= DMA_CACHE_ELEM_SIZE);
 	va = alloc_mapped_frag(dev, nc, size, dir);
@@ -242,7 +254,7 @@ EXPORT_SYMBOL(dma_cache_alloc);
 
 struct page *dma_cache_alloc_page(struct device *dev, enum dma_data_direction dir)
 {
-	struct page_frag_cache *nc = get_frag_cache(dev->iova_mag,
+	struct page_frag_dma_cache *nc = get_frag_cache(dev->iova_mag,
 						    (dir == DMA_TO_DEVICE) ? DMA_CACHE_FRAG_FULL_R : DMA_CACHE_FRAG_FULL_W);
 
 	void *va = alloc_mapped_frag(dev, nc, PAGE_SIZE, dir);
@@ -252,20 +264,31 @@ struct page *dma_cache_alloc_page(struct device *dev, enum dma_data_direction di
 }
 EXPORT_SYMBOL(dma_cache_alloc_page);
 
+struct page *__dma_cache_alloc_pages(struct device *dev, enum dma_data_direction dir)
+{
+	struct page_frag_dma_cache *nc = get_frag_cache(dev->iova_mag,
+						    (dir == DMA_TO_DEVICE) ? DMA_CACHE_FRAG_FULL_4_R : DMA_CACHE_FRAG_FULL_4_W);
+
+	void *va = alloc_mapped_frag(dev, nc, PAGE_SIZE * 16, dir);
+
+	assert(virt_addr_valid(va));
+	return virt_to_page(va);
+}
+
 struct page *dma_cache_alloc_pages(struct device *dev, int order, enum dma_data_direction dir)
 {
 	assert(order <= DMA_CACHE_MAX_ORDER);
 	if (order) {
-		WARN_ONCE((order != DMA_CACHE_MAX_ORDER), "order is %d", order);
-		return alloc_mapped_pages(dev, dir);
+		return __dma_cache_alloc_pages(dev, dir);
 	} else {
 		return dma_cache_alloc_page(dev, dir);
 	}
 }
 EXPORT_SYMBOL(dma_cache_alloc_pages);
 
-void dma_cache_free(struct device *dev, struct page *elem)
+void dma_cache_free(struct device *dev, struct page *page)
 {
+	struct page *elem = compound_head(page);
 	int	idx = iova_key(elem->iova);
 	struct  mag_allocator *allocator = &dev->iova_mag->allocator[idx];
 
