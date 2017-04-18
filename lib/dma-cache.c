@@ -31,8 +31,8 @@ static inline u64 perm2idx(enum dma_data_direction permission)
 */
 static inline u64 	iova_encoding(enum dma_data_direction permission)
 {
-	//return	DMA_CACHE_FLAG |
-	return	((smp_processor_id() << CORE_SHIFT) |
+	return	DMA_CACHE_FLAG |
+		((smp_processor_id() << CORE_SHIFT) |
 		(perm2idx(permission) << PERM_SHIFT));
 }
 
@@ -45,8 +45,7 @@ static inline u64	alloc_key(enum dma_data_direction permission)
 //Watch for the assymetry with iova_encoding;
 static inline u64	iova_get_encoding(u64 iova)
 {
-	//return ((iova >> IOVA_RANGE_SHIFT) & ~DMA_CACHE_FLAG);
-	return (iova & ~PAGE_MASK);
+	return ((iova >> IOVA_RANGE_SHIFT) & ~DMA_CACHE_FLAG);
 }
 
 static inline u64 iova_key(u64 iova)
@@ -57,7 +56,6 @@ static inline u64 iova_key(u64 iova)
 	return (node  << CORE_SHIFT|perm << PERM_SHIFT);
 }
 
-/*
 enum dma_data_direction iova_perm(u64 iova)
 {
 	u64 encoding = iova_get_encoding(iova);
@@ -72,12 +70,12 @@ u64 dma_cache_iova_key(u64 iova)
 	u64 perm = ((encoding & ~DMA_CACHE_CORE_MASK) >> PERM_SHIFT);
 	return (core  << CORE_SHIFT|perm << PERM_SHIFT);
 }
+
 u64 dma_cache_iova_idx(u64 iova)
 {
 	return (iova & (BIT(IOVA_RANGE_SHIFT) - 1)) >> DMA_CACHE_SHIFT;
 }
-*/
-/*
+
 void iova_format(u64 iova)
 {
 	u64 encoding = iova_get_encoding(iova);
@@ -97,7 +95,7 @@ void iova_decode(u64 iova)
 		     core , (perm) ? "RX" : "TX", dma_cache_iova_idx(iova));
 	assert(perm < 2);
 }
-*/
+
 u64 virt_to_iova(void *virt)
 {
 	u64 iova;
@@ -107,11 +105,11 @@ u64 virt_to_iova(void *virt)
 	if (!head->iova)
 		return IOVA_INVALID;
 
-	iova = (head->iova & PAGE_MASK) + ((page - head) * PAGE_SIZE) + ((u64)virt & (PAGE_SIZE -1));
+	iova = head->iova + ((page - head) * PAGE_SIZE) + ((u64)virt & (PAGE_SIZE -1));
 	return iova;
 }
 EXPORT_SYMBOL(virt_to_iova);
-/*
+
 static inline void validate_iova(u64 iova)
 {
 	u64 encoding = iova_get_encoding(iova);
@@ -126,20 +124,16 @@ static inline void validate_iova(u64 iova)
 
 	assert(alloc_key(idx2perm(perm)) == iova_key(iova));
 }
-*/
+
 static inline u64 alloc_new_iova(struct device	*dev,
 				 enum dma_data_direction	dir)
 {
-	return iova_encoding(dir);
-/*
 	u64 iova = iova_encoding(dir) << IOVA_RANGE_SHIFT;
 	u64 idx = atomic64_inc_return(&dev->iova_mag->last_idx[alloc_key(dir)]);
 
 	return (iova | (idx -1) << DMA_CACHE_SHIFT);
-*/
 }
 
-/*
 static inline void map_each_page(struct device *dev, struct page *page,
 				 enum dma_data_direction dir, u64 iova)
 {
@@ -154,7 +148,6 @@ static inline void map_each_page(struct device *dev, struct page *page,
 		iova += PAGE_SIZE;
 	}
 }
-*/
 
 #define DMA_CACHE_ELEM_MASK (DMA_CACHE_ELEM_SIZE - 1)
 static inline void check_allignment(struct page *page)
@@ -171,8 +164,6 @@ static inline struct page *inc_mapping(struct device	*dev,
 				       enum dma_data_direction	dir)
 {
 	dma_addr_t	iova = 0;
-	u64		encoding;
-	struct dma_map_ops *ops = get_dma_ops(dev);
 	struct page	*page;
 
 	page = alloc_pages( __GFP_COMP | __GFP_NOWARN |
@@ -184,12 +175,12 @@ static inline struct page *inc_mapping(struct device	*dev,
 	}
 	check_allignment(page);
 
-	encoding = alloc_new_iova(dev, dir);
+	iova = alloc_new_iova(dev, dir);
 
-	iova = ops->map_page(dev, page, 0, DMA_CACHE_ELEM_SIZE, dir, 0, IOVA_INVALID);
+	map_each_page(dev, page, dir, iova);
 
-	page->iova	= iova | encoding;
-	//validate_iova(page->iova);
+	page->iova	= iova;
+	validate_iova(page->iova);
 	page->device	= dev;
 
 	return page;
@@ -318,7 +309,6 @@ int	register_iova_map(struct device *dev)
 	struct page *page = alloc_pages(__GFP_COMP | __GFP_ZERO,
                                         get_order(sizeof(struct dev_iova_mag)));
 
-	printk(KERN_ERR "%s) Non Encoded IOVA Registering device %p\n", __FUNCTION__, dev);
 	dev->iova_mag = page_address(page);
 
 	for (i = 0; i < NUM_ALLOCATORS; i++) {
