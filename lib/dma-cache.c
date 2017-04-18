@@ -1,6 +1,5 @@
 #include <linux/dma-cache.h>
 #include <linux/dma-mapping.h>
-#include <linux/hugetlb.h>
 
 #ifndef assert
 #define assert(expr) 	do { \
@@ -138,10 +137,15 @@ static inline u64 alloc_new_iova(struct device	*dev,
 static inline void map_each_page(struct device *dev, struct page *page,
 				 enum dma_data_direction dir, u64 iova)
 {
+	int i;
 	struct dma_map_ops *ops = get_dma_ops(dev);
 
-	if (ops->map_page(dev, page, 0, DMA_CACHE_ELEM_SIZE, dir, 0, iova) != iova) {
-		panic("Couldnt MAP page %llx\n", iova);
+	for (i = 0; i < PAGES_IN_DMA_CACHE_ELEM; i++) {
+		if (ops->map_page(dev, page, 0, PAGE_SIZE, dir, 0, iova) != iova) {
+			panic("Couldnt MAP page %llx (%d)", iova, i);
+		}
+		page++;
+		iova += PAGE_SIZE;
 	}
 }
 
@@ -162,12 +166,9 @@ static inline struct page *inc_mapping(struct device	*dev,
 	dma_addr_t	iova = 0;
 	struct page	*page;
 
-	page = alloc_huge_page_node(size_to_hstate(DMA_CACHE_ELEM_SIZE), numa_node_id());
-/*
 	page = alloc_pages( __GFP_COMP | __GFP_NOWARN |
 			   __GFP_NORETRY | GFP_ATOMIC | __GFP_IO
 			   , get_order(DMA_CACHE_ELEM_SIZE));
-*/
 	if (!page) {
 		panic("Couldnt alloc pages\n");
 		return ERR_PTR(-ENOMEM);
@@ -229,7 +230,6 @@ void *alloc_mapped_frag(struct device *dev, struct page_frag_dma_cache *nc, size
 
 	if (unlikely(!nc->va)) {
 		page = alloc_mapped_pages(dev, dir);
-		assert(page == compound_head(page));
 		if (!page)
 			return NULL;
 
