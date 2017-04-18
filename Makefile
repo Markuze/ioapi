@@ -1,7 +1,7 @@
 VERSION = 4
 PATCHLEVEL = 7
 SUBLEVEL = 0
-EXTRAVERSION = '-damn'
+EXTRAVERSION = '-damnn-hp'
 NAME = Psychotic Stoned Sheep
 
 # *DOCUMENTATION*
