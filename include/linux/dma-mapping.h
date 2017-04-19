@@ -169,7 +169,7 @@ static inline void dma_unmap_single_attrs(struct device *dev, dma_addr_t addr,
 
 	BUG_ON(!valid_dma_direction(dir));
 
-	if (is_dma_cache_iova(addr)) {
+	if (dev->iova_mag) {
 		return;
 	}
 
@@ -244,7 +244,7 @@ static inline void dma_unmap_page(struct device *dev, dma_addr_t addr,
 
 	BUG_ON(!valid_dma_direction(dir));
 
-	if (is_dma_cache_iova(addr)) {
+	if (dev->iova_mag) {
 		return;
 	}
 
