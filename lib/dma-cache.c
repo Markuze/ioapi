@@ -212,7 +212,7 @@ void *alloc_mapped_frag(struct device *dev, struct page_frag_cache *nc, size_t f
 	struct page *page;
 	int offset;
 
-	fragsz = __ALIGN_MASK(size, MIN_COPY_ALLOC_MASK);
+	fragsz = __ALIGN_MASK(fragsz, MIN_COPY_ALLOC_MASK);
 	offset = nc->offset - fragsz;
 
 	if (unlikely(offset < 0)) {
