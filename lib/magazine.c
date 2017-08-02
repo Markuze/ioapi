@@ -18,14 +18,14 @@
 
 // page_to_nid - validate copy and mag alloc/free.
 
-static inline void mag_lock(struct mag_allocator *allocator)
+static inline void mag_lock(struct mag_allocator *allocator, unsigned long *flags)
 {
-	spin_lock_bh(&allocator->lock);
+	spin_lock_irqsave(&allocator->lock, *flags);
 }
 
-static inline void mag_unlock(struct mag_allocator *allocator)
+static inline void mag_unlock(struct mag_allocator *allocator, unsigned long flags)
 {
-	spin_unlock_bh(&allocator->lock);
+	spin_unlock_irqrestore(&allocator->lock, flags);
 }
 
 static inline u32 mag_pair_count(struct mag_pair *pair)
@@ -85,10 +85,11 @@ static void mag_pair_free(struct mag_pair *pair, void *elem)
 
 static void mag_allocator_switch_full(struct mag_allocator *allocator, struct mag_pair *pair)
 {
+	unsigned long flags;
 	u32 idx = (pair->count[1] == MAG_DEPTH) ? 1 : 0;
 	assert(pair->count[idx] == MAG_DEPTH);
 
-	mag_lock(allocator);
+	mag_lock(allocator, &flags);
 
 	list_add(&pair->mags[idx]->list, &allocator->full_list);
 	++allocator->full_count;
@@ -102,16 +103,17 @@ static void mag_allocator_switch_full(struct mag_allocator *allocator, struct ma
 
 		pair->mags[idx]	= (void *)ALIGN((u64)ptr, L1_CACHE_BYTES);
 	}
-	mag_unlock(allocator);
+	mag_unlock(allocator, flags);
 
 	pair->count[idx] = 0;
 }
 
 static void mag_allocator_switch_empty(struct mag_allocator *allocator, struct mag_pair *pair)
 {
+	unsigned long flags;
 	int idx = (pair->count[0]) ? 1 : 0;
 
-	mag_lock(allocator);
+	mag_lock(allocator, &flags);
 	if (allocator->full_count) {
 		list_add(&pair->mags[idx]->list, &allocator->empty_list);
 		++allocator->empty_count;
@@ -121,7 +123,7 @@ static void mag_allocator_switch_empty(struct mag_allocator *allocator, struct m
 		pair->count[idx] = MAG_DEPTH;
 		--allocator->full_count;
 	}
-	mag_unlock(allocator);
+	mag_unlock(allocator, flags);
 }
 
 void *mag_alloc_elem(struct mag_allocator *allocator)
