@@ -36,7 +36,10 @@ static inline void set_copy_ops(struct dma_map_ops *target);
 static inline void *dma_copy_sync(void *dst, void *src, size_t size)
 {
 	//trace_debug("syncing %p -> %p [size : %zu]\n", src, dst, size);
-	return memcpy(dst, src, size);
+	if (dst && src)
+		return memcpy(dst, src, size);
+
+	return NULL;
 }
 
 static inline struct shadow_entry *get_shadow_entry(struct device *dev, dma_addr_t iova)
@@ -203,7 +206,8 @@ static void dma_copy_unmap_sg(struct device *dev, struct scatterlist *sgl,
 	struct scatterlist *sg;
 
 	for_each_sg(sgl, sg, nents, i) {
-		dma_copy_unmap(dev, sg_dma_address(sg), sg_dma_len(sg), dir, attrs);
+		if (likely(dev))
+			dma_copy_unmap(dev, sg_dma_address(sg), sg_dma_len(sg), dir, attrs);
 	}
 }
 
