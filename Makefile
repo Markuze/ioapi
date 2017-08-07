@@ -1,7 +1,7 @@
 VERSION = 4
 PATCHLEVEL = 7
 SUBLEVEL = 0
-EXTRAVERSION = '-damn'
+EXTRAVERSION = '-damn-ipsec'
 NAME = Psychotic Stoned Sheep
 
 # *DOCUMENTATION*
