@@ -429,7 +429,6 @@ static int esp_input(struct xfrm_state *x, struct sk_buff *skb)
 	void *tmp;
 	u8 *iv;
 	struct scatterlist *sg;
-	struct sk_buff *copy;
 	int err = -EINVAL;
 
 	if (!pskb_may_pull(skb, sizeof(*esph) + ivlen))
@@ -482,8 +481,7 @@ static int esp_input(struct xfrm_state *x, struct sk_buff *skb)
 	}
 
 	sg_init_table(sg, nfrags);
-	copy = skb_copy(skb, GFP_ATOMIC);
-	skb_to_sgvec(copy, sg, 0, copy->len);
+	skb_to_sgvec(skb, sg, 0, skb->len);
 
 	aead_request_set_crypt(req, sg, sg, elen + ivlen, iv);
 	aead_request_set_ad(req, assoclen);
@@ -498,7 +496,6 @@ static int esp_input(struct xfrm_state *x, struct sk_buff *skb)
 	err = esp_input_done2(skb, err);
 
 out:
-	kfree_skb(copy);
 	return err;
 }
 
