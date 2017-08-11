@@ -854,6 +854,7 @@ struct device {
 	struct dev_iova_mag	*iova_mag;
 	bool			offline_disabled:1;
 	bool			offline:1;
+	bool			no_iommu:1;
 };
 
 static inline struct device *kobj_to_dev(struct kobject *kobj)

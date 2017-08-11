@@ -134,8 +134,12 @@ static inline void map_each_page(struct device *dev, struct page *page,
 				 enum dma_data_direction dir, u64 iova)
 {
 	int i;
-	struct dma_map_ops *ops = get_dma_ops(dev);
+	struct dma_map_ops *ops;
 
+	if (dev->no_iommu)
+		return;
+
+	ops = get_dma_ops(dev);
 	for (i = 0; i < PAGES_IN_DMA_CACHE_ELEM; i++) {
 		if (ops->map_page(dev, page, 0, PAGE_SIZE, dir, 0, iova) != iova) {
 			panic("Couldnt MAP page %llx (%d)", iova, i);
