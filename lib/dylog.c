@@ -4,7 +4,7 @@
 #include <linux/kernel.h>
 #include <linux/dylog.h>
 
-static struct dylog global_dylog;
+static struct dylog global_dylog = {0};
 
 void __dylog_trace_alloc(u64 addr, u16 size, int is_tx, int is_alloc)
 {
