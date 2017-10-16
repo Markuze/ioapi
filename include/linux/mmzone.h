@@ -270,17 +270,23 @@ enum zone_watermarks {
 #define low_wmark_pages(z) (z->watermark[WMARK_LOW])
 #define high_wmark_pages(z) (z->watermark[WMARK_HIGH])
 
+#define MAX_COMP_PAGES_CACHE_ORDER (5)
+#define MIN_COMP_PAGES_CACHE_ORDER (1)
+#define COMP_PAGES_CACHE_ORDER_LEN (MAX_COMP_PAGES_CACHE_ORDER - MIN_COMP_PAGES_CACHE_ORDER + 1)
+
+#define PCP_LIST_LEN	COMP_PAGES_CACHE_ORDER_LEN
 struct per_cpu_pages {
 	int count;		/* number of pages in the list */
 	int high;		/* high watermark, emptying needed */
 	int batch;		/* chunk size for buddy add/remove */
 
 	/* Lists of pages, one per migrate type stored on the pcp-lists */
-	struct list_head lists[MIGRATE_PCPTYPES];
+	struct list_head lists[PCP_LIST_LEN];
 };
 
 struct per_cpu_pageset {
 	struct per_cpu_pages pcp;
+	struct per_cpu_pages pcop;
 #ifdef CONFIG_NUMA
 	s8 expire;
 	u16 vm_numa_stat_diff[NR_VM_NUMA_STAT_ITEMS];
@@ -871,7 +877,7 @@ static inline int is_highmem_idx(enum zone_type idx)
 }
 
 /**
- * is_highmem - helper function to quickly check if a struct zone is a 
+ * is_highmem - helper function to quickly check if a struct zone is a
  *              highmem zone or not.  This is an attempt to keep references
  *              to ZONE_{DMA/NORMAL/HIGHMEM/etc} in general code to a minimum.
  * @zone - pointer to struct zone variable

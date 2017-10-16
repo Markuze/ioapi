@@ -131,6 +131,7 @@ unsigned long totalcma_pages __read_mostly;
 int percpu_pagelist_fraction;
 gfp_t gfp_allowed_mask __read_mostly = GFP_BOOT_MASK;
 
+bool free_hot_cold_pages(struct page *page, int order, bool cold);
 /*
  * A cached value of the page's pageblock's migratetype, used when the page is
  * put on a pcplist. Used to avoid the pageblock migratetype lookup when
@@ -1247,6 +1248,9 @@ static void __free_pages_ok(struct page *page, unsigned int order)
 	unsigned long pfn = page_to_pfn(page);
 
 	if (!free_pages_prepare(page, order, true))
+		return;
+	//free_hot_cold_page
+	if (free_hot_cold_pages(page, order, false))
 		return;
 
 	migratetype = get_pfnblock_migratetype(page, pfn);
@@ -2590,6 +2594,37 @@ void mark_free_pages(struct zone *zone)
 }
 #endif /* CONFIG_PM */
 
+static inline int pcp_limit(int order)
+{
+	int limits[MAX_COMP_PAGES_CACHE_ORDER] = {/* 1 */64, 64, 64, 64, 32};
+	return limits[order -1];
+}
+
+bool free_hot_cold_pages(struct page *page, int order, bool cold)
+{
+	struct zone *zone = page_zone(page);
+	struct per_cpu_pages *pcp;
+	unsigned long flags;
+	bool rc = true;
+
+	if (! order || order > MAX_COMP_PAGES_CACHE_ORDER)
+		return false;
+	pcp = &this_cpu_ptr(zone->pageset)->pcop;
+	local_irq_save(flags);
+	if (pcp->count >= pcp_limit(order)) {
+		rc = false;
+		goto out;
+	}
+
+	if (!cold)
+		list_add(&page->lru, &pcp->lists[order - MIN_COMP_PAGES_CACHE_ORDER]);
+	else
+		list_add_tail(&page->lru, &pcp->lists[order - MIN_COMP_PAGES_CACHE_ORDER]);
+	pcp->count++;
+out:
+	local_irq_restore(flags);
+	return rc;
+}
 /*
  * Free a 0-order page
  * cold == true ? free a cold page : free a hot page
@@ -2757,15 +2792,15 @@ static inline void zone_statistics(struct zone *preferred_zone, struct zone *z)
 }
 
 /* Remove page from the per-cpu list, caller must protect the list */
-static struct page *__rmqueue_pcplist(struct zone *zone, int migratetype,
-			bool cold, struct per_cpu_pages *pcp,
-			struct list_head *list)
+static struct page *__rmqueue_pcplist(struct zone *zone, int migratetype, int order,
+				      bool cold, struct per_cpu_pages *pcp,
+				      struct list_head *list)
 {
 	struct page *page;
 
 	do {
 		if (list_empty(list)) {
-			pcp->count += rmqueue_bulk(zone, 0,
+			pcp->count += rmqueue_bulk(zone, order,
 					pcp->batch, list,
 					migratetype, cold);
 			if (unlikely(list_empty(list)))
@@ -2786,23 +2821,42 @@ static struct page *__rmqueue_pcplist(struct zone *zone, int migratetype,
 
 /* Lock and remove page from the per-cpu list */
 static struct page *rmqueue_pcplist(struct zone *preferred_zone,
-			struct zone *zone, unsigned int order,
-			gfp_t gfp_flags, int migratetype)
+				    struct zone *zone, unsigned int order,
+				    gfp_t gfp_flags, int migratetype)
 {
 	struct per_cpu_pages *pcp;
 	struct list_head *list;
-	bool cold = ((gfp_flags & __GFP_COLD) != 0);
+	bool cold = (gfp_flags & __GFP_COLD);
 	struct page *page;
 	unsigned long flags;
 
 	local_irq_save(flags);
 	pcp = &this_cpu_ptr(zone->pageset)->pcp;
 	list = &pcp->lists[migratetype];
-	page = __rmqueue_pcplist(zone,  migratetype, cold, pcp, list);
+	page = __rmqueue_pcplist(zone,  migratetype, order, cold, pcp, list);
 	if (page) {
 		__count_zid_vm_events(PGALLOC, page_zonenum(page), 1 << order);
 		zone_statistics(preferred_zone, zone);
 	}
+	local_irq_restore(flags);
+	return page;
+}
+
+/* Lock and remove page from the per-cpu list */
+static struct page *rmqueue_pcp_complist(struct zone *preferred_zone,
+					 struct zone *zone, unsigned int order,
+					 gfp_t gfp_flags, int migratetype)
+{
+	struct per_cpu_pages *pcp;
+	struct list_head *list;
+	bool cold = 0;
+	struct page *page = NULL;
+	unsigned long flags;
+
+	pcp = &this_cpu_ptr(zone->pageset)->pcop;
+	list = &pcp->lists[order - MIN_COMP_PAGES_CACHE_ORDER];
+	local_irq_save(flags);
+	page = __rmqueue_pcplist(zone,  migratetype, order, cold, pcp, list);
 	local_irq_restore(flags);
 	return page;
 }
@@ -2821,10 +2875,16 @@ struct page *rmqueue(struct zone *preferred_zone,
 
 	if (likely(order == 0)) {
 		page = rmqueue_pcplist(preferred_zone, zone, order,
-				gfp_flags, migratetype);
+				       gfp_flags, migratetype);
 		goto out;
 	}
 
+	if (likely(order && order <= MAX_COMP_PAGES_CACHE_ORDER)) {
+		page = rmqueue_pcp_complist(preferred_zone, zone, order,
+					    gfp_flags, migratetype);
+		if (page)
+			goto out;
+	}
 	/*
 	 * We most definitely don't want callers attempting to
 	 * allocate greater than order-1 page units with __GFP_NOFAIL.
@@ -5481,6 +5541,11 @@ static void pageset_init(struct per_cpu_pageset *p)
 	pcp = &p->pcp;
 	pcp->count = 0;
 	for (migratetype = 0; migratetype < MIGRATE_PCPTYPES; migratetype++)
+		INIT_LIST_HEAD(&pcp->lists[migratetype]);
+
+	pcp = &p->pcop;
+	pcp->count = 0;
+	for (migratetype = 0; migratetype < COMP_PAGES_CACHE_ORDER_LEN; migratetype++)
 		INIT_LIST_HEAD(&pcp->lists[migratetype]);
 }
 
