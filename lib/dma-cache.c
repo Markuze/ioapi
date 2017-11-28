@@ -1,6 +1,5 @@
 #include <linux/dma-cache.h>
 #include <linux/dma-mapping.h>
-#include <linux/dylog.h>
 
 #ifndef assert
 #define assert(expr) 	do { \
@@ -232,7 +231,7 @@ void *alloc_mapped_frag(struct device *dev, struct page_frag_cache *nc, size_t f
 		nc->va = page_address(page);
 		offset = size - fragsz;
 	}
-	/* We need to make sure the page is not free before its replaced in the cache */
+	/* We need to make sure the page is not free before its replased in the cache */
 	get_page(virt_to_page(nc->va));
 
 	nc->offset = offset;
@@ -248,7 +247,6 @@ void *dma_cache_alloc(struct device *dev, size_t size, enum dma_data_direction d
 						    (dir == DMA_TO_DEVICE) ? DMA_CACHE_FRAG_PARTIAL_R : DMA_CACHE_FRAG_PARTIAL_W);
 	assert(size <= DMA_CACHE_ELEM_SIZE);
 	va = alloc_mapped_frag(dev, nc, size, dir);
-	dylog_trace_alloc(va, __ALIGN_MASK(size, MIN_COPY_ALLOC_MASK), (dir == DMA_TO_DEVICE) ? 1 : 0);
 	return va;
 }
 EXPORT_SYMBOL(dma_cache_alloc);
@@ -259,7 +257,6 @@ struct page *dma_cache_alloc_page(struct device *dev, enum dma_data_direction di
 						    (dir == DMA_TO_DEVICE) ? DMA_CACHE_FRAG_FULL_R : DMA_CACHE_FRAG_FULL_W);
 
 	void *va = alloc_mapped_frag(dev, nc, PAGE_SIZE, dir);
-	dylog_trace_alloc(va, 4096, (dir == DMA_TO_DEVICE) ? 1 : 0);
 
 	assert(virt_addr_valid(va));
 	return virt_to_page(va);
@@ -270,11 +267,8 @@ struct page *dma_cache_alloc_pages(struct device *dev, int order, enum dma_data_
 {
 	assert(order <= DMA_CACHE_MAX_ORDER);
 	if (order) {
-		struct page *page;
 		WARN_ONCE((order != DMA_CACHE_MAX_ORDER), "order is %d", order);
-		page = alloc_mapped_pages(dev, dir);
-		dylog_trace_alloc(page_address(page), 4096 << order, (dir == DMA_TO_DEVICE) ? 1 : 0);
-		return page;
+		return alloc_mapped_pages(dev, dir);
 	} else {
 		return dma_cache_alloc_page(dev, dir);
 	}
@@ -289,7 +283,6 @@ void dma_cache_free(struct device *dev, struct page *elem)
 	assert(page_to_nid(elem) == (idx >> CORE_SHIFT));
 	assert(idx < NUM_ALLOCATORS);
 	mag_free_elem(allocator, elem);
-	dylog_trace_free(page_address(elem));
 	//mag_free_elem(allocator, elem, iova_core(elem->iova)); // When maga support available
 }
 EXPORT_SYMBOL(dma_cache_free);
