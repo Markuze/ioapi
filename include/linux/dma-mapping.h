@@ -232,6 +232,17 @@ static inline dma_addr_t dma_map_single_attrs(struct device *dev, void *ptr,
 
 	kmemcheck_mark_initialized(ptr, size);
 	BUG_ON(!valid_dma_direction(dir));
+
+	if (dev->iova_mag) {
+		struct page *page = virt_to_head_page(ptr);
+
+		if (page->iova) {
+			//size_t offset = ptr - page_address(page);
+			//return (page->iova & PAGE_MASK) + offset; //<-- not a bug :)
+			return virt_to_iova(ptr);
+		}
+	}
+
 	addr = ops->map_page(dev, virt_to_page(ptr),
 			     offset_in_page(ptr), size,
 			     dir, attrs);
@@ -249,6 +260,11 @@ static inline void dma_unmap_single_attrs(struct device *dev, dma_addr_t addr,
 	const struct dma_map_ops *ops = get_dma_ops(dev);
 
 	BUG_ON(!valid_dma_direction(dir));
+
+	if (dev->iova_mag) {
+		return;
+	}
+
 	if (ops->unmap_page)
 		ops->unmap_page(dev, addr, size, dir, attrs);
 	debug_dma_unmap_page(dev, addr, size, dir, true);
@@ -299,6 +315,16 @@ static inline dma_addr_t dma_map_page_attrs(struct device *dev,
 
 	kmemcheck_mark_initialized(page_address(page) + offset, size);
 	BUG_ON(!valid_dma_direction(dir));
+
+	if (dev->iova_mag) {
+		struct page *head = compound_head(page);
+		if (head->iova) {
+			//return (head->iova & PAGE_MASK) + offset;
+			void *ptr = page_address(page) + offset;
+			return virt_to_iova(ptr);
+		}
+	}
+
 	addr = ops->map_page(dev, page, offset, size, dir, attrs);
 	debug_dma_map_page(dev, page, offset, size, dir, addr, false);
 
@@ -313,6 +339,11 @@ static inline void dma_unmap_page_attrs(struct device *dev,
 	const struct dma_map_ops *ops = get_dma_ops(dev);
 
 	BUG_ON(!valid_dma_direction(dir));
+
+	if (dev->iova_mag) {
+		return;
+	}
+
 	if (ops->unmap_page)
 		ops->unmap_page(dev, addr, size, dir, attrs);
 	debug_dma_unmap_page(dev, addr, size, dir, false);

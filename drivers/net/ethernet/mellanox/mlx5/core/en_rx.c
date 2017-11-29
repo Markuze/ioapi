@@ -218,7 +218,7 @@ static inline int mlx5e_page_alloc_mapped(struct mlx5e_rq *rq,
 	if (mlx5e_rx_cache_get(rq, dma_info))
 		return 0;
 
-	dma_info->page = dev_alloc_pages(rq->buff.page_order);
+	dma_info->page = dma_cache_alloc_pages(rq->pdev, rq->buff.page_order, rq->buff.map_dir);
 	if (unlikely(!dma_info->page))
 		return -ENOMEM;
 

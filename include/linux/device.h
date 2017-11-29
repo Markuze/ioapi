@@ -27,6 +27,7 @@
 #include <linux/ratelimit.h>
 #include <linux/uidgid.h>
 #include <linux/gfp.h>
+#include <linux/dma-cache.h>
 #include <asm/device.h>
 
 struct device;
@@ -961,6 +962,7 @@ struct device {
 	struct iommu_group	*iommu_group;
 	struct iommu_fwspec	*iommu_fwspec;
 
+	struct dev_iova_mag	*iova_mag;
 	bool			offline_disabled:1;
 	bool			offline:1;
 	bool			of_node_reused:1;

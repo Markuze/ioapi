@@ -35,6 +35,7 @@
 #include <linux/mlx5/fs.h>
 #include <net/vxlan.h>
 #include <linux/bpf.h>
+#include <linux/dma-cache.h>
 #include "eswitch.h"
 #include "en.h"
 #include "en_tc.h"
@@ -3936,6 +3937,11 @@ void mlx5e_build_nic_params(struct mlx5_core_dev *mdev,
 		MLX5E_PARAMS_MINIMUM_LOG_SQ_SIZE :
 		MLX5E_PARAMS_DEFAULT_LOG_SQ_SIZE;
 
+	mlx5_core_err(mdev, "WQ type %s\n", mlx5e_check_fragmented_striding_rq_cap(mdev) ?
+		"MLX5_WQ_TYPE_LINKED_LIST_STRIDING_RQ" :
+		"MLX5_WQ_TYPE_LINKED_LIST"
+		);
+
 	/* set CQE compression */
 	params->rx_cqe_compress_def = false;
 	if (MLX5_CAP_GEN(mdev, cqe_compression) &&
@@ -4489,7 +4495,7 @@ static void *mlx5e_add(struct mlx5_core_dev *mdev)
 		}
 	}
 #endif
-
+	register_iova_map(&mdev->pdev->dev);
 	netdev = mlx5e_create_netdev(mdev, &mlx5e_nic_profile, rpriv);
 	if (!netdev) {
 		mlx5_core_err(mdev, "mlx5e_create_netdev failed\n");
