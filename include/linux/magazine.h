@@ -28,6 +28,7 @@ struct mag_allocator {
 	struct list_head 	full_list;
 	uint16_t 		empty_count;
 	uint16_t 		full_count;
+	//TODO: dude, use percpu ptr + this shit doesnt work as you think...
 	struct mag_pair		pair[NR_CPUS] ____cacheline_aligned_in_smp; //Per Core instance x 2 (normal , and _bh)
 };
 

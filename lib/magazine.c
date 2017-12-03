@@ -98,6 +98,7 @@ static void mag_allocator_switch_full(struct mag_allocator *allocator, struct ma
 		list_del_init(allocator->empty_list.next);
 		--allocator->empty_count;
 	} else {
+		/* TODO: use cache alloctor*/
 		void *ptr = kzalloc(sizeof(struct magazine) + L1_CACHE_BYTES -1, GFP_ATOMIC|__GFP_COMP|__GFP_NOWARN);
 
 		pair->mags[idx]	= (void *)ALIGN((u64)ptr, L1_CACHE_BYTES);

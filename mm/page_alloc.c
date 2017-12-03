@@ -2596,34 +2596,24 @@ void mark_free_pages(struct zone *zone)
 
 static inline int pcp_limit(int order)
 {
-	int limits[MAX_COMP_PAGES_CACHE_ORDER] = {/* 1 */64, 64, 64, 64, 32};
+	int limits[ALLOC_CACHE_MAX_ORDER] = {/* 1 */16, 16, 16, 8, 4};
 	return limits[order -1];
 }
 
 bool free_hot_cold_pages(struct page *page, int order, bool cold)
 {
 	struct zone *zone = page_zone(page);
-	struct per_cpu_pages *pcp;
-	unsigned long flags;
-	bool rc = true;
+	struct mag_allocator *allocator;
 
-	if (! order || order > MAX_COMP_PAGES_CACHE_ORDER)
-		return false;
-	pcp = &this_cpu_ptr(zone->pageset)->pcop;
-	local_irq_save(flags);
-	if (pcp->count >= pcp_limit(order)) {
-		rc = false;
-		goto out;
-	}
+	if (! order || order > ALLOC_CACHE_MAX_ORDER)
+	        return false;
+	allocator = &zone->alloc_cache.mag_allocator[order -1];
+	if (allocator->full_count >= pcp_limit(order))
+	        return false;
 
-	if (!cold)
-		list_add(&page->lru, &pcp->lists[order - MIN_COMP_PAGES_CACHE_ORDER]);
-	else
-		list_add_tail(&page->lru, &pcp->lists[order - MIN_COMP_PAGES_CACHE_ORDER]);
-	pcp->count++;
-out:
-	local_irq_restore(flags);
-	return rc;
+	mag_free_elem(allocator, page_address(page));
+
+	return true;
 }
 /*
  * Free a 0-order page
@@ -2847,17 +2837,14 @@ static struct page *rmqueue_pcp_complist(struct zone *preferred_zone,
 					 struct zone *zone, unsigned int order,
 					 gfp_t gfp_flags, int migratetype)
 {
-	struct per_cpu_pages *pcp;
-	struct list_head *list;
-	bool cold = 0;
 	struct page *page = NULL;
-	unsigned long flags;
+	struct mag_allocator *allocator;
+	void *elem;
 
-	pcp = &this_cpu_ptr(zone->pageset)->pcop;
-	list = &pcp->lists[order - MIN_COMP_PAGES_CACHE_ORDER];
-	local_irq_save(flags);
-	page = __rmqueue_pcplist(zone,  migratetype, order, cold, pcp, list);
-	local_irq_restore(flags);
+	allocator = &zone->alloc_cache.mag_allocator[order -1];
+	elem = mag_alloc_elem(allocator);
+	if (elem)
+		page = virt_to_page(elem);
 	return page;
 }
 
@@ -2879,7 +2866,7 @@ struct page *rmqueue(struct zone *preferred_zone,
 		goto out;
 	}
 
-	if (likely(order && order <= MAX_COMP_PAGES_CACHE_ORDER)) {
+	if (likely(order && order <= ALLOC_CACHE_MAX_ORDER)) {
 		page = rmqueue_pcp_complist(preferred_zone, zone, order,
 					    gfp_flags, migratetype);
 		if (page)
@@ -5542,11 +5529,6 @@ static void pageset_init(struct per_cpu_pageset *p)
 	pcp->count = 0;
 	for (migratetype = 0; migratetype < MIGRATE_PCPTYPES; migratetype++)
 		INIT_LIST_HEAD(&pcp->lists[migratetype]);
-
-	pcp = &p->pcop;
-	pcp->count = 0;
-	for (migratetype = 0; migratetype < COMP_PAGES_CACHE_ORDER_LEN; migratetype++)
-		INIT_LIST_HEAD(&pcp->lists[migratetype]);
 }
 
 static void setup_pageset(struct per_cpu_pageset *p, unsigned long batch)
@@ -5582,10 +5564,14 @@ static void pageset_set_high_and_batch(struct zone *zone,
 
 static void __meminit zone_pageset_init(struct zone *zone, int cpu)
 {
+	int i;
 	struct per_cpu_pageset *pcp = per_cpu_ptr(zone->pageset, cpu);
 
 	pageset_init(pcp);
 	pageset_set_high_and_batch(zone, pcp);
+
+	for (i = 0; i < ALLOC_CACHE_MAX_ORDER; i++)
+		mag_allocator_init(&zone->alloc_cache.mag_allocator[i]);
 }
 
 void __meminit setup_zone_pageset(struct zone *zone)

@@ -6,6 +6,7 @@
 #ifndef __GENERATING_BOUNDS_H
 
 #include <linux/spinlock.h>
+#include <linux/magazine.h>
 #include <linux/list.h>
 #include <linux/wait.h>
 #include <linux/bitops.h>
@@ -270,23 +271,17 @@ enum zone_watermarks {
 #define low_wmark_pages(z) (z->watermark[WMARK_LOW])
 #define high_wmark_pages(z) (z->watermark[WMARK_HIGH])
 
-#define MAX_COMP_PAGES_CACHE_ORDER (5)
-#define MIN_COMP_PAGES_CACHE_ORDER (1)
-#define COMP_PAGES_CACHE_ORDER_LEN (MAX_COMP_PAGES_CACHE_ORDER - MIN_COMP_PAGES_CACHE_ORDER + 1)
-
-#define PCP_LIST_LEN	COMP_PAGES_CACHE_ORDER_LEN
 struct per_cpu_pages {
 	int count;		/* number of pages in the list */
 	int high;		/* high watermark, emptying needed */
 	int batch;		/* chunk size for buddy add/remove */
 
 	/* Lists of pages, one per migrate type stored on the pcp-lists */
-	struct list_head lists[PCP_LIST_LEN];
+	struct list_head lists[MIGRATE_PCPTYPES];
 };
 
 struct per_cpu_pageset {
 	struct per_cpu_pages pcp;
-	struct per_cpu_pages pcop;
 #ifdef CONFIG_NUMA
 	s8 expire;
 	u16 vm_numa_stat_diff[NR_VM_NUMA_STAT_ITEMS];
@@ -361,6 +356,11 @@ enum zone_type {
 
 #ifndef __GENERATING_BOUNDS_H
 
+#define ALLOC_CACHE_MAX_ORDER 5
+struct alloc_cache {
+	struct mag_allocator mag_allocator[ALLOC_CACHE_MAX_ORDER];
+};
+
 struct zone {
 	/* Read-mostly fields */
 
@@ -384,6 +384,7 @@ struct zone {
 	int node;
 #endif
 	struct pglist_data	*zone_pgdat;
+	struct alloc_cache	alloc_cache;
 	struct per_cpu_pageset __percpu *pageset;
 
 #ifndef CONFIG_SPARSEMEM
