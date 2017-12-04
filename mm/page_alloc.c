@@ -95,6 +95,7 @@ EXPORT_PER_CPU_SYMBOL(_numa_mem_);
 int _node_numa_mem_[MAX_NUMNODES];
 #endif
 
+static bool cache_allowed;
 /* work_structs for global per-cpu drains */
 DEFINE_MUTEX(pcpu_drain_mutex);
 DEFINE_PER_CPU(struct work_struct, pcpu_drain);
@@ -2605,9 +2606,15 @@ bool free_hot_cold_pages(struct page *page, int order, bool cold)
 	struct zone *zone = page_zone(page);
 	struct mag_allocator *allocator;
 
+	if (unlikely(!cache_allowed))
+	        return false;
 	if (! order || order > ALLOC_CACHE_MAX_ORDER)
 	        return false;
 	allocator = &zone->alloc_cache.mag_allocator[order -1];
+	if (unlikely(!allocator)) {
+		pr_err("zone %p has no allocators for %d\n", zone, order);
+		return false;
+	}
 	if (allocator->full_count >= pcp_limit(order))
 	        return false;
 
@@ -2841,6 +2848,8 @@ static struct page *rmqueue_pcp_complist(struct zone *preferred_zone,
 	struct mag_allocator *allocator;
 	void *elem;
 
+	if (unlikely(!cache_allowed))
+	        return NULL;
 	allocator = &zone->alloc_cache.mag_allocator[order -1];
 	elem = mag_alloc_elem(allocator);
 	if (elem)
@@ -5570,8 +5579,10 @@ static void __meminit zone_pageset_init(struct zone *zone, int cpu)
 	pageset_init(pcp);
 	pageset_set_high_and_batch(zone, pcp);
 
+	pr_err("%s: init %p\n", __FUNCTION__, zone);
 	for (i = 0; i < ALLOC_CACHE_MAX_ORDER; i++)
 		mag_allocator_init(&zone->alloc_cache.mag_allocator[i]);
+	cache_allowed = 1;
 }
 
 void __meminit setup_zone_pageset(struct zone *zone)

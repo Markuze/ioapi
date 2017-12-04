@@ -15,17 +15,19 @@
 #endif
 
 #define CACHE_MASK      (BIT(INTERNODE_CACHE_SHIFT) - 1)
-
+#define tag(__fmt, ...)		trace_printk("[%d]%s:%d %s" __fmt "\n",							\
+					smp_processor_id(), __FUNCTION__, __LINE__, in_interrupt() ? "IRQ": "Task", 	\
+					##__VA_ARGS__);
 // page_to_nid - validate copy and mag alloc/free.
 
 static inline void mag_lock(struct mag_allocator *allocator)
 {
-	spin_lock_bh(&allocator->lock);
+	spin_lock_irq(&allocator->lock);
 }
 
 static inline void mag_unlock(struct mag_allocator *allocator)
 {
-	spin_unlock_bh(&allocator->lock);
+	spin_unlock_irq(&allocator->lock);
 }
 
 static inline u32 mag_pair_count(struct mag_pair *pair)
@@ -36,7 +38,7 @@ static inline u32 mag_pair_count(struct mag_pair *pair)
 static inline struct mag_pair *get_cpu_mag_pair(struct mag_allocator *allocator)
 {
 	int cpu	= get_cpu();
-	int idx = cpu << 1| ((in_softirq()) ? 1 : 0);
+	int idx = cpu << 1| ((in_interrupt()) ? 1 : 0);
 
 	assert(idx < NR_CPUS);
 	return &allocator->pair[idx];
@@ -75,21 +77,28 @@ static void mag_pair_free(struct mag_pair *pair, void *elem)
 	u32 idx = 0;
 
 	assert(pair->count[0] < MAG_DEPTH || pair->count[1] < MAG_DEPTH);
-
 	if (pair->count[0] == MAG_DEPTH)
 		idx = 1;
 
+	tag("idx %d pair %p", idx, pair);
+	/* PANIC HERE... why?*/
+	assert(pair->mags[idx]);
 	pair->mags[idx]->stack[pair->count[idx]] = elem;
 	++pair->count[idx];
+	tag();
 }
 
 static void mag_allocator_switch_full(struct mag_allocator *allocator, struct mag_pair *pair)
 {
+	unsigned long flags;
 	u32 idx = (pair->count[1] == MAG_DEPTH) ? 1 : 0;
 	assert(pair->count[idx] == MAG_DEPTH);
 
+	local_irq_save(flags);
 	mag_lock(allocator);
+	tag();
 
+	assert(pair->mags[idx]);
 	list_add(&pair->mags[idx]->list, &allocator->full_list);
 	++allocator->full_count;
 
@@ -100,20 +109,26 @@ static void mag_allocator_switch_full(struct mag_allocator *allocator, struct ma
 	} else {
 		/* TODO: use cache alloctor*/
 		void *ptr = kzalloc(sizeof(struct magazine) + L1_CACHE_BYTES -1, GFP_ATOMIC|__GFP_COMP|__GFP_NOWARN);
-
+		assert(ptr);
+		tag();
 		pair->mags[idx]	= (void *)ALIGN((u64)ptr, L1_CACHE_BYTES);
 	}
+	tag();
 	mag_unlock(allocator);
+	local_irq_restore(flags);
 
 	pair->count[idx] = 0;
 }
 
 static void mag_allocator_switch_empty(struct mag_allocator *allocator, struct mag_pair *pair)
 {
+	unsigned long flags;
 	int idx = (pair->count[0]) ? 1 : 0;
 
+	local_irq_save(flags);
 	mag_lock(allocator);
 	if (allocator->full_count) {
+		tag();
 		list_add(&pair->mags[idx]->list, &allocator->empty_list);
 		++allocator->empty_count;
 
@@ -123,6 +138,7 @@ static void mag_allocator_switch_empty(struct mag_allocator *allocator, struct m
 		--allocator->full_count;
 	}
 	mag_unlock(allocator);
+	local_irq_restore(flags);
 }
 
 void *mag_alloc_elem(struct mag_allocator *allocator)
@@ -144,12 +160,24 @@ void mag_free_elem(struct mag_allocator *allocator, void *elem)
 {
 	struct mag_pair	*pair = get_cpu_mag_pair(allocator);
 
+	assert(pair);
+	assert(elem);
+	tag();
+
+	if (unlikely(allocator->lock_state)) {
+		mag_allocator_init(allocator);
+		pair = get_cpu_mag_pair(allocator);
+	}
+
 	mag_pair_free(pair, elem);
 
+	tag();
 	/* If both mags are full */
 	if (unlikely(mag_pair_count(pair) == (MAG_DEPTH << 1))) {
+		tag();
 		mag_allocator_switch_full(allocator, pair);
 	}
+	tag();
 	put_cpu();
 }
 
@@ -160,6 +188,7 @@ static inline void init_mag_pair(struct mag_pair *pair)
 	struct magazine *mag = kzalloc((sizeof(struct magazine) * MAG_COUNT) + L1_CACHE_BYTES -1, __GFP_COMP|__GFP_NOWARN);
 	assert(mag);
 
+	tag("pair %p", pair)
 	mag = (void *)ALIGN((u64)mag, L1_CACHE_BYTES);
 	for (i = 0; i < MAG_COUNT; i++) {
 		pair->mags[i] = &mag[i];
@@ -171,6 +200,12 @@ void mag_allocator_init(struct mag_allocator *allocator)
 {
 	int idx;
 	assert(!((u64)allocator & CACHE_MASK));
+//3.	init spin lock.
+	if (allocator->lock_state) {
+		tag("Allocator %p state %llx", allocator, allocator->lock_state);
+		return;
+	}
+	spin_lock_init(&allocator->lock);
 //1.	alloc_struct + pair per core x 2;
 //2.	alloc empty mag x2 per idx (init mag_pair, init_mag)
 	for (idx = 0 ; idx < num_online_cpus() * 2; idx++) {
@@ -178,12 +213,10 @@ void mag_allocator_init(struct mag_allocator *allocator)
 		init_mag_pair(&allocator->pair[idx]);
 	}
 
-//3.	init spin lock.
-	spin_lock_init(&allocator->lock);
-
 //4. 	init all lists.
 	INIT_LIST_HEAD(&allocator->empty_list);
 	INIT_LIST_HEAD(&allocator->full_list);
+	allocator->lock_state = MAG_INITIALIZED;
 //5. 	init all alloc func. /* Removed untill last_idx removed */
 //6.    Counters allocated.
 /* Noop */

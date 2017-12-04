@@ -8,6 +8,8 @@
 #define MAG_DEPTH	2
 #define MAG_COUNT	2
 
+#define MAG_INITIALIZED 	0x100000
+
 struct magazine {
 	struct list_head 	list;
 	void 			*stack[MAG_DEPTH];
