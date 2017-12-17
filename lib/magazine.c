@@ -15,9 +15,13 @@
 #endif
 
 #define CACHE_MASK      (BIT(INTERNODE_CACHE_SHIFT) - 1)
+#define tag(...)
+
+#ifndef tag
 #define tag(__fmt, ...)		trace_printk("[%d]%s:%d %s" __fmt "\n",							\
 					smp_processor_id(), __FUNCTION__, __LINE__, in_interrupt() ? "IRQ": "Task", 	\
-					##__VA_ARGS__);
+					##__VA_ARGS__)
+#endif
 // page_to_nid - validate copy and mag alloc/free.
 
 static inline void mag_lock(struct mag_allocator *allocator)
@@ -164,7 +168,7 @@ void mag_free_elem(struct mag_allocator *allocator, void *elem)
 	assert(elem);
 	tag();
 
-	if (unlikely(allocator->lock_state)) {
+	if (unlikely(!allocator->lock_state)) {
 		mag_allocator_init(allocator);
 		pair = get_cpu_mag_pair(allocator);
 	}
@@ -202,13 +206,13 @@ void mag_allocator_init(struct mag_allocator *allocator)
 	assert(!((u64)allocator & CACHE_MASK));
 //3.	init spin lock.
 	if (allocator->lock_state) {
-		tag("Allocator %p state %llx", allocator, allocator->lock_state);
 		return;
 	}
+	tag("Allocator %p [%d-%d-%d]", allocator, num_online_cpus(), num_possible_cpus(), num_present_cpus());
 	spin_lock_init(&allocator->lock);
 //1.	alloc_struct + pair per core x 2;
 //2.	alloc empty mag x2 per idx (init mag_pair, init_mag)
-	for (idx = 0 ; idx < num_online_cpus() * 2; idx++) {
+	for (idx = 0 ; idx < num_possible_cpus() * 2; idx++) {
 		assert(idx < NR_CPUS);
 		init_mag_pair(&allocator->pair[idx]);
 	}
