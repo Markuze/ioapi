@@ -153,9 +153,11 @@ void *mag_alloc_elem(struct mag_allocator *allocator)
 	if (unlikely(mag_pair_count(pair) == 0 )) {
 		/*may fail, it's ok.*/
 		mag_allocator_switch_empty(allocator, pair);
+		++pair->stats.empty;
 	}
 
 	elem = mag_pair_alloc(pair);
+	++pair->stats.alloc;
 	put_cpu();
 	return elem;
 }
@@ -174,12 +176,14 @@ void mag_free_elem(struct mag_allocator *allocator, void *elem)
 	}
 
 	mag_pair_free(pair, elem);
+	++pair->stats.free;
 
 	tag();
 	/* If both mags are full */
 	if (unlikely(mag_pair_count(pair) == (MAG_DEPTH << 1))) {
 		tag();
 		mag_allocator_switch_full(allocator, pair);
+		++pair->stats.full;
 	}
 	tag();
 	put_cpu();
@@ -197,7 +201,33 @@ static inline void init_mag_pair(struct mag_pair *pair)
 	for (i = 0; i < MAG_COUNT; i++) {
 		pair->mags[i] = &mag[i];
 	}
+	memset(&pair->stats, 0, sizeof (struct mag_stats));
 	assert(pair->mags[0]);
+}
+
+static inline void update_stats(struct mag_pair *pair, struct mag_stats *stats)
+{
+	stats->alloc += pair->stats.alloc;
+	stats->free += pair->stats.free;
+	stats->empty += pair->stats.empty;
+	stats->full += pair->stats.full;
+}
+
+void mag_dump_stats(char *str, struct mag_stats *stats)
+{
+	trace_printk("%s; alloc %lld: free %lld: empty %lld: full %lld:\n",
+			str,
+			stats->alloc, stats->free,
+			stats->empty, stats->full);
+}
+
+void mag_get_stats(struct mag_allocator *allocator, struct mag_stats *stats)
+{
+	int idx;
+
+	for (idx = 0 ; idx < num_online_cpus() * 2; idx++) {
+		update_stats(&allocator->pair[idx], stats);
+	}
 }
 
 void mag_allocator_init(struct mag_allocator *allocator)

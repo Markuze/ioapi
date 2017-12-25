@@ -15,12 +15,20 @@ struct magazine {
 	void 			*stack[MAG_DEPTH];
 };
 
+struct mag_stats {
+	uint64_t	alloc;
+	uint64_t	free;
+	uint64_t	empty;
+	uint64_t	full;
+};
+
 struct mag_pair {
 	union {
 		struct magazine *mags[MAG_COUNT];
 		uint64_t 	mag_ptr[MAG_COUNT];
 	};
-	u32		count[MAG_COUNT];
+	u32			count[MAG_COUNT];
+	struct mag_stats	stats;
 } ____cacheline_aligned_in_smp;
 
 struct mag_allocator {
@@ -34,12 +42,15 @@ struct mag_allocator {
 	struct mag_pair		pair[NR_CPUS] ____cacheline_aligned_in_smp; //Per Core instance x 2 (normal , and _bh)
 };
 
+
 void *mag_alloc_elem(struct mag_allocator *allocator);
 
 void mag_free_elem(struct mag_allocator *allocator, void *elem);
 
 void mag_allocator_init(struct mag_allocator *allocator);
 
+void mag_get_stats(struct mag_allocator *allocator, struct mag_stats *stats);
+void mag_dump_stats(char *str, struct mag_stats *stats);
 //Need free and GC
 
 #endif //__MAGAZINE__H

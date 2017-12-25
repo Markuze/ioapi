@@ -2595,10 +2595,42 @@ void mark_free_pages(struct zone *zone)
 }
 #endif /* CONFIG_PM */
 
+static  int pcop_limits[ALLOC_CACHE_MAX_ORDER] __read_mostly = {/* 1 */16, 8, 8, 4, 4};
+
+void get_mag_stats(void)
+{
+	int i;
+	struct zone* zone;
+	struct mag_allocator *allocator;
+	struct mag_stats stats = {0};
+
+	for (i = 0; i < ALLOC_CACHE_MAX_ORDER; i++) {
+		char str[16];
+		// Can't be module as foreach.. not exported
+		for_each_populated_zone(zone) { //for_each_zone is unsafe, because mag were init only for populated.
+			allocator = &zone->alloc_cache.mag_allocator[i];
+			mag_get_stats(allocator, &stats);
+		}
+		snprintf(str, 16 ,"Order %d:", i);
+		mag_dump_stats(str, &stats);
+		memset(&stats, 0, sizeof(struct mag_stats));
+	}
+}
+EXPORT_SYMBOL(get_mag_stats);
+
+void set_pcop_limits(int *array)
+{
+	int i;
+
+	for (i = 0; i < ALLOC_CACHE_MAX_ORDER; i++)
+		if (array[i])
+			pcop_limits[i] = array[i];
+}
+EXPORT_SYMBOL(set_pcop_limits);
+
 static inline int pcp_limit(int order)
 {
-	int limits[ALLOC_CACHE_MAX_ORDER] = {/* 1 */16, 16, 16, 8, 4};
-	return limits[order -1];
+	return pcop_limits[order -1];
 }
 
 bool free_hot_cold_pages(struct page *page, int order, bool cold)
@@ -5573,24 +5605,26 @@ static void pageset_set_high_and_batch(struct zone *zone,
 
 static void __meminit zone_pageset_init(struct zone *zone, int cpu)
 {
-	int i;
 	struct per_cpu_pageset *pcp = per_cpu_ptr(zone->pageset, cpu);
 
 	pageset_init(pcp);
 	pageset_set_high_and_batch(zone, pcp);
 
-	pr_err("%s: init %p\n", __FUNCTION__, zone);
-	for (i = 0; i < ALLOC_CACHE_MAX_ORDER; i++)
-		mag_allocator_init(&zone->alloc_cache.mag_allocator[i]);
 	cache_allowed = 1;
 }
 
 void __meminit setup_zone_pageset(struct zone *zone)
 {
 	int cpu;
+	int i;
 	zone->pageset = alloc_percpu(struct per_cpu_pageset);
+
 	for_each_possible_cpu(cpu)
 		zone_pageset_init(zone, cpu);
+
+	pr_err("%s: init %p\n", __FUNCTION__, zone);
+	for (i = 0; i < ALLOC_CACHE_MAX_ORDER; i++)
+		mag_allocator_init(&zone->alloc_cache.mag_allocator[i]);
 }
 
 /*
