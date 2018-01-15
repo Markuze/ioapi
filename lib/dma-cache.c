@@ -13,6 +13,7 @@
 
 #endif
 
+#define alloc_trace_update(...)
 static inline enum dma_data_direction idx2perm(u64 idx)
 {
 	assert(idx < 2);
