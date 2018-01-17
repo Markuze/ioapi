@@ -64,4 +64,6 @@ void dma_cache_free(struct device *dev, struct page *);
 
 int	register_iova_map(struct device *);
 void	unregister_iova_map(struct device *dev);
+
+void mag_stats_register(void *);
 #endif /*_DMA_BOUNCE_*/

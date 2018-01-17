@@ -314,6 +314,7 @@ int	register_iova_map(struct device *dev)
 	for (i = 0; i < NUM_ALLOCATORS; i++) {
 		mag_allocator_init(&dev->iova_mag->allocator[i]);
 	}
+	mag_stats_register(dev->iova_mag);
 	return 0;
 }
 EXPORT_SYMBOL(register_iova_map);
