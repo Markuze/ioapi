@@ -239,6 +239,7 @@ void mag_allocator_init(struct mag_allocator *allocator)
 		return;
 	}
 	tag("Allocator %p [%d-%d-%d]", allocator, num_online_cpus(), num_possible_cpus(), num_present_cpus());
+	pr_info("Magazine init mag depth %d\n", MAG_DEPTH);
 	spin_lock_init(&allocator->lock);
 //1.	alloc_struct + pair per core x 2;
 //2.	alloc empty mag x2 per idx (init mag_pair, init_mag)
