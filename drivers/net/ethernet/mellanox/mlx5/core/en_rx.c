@@ -221,9 +221,6 @@ static inline int mlx5e_page_alloc_mapped(struct mlx5e_rq *rq,
 	dma_info->page = dev_alloc_pages(rq->buff.page_order);
 	if (unlikely(!dma_info->page))
 		return -ENOMEM;
-	trace_printk("mlx5:%p : %p %d [%p]\n", dma_info->page,
-		page_to_virt(dma_info->page),	rq->buff.page_order,
-		vmemmap);
 
 	dma_info->addr = dma_map_page(rq->pdev, dma_info->page, 0,
 				      RQ_PAGE_SIZE(rq), rq->buff.map_dir);

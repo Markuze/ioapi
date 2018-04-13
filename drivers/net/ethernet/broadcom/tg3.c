@@ -6697,7 +6697,6 @@ static int tg3_alloc_rx_data(struct tg3 *tp, struct tg3_rx_prodring_set *tpr,
 	if (!data)
 		return -ENOMEM;
 
-	trace_printk("tg3:%p : %p : >%lu< [%lx]\n[%p (%lx), %lx]\n", data, virt_to_page(data), __pa(data) >> PAGE_SHIFT, virt_to_pfn(data), vmemmap, vmemmap_base, page_offset_base);
 	mapping = pci_map_single(tp->pdev,
 				 data + TG3_RX_OFFSET(tp),
 				 data_size,
