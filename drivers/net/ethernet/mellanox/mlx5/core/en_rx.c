@@ -160,6 +160,7 @@ static inline u32 mlx5e_decompress_cqes_start(struct mlx5e_rq *rq,
 }
 
 #define RQ_PAGE_SIZE(rq) ((1 << rq->buff.page_order) << PAGE_SHIFT)
+#define RQ_PAGE_NUM(rq) (1 << rq->buff.page_order)
 
 static inline bool mlx5e_page_is_reserved(struct page *page)
 {
@@ -212,9 +213,15 @@ static inline bool mlx5e_rx_cache_get(struct mlx5e_rq *rq,
 	return true;
 }
 
+static inline void shared_info_write_rop(char *base, u32 size)
+{
+	/* Gil, write your ROP code magic here */
+}
+
 static inline int mlx5e_page_alloc_mapped(struct mlx5e_rq *rq,
 					  struct mlx5e_dma_info *dma_info)
 {
+	struct page *p;
 	if (mlx5e_rx_cache_get(rq, dma_info))
 		return 0;
 
@@ -222,13 +229,19 @@ static inline int mlx5e_page_alloc_mapped(struct mlx5e_rq *rq,
 	if (unlikely(!dma_info->page))
 		return -ENOMEM;
 
+	p = dma_info->page;
+	trace_printk("mlx5:%p : %p : >%lx<%d> \n",
+			p, page_address(p), page_to_pfn(p),
+			rq->buff.page_order);
+
 	dma_info->addr = dma_map_page(rq->pdev, dma_info->page, 0,
-				      RQ_PAGE_SIZE(rq), rq->buff.map_dir);
+					RQ_PAGE_SIZE(rq), rq->buff.map_dir);
 	if (unlikely(dma_mapping_error(rq->pdev, dma_info->addr))) {
 		put_page(dma_info->page);
 		dma_info->page = NULL;
 		return -ENOMEM;
 	}
+	shared_info_write_rop(page_address(dma_info->page), RQ_PAGE_SIZE(rq));
 
 	return 0;
 }
@@ -818,6 +831,15 @@ static inline int mlx5e_xdp_handle(struct mlx5e_rq *rq,
 	}
 }
 
+/* sharedinfo attack
+	va - the start of the packet (same param that will be used build_skb)
+	frag_size - the size of the packet (same param that will be used build_skb)
+*/
+static inline void modify_shinfo(void *va, unsigned int frag_size)
+{
+	/* Gil, add your sharedinfo magic here...*/
+}
+
 static inline
 struct sk_buff *skb_from_cqe(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe,
 			     struct mlx5e_wqe_frag_info *wi, u32 cqe_bcnt)
@@ -837,6 +859,7 @@ struct sk_buff *skb_from_cqe(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe,
 				      di->addr + wi->offset,
 				      0, frag_size,
 				      DMA_FROM_DEVICE);
+	modify_shinfo(va, frag_size);
 	prefetch(data);
 	wi->offset += frag_size;
 
@@ -866,6 +889,7 @@ struct sk_buff *skb_from_cqe(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe,
 	return skb;
 }
 
+/* packet handler #1 */
 void mlx5e_handle_rx_cqe(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe)
 {
 	struct mlx5e_wqe_frag_info *wi;
@@ -989,6 +1013,7 @@ static inline void mlx5e_mpwqe_fill_rx_skb(struct mlx5e_rq *rq,
 	skb->len  += headlen;
 }
 
+/* RX handler #2 */
 void mlx5e_handle_rx_cqe_mpwrq(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe)
 {
 	u16 cstrides       = mpwrq_get_cqe_consumed_strides(cqe);

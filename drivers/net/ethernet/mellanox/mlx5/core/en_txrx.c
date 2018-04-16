@@ -44,6 +44,7 @@ static inline bool mlx5e_channel_no_affinity_change(struct mlx5e_channel *c)
 	return cpumask_test_cpu(current_cpu, aff);
 }
 
+/* NAPI Callback*/
 int mlx5e_napi_poll(struct napi_struct *napi, int budget)
 {
 	struct mlx5e_channel *c = container_of(napi, struct mlx5e_channel,

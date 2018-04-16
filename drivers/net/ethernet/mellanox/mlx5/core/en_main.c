@@ -601,7 +601,7 @@ static int mlx5e_alloc_rq(struct mlx5e_channel *c,
 
 	switch (rq->wq_type) {
 	case MLX5_WQ_TYPE_LINKED_LIST_STRIDING_RQ:
-
+		netdev_err(c->netdev, "MLX5_WQ_TYPE_LINKED_LIST_STRIDING_RQ\n");
 		rq->post_wqes = mlx5e_post_rx_mpwqes;
 		rq->dealloc_wqe = mlx5e_dealloc_rx_mpwqe;
 
@@ -634,6 +634,7 @@ static int mlx5e_alloc_rq(struct mlx5e_channel *c,
 			goto err_destroy_umr_mkey;
 		break;
 	default: /* MLX5_WQ_TYPE_LINKED_LIST */
+		netdev_err(c->netdev, "MLX5_WQ_TYPE_LINKED_LIST\n");
 		rq->wqe.frag_info =
 			kzalloc_node(wq_sz * sizeof(*rq->wqe.frag_info),
 				     GFP_KERNEL,

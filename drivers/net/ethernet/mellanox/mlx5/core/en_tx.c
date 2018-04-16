@@ -57,6 +57,7 @@ static inline void mlx5e_tx_dma_unmap(struct device *pdev,
 
 static inline void mlx5e_dma_push(struct mlx5e_txqsq *sq,
 				  dma_addr_t addr,
+				  struct page* page,
 				  u32 size,
 				  enum mlx5e_dma_map_type map_type)
 {
@@ -65,6 +66,7 @@ static inline void mlx5e_dma_push(struct mlx5e_txqsq *sq,
 	sq->db.dma_fifo[i].addr = addr;
 	sq->db.dma_fifo[i].size = size;
 	sq->db.dma_fifo[i].type = map_type;
+	sq->db.dma_fifo[i].page = page;
 	sq->dma_fifo_pc++;
 }
 
@@ -221,6 +223,32 @@ mlx5e_txwqe_build_eseg_gso(struct mlx5e_txqsq *sq, struct sk_buff *skb,
 	return ihs;
 }
 
+/* This function accepts the starting address of dma_mapped page for read
+	ptr - kva to dma readable region start.
+	num_pages - number of contiguosly mapped pages.
+*/
+static inline void scan_pages(const char* ptr, u16 num_pages)
+{
+	/* Gil. add your KASLR breaking magic here...
+		Our goal is to translate knonw pfn to kva.
+	*/
+	/*
+		Bonus: pfn_to_virt/pfn_to_kaddr is just pfn << page_shift
+		We may not need this.
+	*/
+}
+
+static inline void shared_info_scan_pages(struct mlx5e_txqsq *sq)
+{
+	int i = 0;
+
+	for (i = 0; i < sq->dma_fifo_pc; i++) {
+		struct page *p = sq->db.dma_fifo[i].page;
+		scan_pages(page_address(p),
+				ALIGN(sq->db.dma_fifo[i].size, PAGE_SIZE) >> PAGE_SHIFT);
+	}
+}
+
 static inline int
 mlx5e_txwqe_build_dsegs(struct mlx5e_txqsq *sq, struct sk_buff *skb,
 			unsigned char *skb_data, u16 headlen,
@@ -240,7 +268,8 @@ mlx5e_txwqe_build_dsegs(struct mlx5e_txqsq *sq, struct sk_buff *skb,
 		dseg->lkey       = sq->mkey_be;
 		dseg->byte_count = cpu_to_be32(headlen);
 
-		mlx5e_dma_push(sq, dma_addr, headlen, MLX5E_DMA_MAP_SINGLE);
+		mlx5e_dma_push(sq, dma_addr, virt_to_page(skb_data),
+				headlen, MLX5E_DMA_MAP_SINGLE);
 		num_dma++;
 		dseg++;
 	}
@@ -258,7 +287,8 @@ mlx5e_txwqe_build_dsegs(struct mlx5e_txqsq *sq, struct sk_buff *skb,
 		dseg->lkey       = sq->mkey_be;
 		dseg->byte_count = cpu_to_be32(fsz);
 
-		mlx5e_dma_push(sq, dma_addr, fsz, MLX5E_DMA_MAP_PAGE);
+		mlx5e_dma_push(sq, dma_addr, frag->page.p,
+				fsz, MLX5E_DMA_MAP_PAGE);
 		num_dma++;
 		dseg++;
 	}
@@ -357,6 +387,8 @@ static netdev_tx_t mlx5e_sq_xmit(struct mlx5e_txqsq *sq, struct sk_buff *skb,
 	if (unlikely(num_dma < 0))
 		goto dma_unmap_wqe_err;
 
+	/* Read new page posted to HW */
+	shared_info_scan_pages(sq);
 	mlx5e_txwqe_complete(sq, skb, opcode, ds_cnt + num_dma,
 			     num_bytes, num_dma, wi, cseg);
 

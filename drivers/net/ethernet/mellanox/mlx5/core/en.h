@@ -331,6 +331,7 @@ enum mlx5e_dma_map_type {
 };
 
 struct mlx5e_sq_dma {
+	struct page *		page;
 	dma_addr_t              addr;
 	u32                     size;
 	enum mlx5e_dma_map_type type;

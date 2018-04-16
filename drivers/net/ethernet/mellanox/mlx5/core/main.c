@@ -1577,6 +1577,9 @@ static int __init init(void)
 	if (err)
 		goto err_debug;
 
+	trace_printk("[%p (%lx), %lx] Offset %lx\n",
+			vmemmap, vmemmap_base, page_offset_base, PAGE_OFFSET);
+
 #ifdef CONFIG_MLX5_CORE_EN
 	mlx5e_init();
 #endif
