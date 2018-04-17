@@ -333,7 +333,49 @@ struct napi_alloc_cache {
 };
 
 static DEFINE_PER_CPU(struct page_frag_cache, netdev_alloc_cache);
+static DEFINE_PER_CPU(struct page_frag_cache, io_alloc_cache);
+static DEFINE_PER_CPU(struct page_frag_cache, io_alloc_pages_cache);
 static DEFINE_PER_CPU(struct napi_alloc_cache, napi_alloc_cache);
+
+#define CURRENT_IDX 0
+struct page *io_alloc_pages(gfp_t gfp_mask, unsigned int order)
+{
+	struct page_frag_cache *nc;
+	unsigned long flags;
+	void *data;
+
+	if (order >= CURRENT_IDX + 3)
+		return alloc_pages(gfp_mask, order);
+
+	local_irq_save(flags);
+	nc = this_cpu_ptr(&io_alloc_pages_cache);
+	nc->idx = CURRENT_IDX;
+	data = page_frag_alloc(nc, PAGE_SIZE << order, gfp_mask);
+	local_irq_restore(flags);
+	return virt_to_page(data);
+}
+EXPORT_SYMBOL(io_alloc_pages);
+
+void *io_alloc_frag(unsigned int fragsz, gfp_t gfp_mask, bool *b)
+{
+	struct page_frag_cache *nc;
+	unsigned long flags;
+	void *data;
+
+	local_irq_save(flags);
+	nc = this_cpu_ptr(&io_alloc_cache);
+	nc->idx = CURRENT_IDX;
+	data = page_frag_alloc(nc, fragsz, gfp_mask);
+	local_irq_restore(flags);
+	if (b)
+		*b = nc->pfmemalloc;
+
+	if (unlikely(!data)) {
+		trace_printk("Failed to page_frag_alloc\n...");
+	}
+	return data;
+}
+EXPORT_SYMBOL(io_alloc_frag);
 
 static void *__netdev_alloc_frag(unsigned int fragsz, gfp_t gfp_mask)
 {

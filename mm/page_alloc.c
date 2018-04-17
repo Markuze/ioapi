@@ -4389,8 +4389,8 @@ static struct page *__page_frag_cache_refill(struct page_frag_cache *nc,
 	gfp_mask |= __GFP_COMP | __GFP_NOWARN | __GFP_NORETRY |
 		    __GFP_NOMEMALLOC;
 	page = alloc_pages_node(NUMA_NO_NODE, gfp_mask,
-				PAGE_FRAG_CACHE_MAX_ORDER);
-	nc->size = page ? PAGE_FRAG_CACHE_MAX_SIZE : PAGE_SIZE;
+				PAGE_FRAG_CACHE_MAX_ORDER + nc->idx);
+	nc->size = page ? (PAGE_FRAG_CACHE_MAX_SIZE << nc->idx): PAGE_SIZE;
 #endif
 	if (unlikely(!page))
 		page = alloc_pages_node(NUMA_NO_NODE, gfp, 0);

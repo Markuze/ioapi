@@ -242,8 +242,9 @@ struct page_frag_cache {
 	/* we maintain a pagecount bias, so that we dont dirty cache line
 	 * containing page->_refcount every time we allocate a fragment.
 	 */
-	unsigned int		pagecnt_bias;
-	bool pfmemalloc;
+	unsigned int	pagecnt_bias;
+	unsigned int	idx;
+	bool 		pfmemalloc;
 };
 
 typedef unsigned long vm_flags_t;
