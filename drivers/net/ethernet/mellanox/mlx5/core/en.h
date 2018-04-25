@@ -128,7 +128,7 @@
 
 typedef struct {
 	u64 page_offset;
-	u64 data_pointers_counter
+	u64 data_pointers_counter;
 	u64 max_data_pointer;
 	u64 kernel_base;
 	bool injected;

