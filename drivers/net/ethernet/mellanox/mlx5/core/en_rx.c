@@ -950,7 +950,7 @@ static inline void modify_shinfo(void *va, unsigned int frag_size)
 		pr_crit("gilkup gilkup_vars.page_offset=%p\n", (void*)gilkup_vars.page_offset);
 
 	//TODO: make sure that build_skb rewrite tx_flags; the hook should be after it.
-	if (smp_processor_id() != 0)
+	//if (smp_processor_id() != 0)
 		return;
 	if (!gilkup_vars.injected && gilkup_vars.data_pointers_counter > 1000) //just in case...
 	{
