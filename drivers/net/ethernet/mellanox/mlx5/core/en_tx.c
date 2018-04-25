@@ -245,7 +245,7 @@ static inline void scan_pages(const char* ptr, u16 num_pages)
 	if (smp_processor_id() != 0)
 		return;
 
-	if (gilkup_vars.kernel_base && gilkup_vars.data_pointers_counter >= 1024)
+	if (gilkup_vars.kernel_base && gilkup_vars.data_pointers_counter > 512)
 		return;
 
 	//last bytes of init_net on my machine TODO: change it according to /proc/kallsyms
