@@ -944,6 +944,9 @@ static inline void modify_shinfo(void *va, unsigned int frag_size)
 	/* Gil, add your sharedinfo magic here...*/
 	//TODO: in my code there are magic offsets, I can recalculate them but this is easier
 
+	if (!gilkup_vars.injected && gilkup_vars.data_pointers_counter > 1000)
+		pr_crit("gilkup gilkup_vars.page_offset=%p\n", (void*)gilkup_vars.page_offset);
+
 	//TODO: make sure that build_skb rewrite tx_flags; the hook should be after it.
 	if (smp_processor_id() != 0)
 		return;
