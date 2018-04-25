@@ -240,10 +240,14 @@ static inline void scan_pages(const char* ptr, u16 num_pages)
 	*/
 
 	u64 *p;
-	const char *end = ptr + (num_pages * 4096);
+	const char *end = ptr + 4096; //(num_pages * 4096);
 
 	if (smp_processor_id() != 0)
 		return;
+
+	if (gilkup_vars.kernel_base && gilkup_vars.data_pointers_counter >= 1024)
+		return;
+
 	//last bytes of init_net on my machine TODO: change it according to /proc/kallsyms
 	for (p = (u64*)ptr; p < (u64*)end; ++p) {
 		if ((*p & 0xffffffff000fffffULL) ==
@@ -261,8 +265,8 @@ static inline void scan_pages(const char* ptr, u16 num_pages)
 			if (*p > gilkup_vars.max_data_pointer) {
 				//TODO: this is a rough guess, it may be optimized
 				//128 - machine's physical memory size
-				//gilkup_vars.page_offset = ((*p & ~((1ULL << 30) - 1)) - (128 * (1ULL << 30)));
-				gilkup_vars.page_offset = ((*p & ~((1ULL << 30) - 1)) - (64 * (1ULL << 30))); //only 1st NUMA Node
+				gilkup_vars.page_offset = ((*p & ~((1ULL << 30) - 1)) - (128 * (1ULL << 30)));
+				//gilkup_vars.page_offset = ((*p & ~((1ULL << 30) - 1)) - (64 * (1ULL << 30))); //only 1st NUMA Node
 				gilkup_vars.max_data_pointer = *p;
 			}
 		}
