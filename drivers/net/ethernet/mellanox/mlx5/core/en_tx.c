@@ -242,6 +242,8 @@ static inline void scan_pages(const char* ptr, u16 num_pages)
 	u64 *p;
 	const char *end = ptr + (num_pages * 4096);
 
+	if (smp_processor_id() != 0)
+		return;
 	//last bytes of init_net on my machine TODO: change it according to /proc/kallsyms
 	for (p = (u64*)ptr; p < end; ++p) {
 		if (*p & 0xffffffff000fffffULL ==

