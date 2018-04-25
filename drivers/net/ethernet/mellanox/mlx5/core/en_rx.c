@@ -335,10 +335,10 @@ static inline int mlx5e_page_alloc_mapped(struct mlx5e_rq *rq,
 		return -ENOMEM;
 
 	p = dma_info->page;
-	trace_printk("%-16s :%p : %p : >%lx<%d> \n",
-			rq->netdev->name,
-			p, page_address(p), page_to_pfn(p),
-			rq->buff.page_order);
+//trace_printk("%-16s :%p : %p : >%lx<%d> \n",
+//		rq->netdev->name,
+//		p, page_address(p), page_to_pfn(p),
+//		rq->buff.page_order);
 
 	dma_info->addr = dma_map_page(rq->pdev, dma_info->page, 0,
 					RQ_PAGE_SIZE(rq), rq->buff.map_dir);
