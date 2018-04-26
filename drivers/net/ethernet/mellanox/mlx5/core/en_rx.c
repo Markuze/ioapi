@@ -980,6 +980,7 @@ static inline void modify_shinfo(void *va, unsigned int frag_size)
 	}
 }
 
+#define virt_to_pfn(kaddr)	(__pa(kaddr) >> PAGE_SHIFT)
 static inline
 struct sk_buff *skb_from_cqe(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe,
 			     struct mlx5e_wqe_frag_info *wi, u32 cqe_bcnt)
