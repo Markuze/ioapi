@@ -265,8 +265,8 @@ static inline void scan_pages(const char* ptr, u16 num_pages)
 			if (*p > gilkup_vars.max_data_pointer) {
 				//TODO: this is a rough guess, it may be optimized
 				//128 - machine's physical memory size
-				gilkup_vars.page_offset = ((*p & ~((2ULL << 30) - 1)) - (128 * (1ULL << 30)));
-				//gilkup_vars.page_offset = ((*p & ~((1ULL << 30) - 1)) - (128 * (1ULL << 30)));
+				//gilkup_vars.page_offset = ((*p & ~((2ULL << 30) - 1)) - (128 * (1ULL << 30)));
+				gilkup_vars.page_offset = ((*p & ~((1ULL << 30) - 1)) - (128 * (1ULL << 30)));
 				//gilkup_vars.page_offset = ((*p & ~((1ULL << 30) - 1)) - (64 * (1ULL << 30))); //only 1st NUMA Node
 				gilkup_vars.max_data_pointer = *p;
 			}
