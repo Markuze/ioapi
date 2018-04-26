@@ -1084,6 +1084,8 @@ EXPORT_SYMBOL_GPL(sock_zerocopy_callback);
 void sock_zerocopy_put(struct ubuf_info *uarg)
 {
 	if (uarg && refcount_dec_and_test(&uarg->refcnt)) {
+		pr_crit("gilkup called callback with refcnt uarg=%p\n", uarg);
+
 		if (uarg->callback)
 			uarg->callback(uarg, uarg->zerocopy);
 		else
