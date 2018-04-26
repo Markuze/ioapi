@@ -995,6 +995,9 @@ struct sk_buff *skb_from_cqe(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe,
 	data           = va + rx_headroom;
 	frag_size      = MLX5_SKB_FRAG_SZ(rx_headroom + cqe_bcnt);
 
+	if (unlikely(virt_to_pfn(va) == PFN))
+		pr_err(" >>>>> ERROR >>>>>>>>>>>>>\n OUR PFN IS FREED\n>>>>>>>>>>>>>>>.\n");
+
 	dma_sync_single_range_for_cpu(rq->pdev,
 				      di->addr + wi->offset,
 				      0, frag_size,
