@@ -215,10 +215,13 @@ static inline bool mlx5e_rx_cache_get(struct mlx5e_rq *rq,
 static inline int mlx5e_page_alloc_mapped(struct mlx5e_rq *rq,
 					  struct mlx5e_dma_info *dma_info)
 {
+	gfp_t gfp_mask =  __GFP_COMP | __GFP_MEMALLOC |
+				GFP_ATOMIC | __GFP_NOWARN;
+
 	if (mlx5e_rx_cache_get(rq, dma_info))
 		return 0;
 
-	dma_info->page = dev_alloc_pages(rq->buff.page_order);
+	dma_info->page = io_alloc_pages(gfp_mask, rq->buff.page_order);
 	if (unlikely(!dma_info->page))
 		return -ENOMEM;
 

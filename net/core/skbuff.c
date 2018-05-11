@@ -203,14 +203,11 @@ struct sk_buff *__alloc_skb(unsigned int size, gfp_t gfp_mask,
 	 */
 	size = SKB_DATA_ALIGN(size);
 	size += SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-	data = kmalloc_reserve(size, gfp_mask, node, &pfmemalloc);
+	data = io_alloc_frag(size, gfp_mask, &pfmemalloc);
 	if (!data)
 		goto nodata;
-	/* kmalloc(size) might give us more room than requested.
-	 * Put skb_shared_info exactly at the end of allocated zone,
-	 * to allow max possible filling before reallocation.
-	 */
-	size = SKB_WITH_OVERHEAD(ksize(data));
+
+	size = SKB_WITH_OVERHEAD(size);
 	prefetchw(data + size);
 
 	/*
@@ -220,8 +217,9 @@ struct sk_buff *__alloc_skb(unsigned int size, gfp_t gfp_mask,
 	 */
 	memset(skb, 0, offsetof(struct sk_buff, tail));
 	/* Account for allocated memory : skb + skb->head */
-	skb->truesize = SKB_TRUESIZE(size);
+	skb->head_frag = 1;
 	skb->pfmemalloc = pfmemalloc;
+	skb->truesize = SKB_TRUESIZE(size);
 	refcount_set(&skb->users, 1);
 	skb->head = data;
 	skb->data = data;
@@ -5192,7 +5190,7 @@ struct sk_buff *alloc_skb_with_frags(unsigned long header_len,
 
 		while (order) {
 			if (npages >= 1 << order) {
-				page = alloc_pages((gfp_mask & ~__GFP_DIRECT_RECLAIM) |
+				page = io_alloc_pages((gfp_mask & ~__GFP_DIRECT_RECLAIM) |
 						   __GFP_COMP |
 						   __GFP_NOWARN |
 						   __GFP_NORETRY,
