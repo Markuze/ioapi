@@ -197,7 +197,7 @@ static inline bool mlx5e_rx_cache_get(struct mlx5e_rq *rq,
 		return false;
 	}
 
-	if (page_ref_count(cache->page_cache[cache->head].page) != 1) {
+	if (page_ref_count(compound_head(cache->page_cache[cache->head].page)) != 1) {
 		rq->stats.cache_busy++;
 		return false;
 	}
@@ -388,7 +388,7 @@ static int mlx5e_alloc_rx_umr_mpwqe(struct mlx5e_rq *rq,
 		if (unlikely(err))
 			goto err_unmap;
 		wi->umr.mtt[i] = cpu_to_be64(dma_info->addr | MLX5_EN_WR);
-		page_ref_add(dma_info->page, pg_strides);
+		page_ref_add(compound_head(dma_info->page), pg_strides);
 	}
 
 	memset(wi->skbs_frags, 0, sizeof(*wi->skbs_frags) * MLX5_MPWRQ_PAGES_PER_WQE);
@@ -399,7 +399,7 @@ static int mlx5e_alloc_rx_umr_mpwqe(struct mlx5e_rq *rq,
 err_unmap:
 	while (--i >= 0) {
 		dma_info--;
-		page_ref_sub(dma_info->page, pg_strides);
+		page_ref_sub(compound_head(dma_info->page), pg_strides);
 		mlx5e_page_release(rq, dma_info, true);
 	}
 
@@ -413,7 +413,7 @@ void mlx5e_free_rx_mpwqe(struct mlx5e_rq *rq, struct mlx5e_mpw_info *wi)
 	int i;
 
 	for (i = 0; i < MLX5_MPWRQ_PAGES_PER_WQE; i++, dma_info++) {
-		page_ref_sub(dma_info->page, pg_strides - wi->skbs_frags[i]);
+		page_ref_sub(compound_head(dma_info->page), pg_strides - wi->skbs_frags[i]);
 		mlx5e_page_release(rq, dma_info, true);
 	}
 }
@@ -861,7 +861,7 @@ struct sk_buff *skb_from_cqe(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe,
 	}
 
 	/* queue up for recycling/reuse */
-	page_ref_inc(di->page);
+	page_ref_inc(compound_head(di->page));
 
 	skb_reserve(skb, rx_headroom);
 	skb_put(skb, cqe_bcnt);
