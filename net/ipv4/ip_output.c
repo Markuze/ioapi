@@ -858,6 +858,14 @@ csum_page(struct page *page, int offset, int copy)
 	return csum;
 }
 
+static inline struct device *dev_cork(struct inet_cork *cork)
+{
+        if (cork && cork->dst)
+                if (cork->dst->dev)
+                        return cork->dst->dev->dev.parent;
+        return NULL;
+}
+
 static int __ip_append_data(struct sock *sk,
 			    struct flowi4 *fl4,
 			    struct sk_buff_head *queue,
@@ -884,6 +892,8 @@ static int __ip_append_data(struct sock *sk,
 	struct rtable *rt = (struct rtable *)cork->dst;
 	unsigned int wmem_alloc_delta = 0;
 	bool paged, extra_uref = false;
+	struct device *device = dev_cork(cork);
+
 	u32 tskey = 0;
 
 	skb = skb_peek_tail(queue);
@@ -996,15 +1006,16 @@ alloc_new_skb:
 				alloclen += rt->dst.trailer_len;
 
 			if (transhdrlen) {
-				skb = sock_alloc_send_skb(sk,
-						alloclen + hh_len + 15,
-						(flags & MSG_DONTWAIT), &err);
+				skb = sock_dev_alloc_send_skb(sk, device,
+							      alloclen + hh_len + 15,
+							      (flags & MSG_DONTWAIT), &err);
 			} else {
 				skb = NULL;
 				if (refcount_read(&sk->sk_wmem_alloc) + wmem_alloc_delta <=
 				    2 * sk->sk_sndbuf)
-					skb = alloc_skb(alloclen + hh_len + 15,
-							sk->sk_allocation);
+					skb = sock_dev_wmalloc(sk, device,
+							   alloclen + hh_len + 15, 1,
+							   sk->sk_allocation);
 				if (unlikely(!skb))
 					err = -ENOBUFS;
 			}

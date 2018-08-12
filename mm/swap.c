@@ -75,14 +75,22 @@ static void __page_cache_release(struct page *page)
 
 static void __put_single_page(struct page *page)
 {
-	__page_cache_release(page);
-	free_unref_page(page);
+	if (unlikely(is_dma_cache_page(page))) {
+		panic("WTF?!?...\n");
+	} else {
+		__page_cache_release(page);
+		free_unref_page(page);
+	}
 }
 
 static void __put_compound_page(struct page *page)
 {
 	compound_page_dtor *dtor;
 
+	if (unlikely(is_dma_cache_page(page))) {
+		dma_cache_free(page->device, page);
+		return;
+	}
 	/*
 	 * __page_cache_release() is supposed to be called for thp, not for
 	 * hugetlb. This is because hugetlb page does never have PageLRU set
