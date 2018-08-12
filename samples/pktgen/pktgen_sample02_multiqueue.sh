@@ -17,7 +17,7 @@ source ${basedir}/parameters.sh
 [ -z "$COUNT" ] && COUNT="100000" # Zero means indefinitely
 
 # Base Config
-DELAY="0"        # Zero means max speed
+DELAY="0"	# Zero means max speed
 [ -z "$CLONE_SKB" ] && CLONE_SKB="0"
 
 # Flow variation random source port between min and max
@@ -54,6 +54,8 @@ for ((thread = $F_THREAD; thread <= $L_THREAD; thread++)); do
     pg_set $dev "delay $DELAY"
 
     # Flag example disabling timestamping
+    pg_set $dev "flag NO_TIMESTAMP"
+    pg_set $dev "flag NODE_ALLOC"
     pg_set $dev "flag NO_TIMESTAMP"
 
     # Destination

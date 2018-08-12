@@ -2,7 +2,7 @@
 VERSION = 5
 PATCHLEVEL = 1
 SUBLEVEL = 12
-EXTRAVERSION = '-no-irq'
+EXTRAVERSION = '-damn-no-irq'
 NAME = Shy Crocodile
 
 # *DOCUMENTATION*

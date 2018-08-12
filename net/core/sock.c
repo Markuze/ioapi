@@ -143,6 +143,8 @@
 #include <net/tcp.h>
 #include <net/busy_poll.h>
 
+#include <linux/dma-cache.h>
+
 static DEFINE_MUTEX(proto_list_mutex);
 static LIST_HEAD(proto_list);
 
@@ -2065,17 +2067,24 @@ EXPORT_SYMBOL(sock_i_ino);
 /*
  * Allocate a skb from the socket's send buffer.
  */
-struct sk_buff *sock_wmalloc(struct sock *sk, unsigned long size, int force,
-			     gfp_t priority)
+struct sk_buff *sock_dev_wmalloc(struct sock *sk, struct device *dev,
+				 unsigned long size, int force, gfp_t priority)
 {
 	if (force || refcount_read(&sk->sk_wmem_alloc) < sk->sk_sndbuf) {
-		struct sk_buff *skb = alloc_skb(size, priority);
+		struct sk_buff *skb = dma_alloc_skb(dev, size, priority);
 		if (skb) {
 			skb_set_owner_w(skb, sk);
 			return skb;
 		}
 	}
 	return NULL;
+}
+EXPORT_SYMBOL(sock_dev_wmalloc);
+
+struct sk_buff *sock_wmalloc(struct sock *sk, unsigned long size, int force,
+			     gfp_t priority)
+{
+	return sock_dev_wmalloc(sk, NULL, size, force, priority);
 }
 EXPORT_SYMBOL(sock_wmalloc);
 
@@ -2187,9 +2196,10 @@ static long sock_wait_for_wmem(struct sock *sk, long timeo)
  *	Generic send/receive buffer handlers
  */
 
-struct sk_buff *sock_alloc_send_pskb(struct sock *sk, unsigned long header_len,
-				     unsigned long data_len, int noblock,
-				     int *errcode, int max_page_order)
+struct sk_buff *sock_dev_alloc_send_pskb(struct sock *sk, struct device *dev,
+					 unsigned long header_len,
+					 unsigned long data_len, int noblock,
+					 int *errcode, int max_page_order)
 {
 	struct sk_buff *skb;
 	long timeo;
@@ -2217,7 +2227,8 @@ struct sk_buff *sock_alloc_send_pskb(struct sock *sk, unsigned long header_len,
 			goto interrupted;
 		timeo = sock_wait_for_wmem(sk, timeo);
 	}
-	skb = alloc_skb_with_frags(header_len, data_len, max_page_order,
+	skb = alloc_skb_with_frags(sk, dev, header_len, data_len,
+				   max_page_order,
 				   errcode, sk->sk_allocation);
 	if (skb)
 		skb_set_owner_w(skb, sk);
@@ -2229,7 +2240,22 @@ failure:
 	*errcode = err;
 	return NULL;
 }
+EXPORT_SYMBOL(sock_dev_alloc_send_pskb);
+
+struct sk_buff *sock_alloc_send_pskb(struct sock *sk, unsigned long header_len,
+				     unsigned long data_len, int noblock,
+				     int *errcode, int max_page_order)
+{
+	return sock_dev_alloc_send_pskb(sk, NULL, header_len, data_len, noblock, errcode, max_page_order);
+}
 EXPORT_SYMBOL(sock_alloc_send_pskb);
+
+struct sk_buff *sock_dev_alloc_send_skb(struct sock *sk, struct device *dev, unsigned long size,
+				    int noblock, int *errcode)
+{
+	return sock_dev_alloc_send_pskb(sk, dev, size, 0, noblock, errcode, 0);
+}
+EXPORT_SYMBOL(sock_dev_alloc_send_skb);
 
 struct sk_buff *sock_alloc_send_skb(struct sock *sk, unsigned long size,
 				    int noblock, int *errcode)
@@ -2332,9 +2358,11 @@ static void sk_leave_memory_pressure(struct sock *sk)
  * no guarantee that allocations succeed. Therefore, @sz MUST be
  * less or equal than PAGE_SIZE.
  */
-bool skb_page_frag_refill(unsigned int sz, struct page_frag *pfrag, gfp_t gfp)
+bool skb_page_frag_refill(struct device *dev, unsigned int sz,
+			  struct page_frag *pfrag, gfp_t gfp)
 {
 	if (pfrag->page) {
+		/* This is o.k...*/
 		if (page_ref_count(pfrag->page) == 1) {
 			pfrag->offset = 0;
 			return true;
@@ -2346,11 +2374,19 @@ bool skb_page_frag_refill(unsigned int sz, struct page_frag *pfrag, gfp_t gfp)
 
 	pfrag->offset = 0;
 	if (SKB_FRAG_PAGE_ORDER) {
-		/* Avoid direct reclaim but allow kswapd to wake */
-		pfrag->page = alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM) |
-					  __GFP_COMP | __GFP_NOWARN |
-					  __GFP_NORETRY,
-					  SKB_FRAG_PAGE_ORDER);
+		pfrag->page = NULL;
+		if (dev && dev->iova_mag) {
+			pfrag->page = dma_cache_alloc_pages(dev, SKB_FRAG_PAGE_ORDER, DMA_TO_DEVICE);
+		}
+
+		if (!pfrag->page) {
+			/* Avoid direct reclaim but allow kswapd to wake */
+			pfrag->page = alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM)
+						  | __GFP_COMP | __GFP_NOWARN |
+						  __GFP_NORETRY,
+						  SKB_FRAG_PAGE_ORDER);
+		}
+
 		if (likely(pfrag->page)) {
 			pfrag->size = PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
 			return true;
@@ -2367,7 +2403,11 @@ EXPORT_SYMBOL(skb_page_frag_refill);
 
 bool sk_page_frag_refill(struct sock *sk, struct page_frag *pfrag)
 {
-	if (likely(skb_page_frag_refill(32U, pfrag, sk->sk_allocation)))
+	struct dst_entry *dst = sk_dst_get(sk);
+	struct net_device *netdev = (dst) ? dst->dev : NULL;
+	struct device *dev = (netdev) ? netdev->dev.parent : NULL;
+
+	if (likely(skb_page_frag_refill(dev, 32U, pfrag, sk->sk_allocation)))
 		return true;
 
 	sk_enter_memory_pressure(sk);

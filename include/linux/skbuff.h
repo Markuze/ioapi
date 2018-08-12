@@ -1040,10 +1040,17 @@ void kfree_skb_partial(struct sk_buff *skb, bool head_stolen);
 bool skb_try_coalesce(struct sk_buff *to, struct sk_buff *from,
 		      bool *fragstolen, int *delta_truesize);
 
-struct sk_buff *__alloc_skb(unsigned int size, gfp_t priority, int flags,
-			    int node);
+struct sk_buff *__alloc_skb(struct device*, unsigned int size, gfp_t priority,
+			    int flags, int node);
 struct sk_buff *__build_skb(void *data, unsigned int frag_size);
 struct sk_buff *build_skb(void *data, unsigned int frag_size);
+
+static inline struct sk_buff *dma_alloc_skb(struct device *dev,
+					    unsigned int size,
+					    gfp_t priority)
+{
+	return __alloc_skb(dev, size, priority, 0, NUMA_NO_NODE);
+}
 
 /**
  * alloc_skb - allocate a network buffer
@@ -1055,10 +1062,11 @@ struct sk_buff *build_skb(void *data, unsigned int frag_size);
 static inline struct sk_buff *alloc_skb(unsigned int size,
 					gfp_t priority)
 {
-	return __alloc_skb(size, priority, 0, NUMA_NO_NODE);
+	return __alloc_skb(NULL, size, priority, 0, NUMA_NO_NODE);
 }
 
-struct sk_buff *alloc_skb_with_frags(unsigned long header_len,
+struct sk_buff *alloc_skb_with_frags(struct sock *sk, struct device *dev,
+				     unsigned long header_len,
 				     unsigned long data_len,
 				     int max_page_order,
 				     int *errcode,
@@ -1094,6 +1102,13 @@ static inline bool skb_fclone_busy(const struct sock *sk,
 	       fclones->skb2.sk == sk;
 }
 
+static inline struct sk_buff *dev_alloc_skb_fclone(struct device *dev,
+						   unsigned int size,
+						   gfp_t priority)
+{
+	return __alloc_skb(dev, size, priority, SKB_ALLOC_FCLONE, NUMA_NO_NODE);
+}
+
 /**
  * alloc_skb_fclone - allocate a network buffer from fclone cache
  * @size: size to allocate
@@ -1104,7 +1119,8 @@ static inline bool skb_fclone_busy(const struct sock *sk,
 static inline struct sk_buff *alloc_skb_fclone(unsigned int size,
 					       gfp_t priority)
 {
-	return __alloc_skb(size, priority, SKB_ALLOC_FCLONE, NUMA_NO_NODE);
+	return __alloc_skb(NULL, size, priority, SKB_ALLOC_FCLONE,
+			   NUMA_NO_NODE);
 }
 
 struct sk_buff *skb_morph(struct sk_buff *dst, struct sk_buff *src);
@@ -2960,7 +2976,8 @@ static inline void skb_frag_set_page(struct sk_buff *skb, int f,
 	__skb_frag_set_page(&skb_shinfo(skb)->frags[f], page);
 }
 
-bool skb_page_frag_refill(unsigned int sz, struct page_frag *pfrag, gfp_t prio);
+bool skb_page_frag_refill(struct device *dev, unsigned int sz,
+			  struct page_frag *pfrag, gfp_t prio);
 
 /**
  * skb_frag_dma_map - maps a paged fragment via the DMA API

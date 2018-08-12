@@ -37,6 +37,8 @@
 #include <linux/bpf.h>
 #include <linux/if_bridge.h>
 #include <net/page_pool.h>
+#include <linux/dma-cache.h>
+
 #include "eswitch.h"
 #include "en.h"
 #include "en_tc.h"
@@ -5193,6 +5195,7 @@ static void *mlx5e_add(struct mlx5_core_dev *mdev)
 	}
 #endif
 
+	register_iova_map(&mdev->pdev->dev);
 	nch = mlx5e_get_max_num_channels(mdev);
 	netdev = mlx5e_create_netdev(mdev, &mlx5e_nic_profile, nch, NULL);
 	if (!netdev) {
