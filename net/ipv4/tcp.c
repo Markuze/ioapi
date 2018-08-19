@@ -1352,7 +1352,7 @@ new_segment:
 			} else {
 				skb_fill_page_desc(skb, i, pfrag->page,
 						   pfrag->offset, copy);
-				page_ref_inc(pfrag->page);
+				get_page(pfrag->page);
 			}
 			pfrag->offset += copy;
 		} else {
