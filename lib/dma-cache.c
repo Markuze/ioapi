@@ -1,6 +1,5 @@
 #include <linux/dma-cache.h>
 #include <linux/dma-mapping.h>
-#include <linux/alloc_trace.h>
 #include <linux/trace-io.h>
 
 #ifndef assert
@@ -250,7 +249,7 @@ void *dma_cache_alloc(struct device *dev, size_t size, enum dma_data_direction d
 						    (dir == DMA_TO_DEVICE) ? DMA_CACHE_FRAG_PARTIAL_R : DMA_CACHE_FRAG_PARTIAL_W);
 	assert(size <= DMA_CACHE_ELEM_SIZE);
 	va = alloc_mapped_frag(dev, nc, size, dir);
-	alloc_trace_update(get_order(size), ALLOC_TRACE_ALLOC);
+	trace_io(va, size, TRACE_IO_ALLOC);
 	return va;
 }
 EXPORT_SYMBOL(dma_cache_alloc);
@@ -261,9 +260,9 @@ struct page *dma_cache_alloc_page(struct device *dev, enum dma_data_direction di
 						    (dir == DMA_TO_DEVICE) ? DMA_CACHE_FRAG_FULL_R : DMA_CACHE_FRAG_FULL_W);
 
 	void *va = alloc_mapped_frag(dev, nc, PAGE_SIZE, dir);
-	alloc_trace_update(0, ALLOC_TRACE_ALLOC);
 
 	assert(virt_addr_valid(va));
+	trace_io(va, PAGE_SIZE, TRACE_IO_ALLOC_PAGE);
 	return virt_to_page(va);
 }
 EXPORT_SYMBOL(dma_cache_alloc_page);
@@ -271,18 +270,19 @@ EXPORT_SYMBOL(dma_cache_alloc_page);
 struct page *dma_cache_alloc_pages(struct device *dev, int order, enum dma_data_direction dir)
 {
 	assert(order <= DMA_CACHE_MAX_ORDER);
-	alloc_trace_update(order, ALLOC_TRACE_ALLOC);
 
 	if (order == DMA_CACHE_MAX_ORDER) {
 		struct page *page;
 		WARN_ONCE((order != DMA_CACHE_MAX_ORDER), "order is %d", order);
 		page = alloc_mapped_pages(dev, dir);
+		trace_io(page_to_virt(page), PAGE_SIZE << order, TRACE_IO_ALLOC_PAGE);
 		return page;
 	} else {
 		struct page_frag_cache *nc = get_frag_cache(dev->iova_mag, order + 1,
 						    (dir == DMA_TO_DEVICE) ? DMA_CACHE_FRAG_FULL_R : DMA_CACHE_FRAG_FULL_W);
 		void *va = alloc_mapped_frag(dev, nc, PAGE_SIZE << order, dir);
 		assert(virt_addr_valid(va));
+		trace_io(va, PAGE_SIZE << order, TRACE_IO_ALLOC_PAGE);
 		return virt_to_page(va);
 	}
 }
@@ -296,7 +296,7 @@ void dma_cache_free(struct device *dev, struct page *elem)
 	assert(page_to_nid(elem) == (idx >> CORE_SHIFT));
 	assert(idx < NUM_ALLOCATORS);
 	mag_free_elem(allocator, elem);
-	alloc_trace_update(compound_order(elem), ALLOC_TRACE_FREE);
+	trace_io(virt_to_page(elem), 0, TRACE_IO_FREE);
 
 	//mag_free_elem(allocator, elem, iova_core(elem->iova)); // When maga support available
 }
@@ -314,7 +314,6 @@ int	register_iova_map(struct device *dev)
 	for (i = 0; i < NUM_ALLOCATORS; i++) {
 		mag_allocator_init(&dev->iova_mag->allocator[i]);
 	}
-	alloc_trace_init();
 	return 0;
 }
 EXPORT_SYMBOL(register_iova_map);
