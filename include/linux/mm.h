@@ -656,9 +656,33 @@ static inline unsigned int compound_order(struct page *page)
 	return page[1].compound_order;
 }
 
+static inline unsigned int compound_io(struct page *p)
+{
+	//struct page *page = compound_head(p);
+	if (!PageHead(p))
+		panic("DE fuck is going on?!");
+	return (p[2].compound_order == 0x10);
+}
+
+static inline void clear_compound_io(struct page *page)
+{
+	if (!PageHead(page) || page[1].compound_order <2)
+		panic("DE fuck is going on?!");
+	page[2].compound_order = 0x0;
+}
+
+static inline void set_compound_io(struct page *page)
+{
+	if (!PageHead(page) || page[1].compound_order <2)
+		panic("DE fuck is going on?!");
+	page[2].compound_order = 0x10;
+}
+
 static inline void set_compound_order(struct page *page, unsigned int order)
 {
 	page[1].compound_order = order;
+	if (order > 1)
+		page[2].compound_order = 0;
 }
 
 void free_compound_page(struct page *page);

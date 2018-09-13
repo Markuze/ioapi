@@ -68,6 +68,7 @@
 #include <linux/ftrace.h>
 #include <linux/lockdep.h>
 #include <linux/nmi.h>
+#include <linux/trace-io.h>
 
 #include <asm/sections.h>
 #include <asm/tlbflush.h>
@@ -128,6 +129,8 @@ static DEFINE_SPINLOCK(managed_page_count_lock);
 unsigned long totalram_pages __read_mostly;
 unsigned long totalreserve_pages __read_mostly;
 unsigned long totalcma_pages __read_mostly;
+
+struct mag_allocator io_cache;
 
 int percpu_pagelist_fraction;
 gfp_t gfp_allowed_mask __read_mostly = GFP_BOOT_MASK;
@@ -556,6 +559,7 @@ static void bad_page(struct page *page, const char *reason,
 	if (nr_shown++ == 0)
 		resume = jiffies + 60 * HZ;
 
+	trace_printk("bad page %p\n", page);
 	pr_alert("BUG: Bad page state in process %s  pfn:%05lx\n",
 		current->comm, page_to_pfn(page));
 	__dump_page(page, reason);
@@ -567,6 +571,8 @@ static void bad_page(struct page *page, const char *reason,
 
 	print_modules();
 	dump_stack();
+	trace_printk("BAD PAGE %p\n", page);
+	panic("bad page");
 out:
 	/* Leave bad fields for debug, except PageBuddy could make trouble */
 	page_mapcount_reset(page); /* remove PageBuddy */
@@ -1007,6 +1013,11 @@ out:
 	return ret;
 }
 
+static int is_io_page(struct page *page, unsigned int order)
+{
+	return (order > 1 && PageCompound(page) && compound_io(page));
+}
+
 static __always_inline bool free_pages_prepare(struct page *page,
 					unsigned int order, bool check_free)
 {
@@ -1026,6 +1037,9 @@ static __always_inline bool free_pages_prepare(struct page *page,
 		int i;
 
 		VM_BUG_ON_PAGE(compound && compound_order(page) != order, page);
+		if (is_io_page(page, order)) {
+			panic("NOW HOW DID THIS HAPPEN");
+		}
 
 		if (compound)
 			ClearPageDoubleMap(page);
@@ -1248,8 +1262,16 @@ static void __free_pages_ok(struct page *page, unsigned int order)
 	int migratetype;
 	unsigned long pfn = page_to_pfn(page);
 
+	if (is_io_page(page, order)) {
+		//trace_printk("io page %p [%d]\n", page, order);
+		trace_io(page_address(page), 0, TRACE_IO_FREE);
+		mag_free_elem(&io_cache, page);
+		return;
+	}
+
 	if (!free_pages_prepare(page, order, true))
 		return;
+
 	//free_hot_cold_page
 	if (free_hot_cold_pages(page, order, false))
 		return;
@@ -4379,17 +4401,33 @@ EXPORT_SYMBOL(free_pages);
  * drivers to provide a backing region of memory for use as either an
  * sk_buff->head, or to be used in the "frags" portion of skb_shared_info.
  */
-static struct page *__page_frag_cache_refill(struct page_frag_cache *nc,
+//static
+struct page *__page_frag_cache_refill(struct page_frag_cache *nc,
 					     gfp_t gfp_mask)
 {
 	struct page *page = NULL;
 	gfp_t gfp = gfp_mask;
 
 #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
-	gfp_mask |= __GFP_COMP | __GFP_NOWARN | __GFP_NORETRY |
-		    __GFP_NOMEMALLOC;
-	page = alloc_pages_node(NUMA_NO_NODE, gfp_mask,
-				PAGE_FRAG_CACHE_MAX_ORDER + nc->idx);
+	if (nc->idx) {
+		// order is 6
+		page = mag_alloc_elem(&io_cache);
+		if (page) {
+			init_page_count(page);
+			//trace_printk("mag io page %p [%d]\n", page, compound_order(page));
+		}
+	}
+
+	if (!page) {
+		gfp_mask |= __GFP_COMP | __GFP_NOWARN | __GFP_NORETRY |
+			    __GFP_NOMEMALLOC;
+		page = alloc_pages_node(NUMA_NO_NODE, gfp_mask,
+					PAGE_FRAG_CACHE_MAX_ORDER + nc->idx);
+		if (nc->idx && page) {
+			set_compound_io(page);
+			//trace_printk("new io page %p [%d]\n", page, compound_order(page));
+		}
+	}
 	nc->size = page ? (PAGE_FRAG_CACHE_MAX_SIZE << nc->idx): PAGE_SIZE;
 #endif
 	if (unlikely(!page))
@@ -5625,6 +5663,7 @@ void __meminit setup_zone_pageset(struct zone *zone)
 	pr_err("%s: init %p\n", __FUNCTION__, zone);
 	for (i = 0; i < ALLOC_CACHE_MAX_ORDER; i++)
 		mag_allocator_init(&zone->alloc_cache.mag_allocator[i]);
+	mag_allocator_init(&io_cache);
 }
 
 /*

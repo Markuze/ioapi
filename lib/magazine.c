@@ -233,7 +233,7 @@ void mag_get_stats(struct mag_allocator *allocator, struct mag_stats *stats)
 void mag_allocator_init(struct mag_allocator *allocator)
 {
 	int idx;
-	assert(!((u64)allocator & CACHE_MASK));
+	//assert(!((u64)allocator & CACHE_MASK));
 //3.	init spin lock.
 	if (allocator->lock_state) {
 		return;
