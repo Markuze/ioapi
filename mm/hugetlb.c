@@ -1262,6 +1262,7 @@ void free_huge_page(struct page *page)
 		(struct hugepage_subpool *)page_private(page);
 	bool restore_reserve;
 
+	panic("why am I here?\n");
 	set_page_private(page, 0);
 	page->mapping = NULL;
 	VM_BUG_ON_PAGE(page_count(page), page);

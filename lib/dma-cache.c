@@ -1,6 +1,7 @@
 #include <linux/dma-cache.h>
 #include <linux/dma-mapping.h>
 #include <linux/trace-io.h>
+#include <linux/hugetlb.h>
 
 #ifndef assert
 #define assert(expr) 	do { \
