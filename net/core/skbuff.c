@@ -77,6 +77,7 @@
 #include <linux/highmem.h>
 #include <linux/capability.h>
 #include <linux/user_namespace.h>
+#include <linux/trace-io.h>
 
 struct kmem_cache *skbuff_head_cache __read_mostly;
 static struct kmem_cache *skbuff_fclone_cache __read_mostly;
@@ -212,6 +213,7 @@ struct sk_buff *__alloc_skb(unsigned int size, gfp_t gfp_mask,
 	 */
 	size = SKB_WITH_OVERHEAD(ksize(data));
 	prefetchw(data + size);
+	trace_io(data, size, TRACE_IO_ALLOC);
 
 	/*
 	 * Only clear those fields we need to clear, not those that we will
@@ -5155,8 +5157,10 @@ struct sk_buff *alloc_skb_with_frags(unsigned long header_len,
 						   __GFP_NOWARN |
 						   __GFP_NORETRY,
 						   order);
-				if (page)
+				if (page) {
+					trace_io(page_to_virt(page), PAGE_SIZE << order, TRACE_IO_TX);
 					goto fill_page;
+				}
 				/* Do not retry other high order allocations */
 				order = 1;
 				max_page_order = 0;
