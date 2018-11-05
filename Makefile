@@ -2,7 +2,7 @@
 VERSION = 4
 PATCHLEVEL = 14
 SUBLEVEL = 0
-EXTRAVERSION = '-damn-ne_v1'
+EXTRAVERSION = '-damn'
 NAME = Fearless Coyote
 
 # *DOCUMENTATION*
