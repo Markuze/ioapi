@@ -392,7 +392,7 @@ netdev_tx_t mlx5e_xmit(struct sk_buff *skb, struct net_device *dev)
 	return mlx5e_sq_xmit(sq, skb, wqe, pi);
 }
 
-bool mlx5e_poll_tx_cq(struct mlx5e_cq *cq, int napi_budget)
+int mlx5e_poll_tx_cq(struct mlx5e_cq *cq, int napi_budget)
 {
 	struct mlx5e_txqsq *sq;
 	struct mlx5_cqe64 *cqe;
@@ -488,7 +488,7 @@ bool mlx5e_poll_tx_cq(struct mlx5e_cq *cq, int napi_budget)
 		sq->stats.wake++;
 	}
 
-	return (i == MLX5E_TX_CQ_POLL_BUDGET);
+	return i;//(i == MLX5E_TX_CQ_POLL_BUDGET);
 }
 
 void mlx5e_free_txqsq_descs(struct mlx5e_txqsq *sq)

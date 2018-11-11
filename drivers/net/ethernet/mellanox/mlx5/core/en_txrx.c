@@ -53,7 +53,7 @@ int mlx5e_napi_poll(struct napi_struct *napi, int budget)
 	int i;
 
 	for (i = 0; i < c->num_tc; i++)
-		busy |= mlx5e_poll_tx_cq(&c->sq[i].cq, budget);
+		busy |= !!mlx5e_poll_tx_cq(&c->sq[i].cq, MLX5E_TX_CQ_POLL_BUDGET);
 
 	if (c->xdp)
 		busy |= mlx5e_poll_xdpsq_cq(&c->rq.xdpsq.cq);
