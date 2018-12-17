@@ -1528,7 +1528,7 @@ static void mlx5e_free_cq(struct mlx5e_cq *cq)
 	mlx5_cqwq_destroy(&cq->wq_ctrl);
 }
 
-static int mlx5e_create_cq(struct mlx5e_cq *cq, struct mlx5e_cq_param *param)
+static int mlx5e_create_cq(struct mlx5e_cq *cq, struct mlx5e_cq_param *param, bool arm)
 {
 	struct mlx5_core_dev *mdev = cq->mdev;
 	struct mlx5_core_cq *mcq = &cq->mcq;
@@ -1555,6 +1555,7 @@ static int mlx5e_create_cq(struct mlx5e_cq *cq, struct mlx5e_cq_param *param)
 
 	mlx5_vector2eqn(mdev, param->eq_ix, &eqn, &irqn_not_used);
 
+	/*TODO: consider removing moderation code on arm == false ...*/
 	MLX5_SET(cqc,   cqc, cq_period_mode, param->cq_period_mode);
 	MLX5_SET(cqc,   cqc, c_eqn,         eqn);
 	MLX5_SET(cqc,   cqc, uar_page,      mdev->priv.uar->index);
@@ -1569,7 +1570,8 @@ static int mlx5e_create_cq(struct mlx5e_cq *cq, struct mlx5e_cq_param *param)
 	if (err)
 		return err;
 
-	mlx5e_cq_arm(cq);
+	if (arm)
+		mlx5e_cq_arm(cq);
 
 	return 0;
 }
@@ -1582,7 +1584,8 @@ static void mlx5e_destroy_cq(struct mlx5e_cq *cq)
 static int mlx5e_open_cq(struct mlx5e_channel *c,
 			 struct mlx5e_cq_moder moder,
 			 struct mlx5e_cq_param *param,
-			 struct mlx5e_cq *cq)
+			 struct mlx5e_cq *cq,
+			 bool arm)
 {
 	struct mlx5_core_dev *mdev = c->mdev;
 	int err;
@@ -1591,10 +1594,11 @@ static int mlx5e_open_cq(struct mlx5e_channel *c,
 	if (err)
 		return err;
 
-	err = mlx5e_create_cq(cq, param);
+	err = mlx5e_create_cq(cq, param, arm);
 	if (err)
 		goto err_free_cq;
 
+	/*TODO: Coallesing... intersting.... + consider ignoring on arm ==false*/
 	if (MLX5_CAP_GEN(mdev, cq_moderation))
 		mlx5_core_modify_cq_moderation(mdev, &cq->mcq, moder.usec, moder.pkts);
 	return 0;
@@ -1620,7 +1624,8 @@ static int mlx5e_open_tx_cqs(struct mlx5e_channel *c,
 
 	for (tc = 0; tc < c->num_tc; tc++) {
 		err = mlx5e_open_cq(c, params->tx_cq_moderation,
-				    &cparam->tx_cq, &c->sq[tc].cq);
+				    &cparam->tx_cq, &c->sq[tc].cq,
+				    false);
 		if (err)
 			goto err_close_tx_cqs;
 	}
@@ -1781,9 +1786,11 @@ static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
 	mlx5_vector2eqn(priv->mdev, ix, &eqn, &irq);
 	c->irq_desc = irq_to_desc(irq);
 
+	/* consider adding a distinct napi handler...*/
 	netif_napi_add(netdev, &c->napi, mlx5e_napi_poll, 64);
 
-	err = mlx5e_open_cq(c, icocq_moder, &cparam->icosq_cq, &c->icosq.cq);
+	err = mlx5e_open_cq(c, icocq_moder, &cparam->icosq_cq,
+				&c->icosq.cq, true);
 	if (err)
 		goto err_napi_del;
 
@@ -1791,13 +1798,14 @@ static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
 	if (err)
 		goto err_close_icosq_cq;
 
-	err = mlx5e_open_cq(c, params->rx_cq_moderation, &cparam->rx_cq, &c->rq.cq);
+	err = mlx5e_open_cq(c, params->rx_cq_moderation,
+				&cparam->rx_cq, &c->rq.cq, true);
 	if (err)
 		goto err_close_tx_cqs;
 
 	/* XDP SQ CQ params are same as normal TXQ sq CQ params */
 	err = c->xdp ? mlx5e_open_cq(c, params->tx_cq_moderation,
-				     &cparam->tx_cq, &c->rq.xdpsq.cq) : 0;
+				     &cparam->tx_cq, &c->rq.xdpsq.cq, true) : 0;
 	if (err)
 		goto err_close_rx_cq;
 
@@ -2797,7 +2805,7 @@ static int mlx5e_open_drop_rq(struct mlx5_core_dev *mdev,
 	if (err)
 		return err;
 
-	err = mlx5e_create_cq(cq, &cq_param);
+	err = mlx5e_create_cq(cq, &cq_param, true);
 	if (err)
 		goto err_free_cq;
 
@@ -3761,6 +3769,9 @@ static const struct net_device_ops mlx5e_netdev_ops = {
 	.ndo_open                = mlx5e_open,
 	.ndo_stop                = mlx5e_close,
 	.ndo_start_xmit          = mlx5e_xmit,
+	.ndo_poll_dev		 = mlx5e_poll_dev,
+	.ndo_arm_cq		 = mlx5e_arm_cq,
+	.ndo_arm_all_cq		 = mlx5e_arm_all_cq,
 	.ndo_setup_tc            = mlx5e_setup_tc,
 	.ndo_select_queue        = mlx5e_select_queue,
 	.ndo_get_stats64         = mlx5e_get_stats,

@@ -1129,6 +1129,9 @@ struct xfrmdev_ops {
  */
 struct net_device_ops {
 	int			(*ndo_init)(struct net_device *dev);
+	void 			(*ndo_arm_cq)(struct net_device *dev, struct sk_buff *skb);
+	void 			(*ndo_arm_all_cq)(struct net_device *dev);
+	int			(*ndo_poll_dev)(struct net_device *dev);
 	void			(*ndo_uninit)(struct net_device *dev);
 	int			(*ndo_open)(struct net_device *dev);
 	int			(*ndo_stop)(struct net_device *dev);

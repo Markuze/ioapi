@@ -158,6 +158,14 @@ trace:
 	return skb;
 }
 
+void arm_cq(struct net_device *dev, struct sk_buff *skb)
+{
+	if (dev->netdev_ops->ndo_arm_cq)
+		dev->netdev_ops->ndo_arm_cq(dev, skb);
+	else
+		pr_err("Queue closed %s\n", dev->name);
+}
+
 /*
  * Transmit possibly several skbs, and handle the return status as
  * required. Owning running seqcount bit guarantees that
@@ -184,6 +192,9 @@ int sch_direct_xmit(struct sk_buff *skb, struct Qdisc *q,
 		HARD_TX_LOCK(dev, txq, smp_processor_id());
 		if (!netif_xmit_frozen_or_stopped(txq))
 			skb = dev_hard_start_xmit(skb, dev, txq, &ret);
+		else
+			arm_cq(dev, skb);
+
 
 		HARD_TX_UNLOCK(dev, txq);
 	} else {
@@ -288,6 +299,16 @@ unsigned long dev_trans_start(struct net_device *dev)
 }
 EXPORT_SYMBOL(dev_trans_start);
 
+int poll_cq(struct net_device *dev)
+{
+	int rc = 0;
+	if (dev->netdev_ops->ndo_poll_dev)
+		rc = dev->netdev_ops->ndo_poll_dev(dev);
+	else
+		pr_err("dude poll CQ and reopen... (%s)", dev->name);
+	return rc;
+}
+
 static void dev_watchdog(unsigned long arg)
 {
 	struct net_device *dev = (struct net_device *)arg;
@@ -306,12 +327,17 @@ static void dev_watchdog(unsigned long arg)
 
 				txq = netdev_get_tx_queue(dev, i);
 				trans_start = txq->trans_start;
-				if (netif_xmit_stopped(txq) &&
-				    time_after(jiffies, (trans_start +
-							 dev->watchdog_timeo))) {
-					some_queue_timedout = 1;
-					txq->trans_timeout++;
-					break;
+				if (netif_xmit_stopped(txq)) {
+
+					if (time_after(jiffies, (trans_start +
+								 dev->watchdog_timeo))) {
+						some_queue_timedout = 1;
+						txq->trans_timeout++;
+						break;
+					} else {
+						poll_cq(dev);
+						/* Open Q */
+					}
 				}
 			}
 
@@ -321,8 +347,7 @@ static void dev_watchdog(unsigned long arg)
 				dev->netdev_ops->ndo_tx_timeout(dev);
 			}
 			if (!mod_timer(&dev->watchdog_timer,
-				       round_jiffies(jiffies +
-						     dev->watchdog_timeo)))
+				       round_jiffies(jiffies + HZ/*dev->watchdog_timeo*/)))
 				dev_hold(dev);
 		}
 	}
@@ -337,7 +362,7 @@ void __netdev_watchdog_up(struct net_device *dev)
 		if (dev->watchdog_timeo <= 0)
 			dev->watchdog_timeo = 5*HZ;
 		if (!mod_timer(&dev->watchdog_timer,
-			       round_jiffies(jiffies + dev->watchdog_timeo)))
+			       round_jiffies(jiffies + HZ/*dev->watchdog_timeo*/)))
 			dev_hold(dev);
 	}
 }

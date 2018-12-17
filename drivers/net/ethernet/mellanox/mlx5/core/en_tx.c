@@ -289,6 +289,9 @@ mlx5e_txwqe_complete(struct mlx5e_txqsq *sq, struct sk_buff *skb,
 
 	sq->pc += wi->num_wqebbs;
 	if (unlikely(!mlx5e_wqc_has_room_for(wq, sq->cc, sq->pc, MLX5E_SQ_STOP_ROOM))) {
+		pr_err("Queue stopped [cc %d pc %d]...\n", sq->cc, sq->pc);
+		panic("Realy not here?!...");
+		/*TODO: Schedule napi...*/
 		netif_tx_stop_queue(sq->txq);
 		sq->stats.stopped++;
 	}
@@ -359,16 +362,67 @@ static netdev_tx_t mlx5e_sq_xmit(struct mlx5e_txqsq *sq, struct sk_buff *skb,
 
 	mlx5e_txwqe_complete(sq, skb, opcode, ds_cnt + num_dma,
 			     num_bytes, num_dma, wi, cseg);
-
+	skb_orphan(skb);
 	return NETDEV_TX_OK;
 
 dma_unmap_wqe_err:
+	trace_printk("Dropped!");
 	sq->stats.dropped++;
 	mlx5e_dma_unmap_wqe_err(sq, wi->num_dma);
 
 	dev_kfree_skb_any(skb);
 
 	return NETDEV_TX_OK;
+}
+
+void mlx5e_arm_all_cq(struct net_device *dev)
+{
+	struct mlx5e_priv *priv = netdev_priv(dev);
+	struct mlx5e_txqsq *sq;
+	int i = 0;
+
+	mlx5e_poll_dev(dev);
+
+	while (sq = priv->txq2sq[i++]) {
+		mlx5e_cq_arm(&sq->cq);
+	}
+}
+
+
+void mlx5e_arm_cq(struct net_device *dev, struct sk_buff *skb)
+{
+	struct mlx5e_priv *priv = netdev_priv(dev);
+	struct mlx5e_txqsq *sq = priv->txq2sq[skb_get_queue_mapping(skb)];
+	trace_printk("ARMED CQ %s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
+	mlx5e_poll_dev(dev);
+	mlx5e_cq_arm(&sq->cq);
+}
+
+int mlx5e_poll_dev(struct net_device *dev)
+{
+	struct mlx5e_priv *priv = netdev_priv(dev);
+	int itr = 0;
+	int rc = 0;
+	int polled = 0;
+
+	//local_bh_disable();
+	while (priv->txq2sq[itr]) {
+		struct mlx5e_txqsq *sq = priv->txq2sq[itr++];
+		int p = 0;
+		int closed = 0;
+		closed = netif_tx_queue_stopped(sq->txq);
+		p = mlx5e_poll_tx_cq(&sq->cq, 128);
+		if (p || closed)
+			trace_printk("polled [%d] for %d completions now Q %s was %s\n", itr, p,
+					netif_tx_queue_stopped(sq->txq) ? "Stopped":"Open",
+					closed  ? "Stopped":"Open");
+
+		rc += p;
+		++polled;
+	}
+	trace_printk("Polled %d SQs for %d completions\n", polled, rc);
+	//local_bh_enable();
+	return rc;
 }
 
 netdev_tx_t mlx5e_xmit(struct sk_buff *skb, struct net_device *dev)
@@ -378,6 +432,7 @@ netdev_tx_t mlx5e_xmit(struct sk_buff *skb, struct net_device *dev)
 	struct mlx5_wq_cyc *wq = &sq->wq;
 	u16 pi = sq->pc & wq->sz_m1;
 	struct mlx5e_tx_wqe *wqe = mlx5_wq_cyc_get_wqe(wq, pi);
+	netdev_tx_t rc;
 
 	memset(wqe, 0, sizeof(*wqe));
 
@@ -389,10 +444,24 @@ netdev_tx_t mlx5e_xmit(struct sk_buff *skb, struct net_device *dev)
 	}
 #endif
 
-	return mlx5e_sq_xmit(sq, skb, wqe, pi);
+	rc = mlx5e_sq_xmit(sq, skb, wqe, pi);
+#if 1
+	if (!(pi & 0x7f)) {
+		//local_bh_disable();
+		mlx5e_poll_tx_cq(&sq->cq, 128);
+		//local_bh_enable();
+	}
+#else
+	trace_printk("%s) sending[%d/(%lu * %d)]\n", dev->name, skb_get_queue_mapping(skb), MLX5E_MAX_NUM_CHANNELS, MLX5E_MAX_NUM_TC);
+	if (mlx5e_poll_tx_cq(&sq->cq, 128))
+		trace_printk("%s)[%d]successfull polling sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
+	else
+		trace_printk("%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
+#endif
+	return rc;
 }
 
-bool mlx5e_poll_tx_cq(struct mlx5e_cq *cq, int napi_budget)
+int mlx5e_poll_tx_cq(struct mlx5e_cq *cq, int napi_budget)
 {
 	struct mlx5e_txqsq *sq;
 	struct mlx5_cqe64 *cqe;
@@ -404,12 +473,14 @@ bool mlx5e_poll_tx_cq(struct mlx5e_cq *cq, int napi_budget)
 
 	sq = container_of(cq, struct mlx5e_txqsq, cq);
 
-	if (unlikely(!MLX5E_TEST_BIT(sq->state, MLX5E_SQ_STATE_ENABLED)))
+	if (unlikely(!MLX5E_TEST_BIT(sq->state, MLX5E_SQ_STATE_ENABLED))) {
 		return false;
+	}
 
 	cqe = mlx5_cqwq_get_cqe(&cq->wq);
-	if (!cqe)
+	if (!cqe) {
 		return false;
+	}
 
 	npkts = 0;
 	nbytes = 0;
@@ -487,8 +558,7 @@ bool mlx5e_poll_tx_cq(struct mlx5e_cq *cq, int napi_budget)
 		netif_tx_wake_queue(sq->txq);
 		sq->stats.wake++;
 	}
-
-	return (i == MLX5E_TX_CQ_POLL_BUDGET);
+	return i;
 }
 
 void mlx5e_free_txqsq_descs(struct mlx5e_txqsq *sq)

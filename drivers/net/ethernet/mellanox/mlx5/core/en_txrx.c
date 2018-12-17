@@ -53,7 +53,7 @@ int mlx5e_napi_poll(struct napi_struct *napi, int budget)
 	int i;
 
 	for (i = 0; i < c->num_tc; i++)
-		busy |= mlx5e_poll_tx_cq(&c->sq[i].cq, budget);
+		/*busy |=*/ mlx5e_poll_tx_cq(&c->sq[i].cq, budget);
 
 	if (c->xdp)
 		busy |= mlx5e_poll_xdpsq_cq(&c->rq.xdpsq.cq);
@@ -74,10 +74,10 @@ int mlx5e_napi_poll(struct napi_struct *napi, int budget)
 
 	if (unlikely(!napi_complete_done(napi, work_done)))
 		return work_done;
-
+/*
 	for (i = 0; i < c->num_tc; i++)
 		mlx5e_cq_arm(&c->sq[i].cq);
-
+*/
 	if (MLX5E_TEST_BIT(c->rq.state, MLX5E_RQ_STATE_AM))
 		mlx5e_rx_am(&c->rq);
 

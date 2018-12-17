@@ -828,11 +828,15 @@ void mlx5e_build_ptys2ethtool_map(void);
 u16 mlx5e_select_queue(struct net_device *dev, struct sk_buff *skb,
 		       void *accel_priv, select_queue_fallback_t fallback);
 netdev_tx_t mlx5e_xmit(struct sk_buff *skb, struct net_device *dev);
+int mlx5e_poll_dev(struct net_device *dev);
+void mlx5e_arm_cq(struct net_device *dev, struct sk_buff *skb);
+void mlx5e_arm_all_cq(struct net_device *dev);
 
 void mlx5e_completion_event(struct mlx5_core_cq *mcq);
 void mlx5e_cq_error_event(struct mlx5_core_cq *mcq, enum mlx5_event event);
 int mlx5e_napi_poll(struct napi_struct *napi, int budget);
-bool mlx5e_poll_tx_cq(struct mlx5e_cq *cq, int napi_budget);
+int mlx5e_poll_channel(struct mlx5e_channel *c);
+int mlx5e_poll_tx_cq(struct mlx5e_cq *cq, int napi_budget);
 int mlx5e_poll_rx_cq(struct mlx5e_cq *cq, int budget);
 bool mlx5e_poll_xdpsq_cq(struct mlx5e_cq *cq);
 void mlx5e_free_txqsq_descs(struct mlx5e_txqsq *sq);

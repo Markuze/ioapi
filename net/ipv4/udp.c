@@ -863,6 +863,12 @@ out:
 }
 EXPORT_SYMBOL(udp_push_pending_frames);
 
+void arm_all_cq(struct net_device *dev)
+{
+	if (dev && dev->netdev_ops && dev->netdev_ops->ndo_arm_all_cq)
+		dev->netdev_ops->ndo_arm_all_cq(dev);
+}
+
 int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
 {
 	struct inet_sock *inet = inet_sk(sk);
@@ -1049,6 +1055,9 @@ back_from_confirm:
 		err = PTR_ERR(skb);
 		if (!IS_ERR_OR_NULL(skb))
 			err = udp_send_skb(skb, fl4);
+		else {
+			arm_all_cq(rt->dst.dev);
+		}
 		goto out;
 	}
 
