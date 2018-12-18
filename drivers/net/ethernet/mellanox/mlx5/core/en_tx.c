@@ -360,6 +360,7 @@ static netdev_tx_t mlx5e_sq_xmit(struct mlx5e_txqsq *sq, struct sk_buff *skb,
 	mlx5e_txwqe_complete(sq, skb, opcode, ds_cnt + num_dma,
 			     num_bytes, num_dma, wi, cseg);
 
+	skb_orphan(skb);
 	return NETDEV_TX_OK;
 
 dma_unmap_wqe_err:
