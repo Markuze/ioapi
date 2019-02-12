@@ -43,6 +43,7 @@
 #include "en_accel/ipsec_rxtx.h"
 #include "accel/ipsec.h"
 #include "vxlan.h"
+#include "trace-io.h"
 
 struct mlx5e_rq_param {
 	u32			rqc[MLX5_ST_SZ_DW(rqc)];

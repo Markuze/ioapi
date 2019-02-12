@@ -1,4 +1,5 @@
 /*
+	struct mlx5e_ts *ts	= (struct mlx5e_ts *)skb->cb;
  * Copyright (c) 2015, Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
@@ -263,6 +264,7 @@ static int mlx5e_alloc_rx_wqe(struct mlx5e_rq *rq, struct mlx5e_rx_wqe *wqe, u16
 		wi->offset = 0;
 	}
 
+	wi->ts = rdtsc();
 	wqe->data.addr = cpu_to_be64(wi->di.addr + wi->offset + rq->buff.headroom);
 	return 0;
 }
@@ -896,6 +898,7 @@ void mlx5e_handle_rx_cqe(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe)
 	}
 
 	mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb);
+	/* MARK: Post processing here*/
 	napi_gro_receive(rq->cq.napi, skb);
 
 	mlx5e_free_rx_wqe_reuse(rq, wi);

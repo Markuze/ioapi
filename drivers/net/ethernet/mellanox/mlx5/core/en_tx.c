@@ -271,7 +271,8 @@ mlx5e_txwqe_complete(struct mlx5e_txqsq *sq, struct sk_buff *skb,
 		     u8 opcode, u16 ds_cnt, u32 num_bytes, u8 num_dma,
 		     struct mlx5e_tx_wqe_info *wi, struct mlx5_wqe_ctrl_seg *cseg)
 {
-	struct mlx5_wq_cyc *wq = &sq->wq;
+	struct mlx5_wq_cyc *wq	= &sq->wq;
+	struct mlx5e_ts *ts	= (struct mlx5e_ts *)skb->cb;
 	u16 pi;
 
 	wi->num_bytes = num_bytes;
@@ -292,6 +293,9 @@ mlx5e_txwqe_complete(struct mlx5e_txqsq *sq, struct sk_buff *skb,
 		netif_tx_stop_queue(sq->txq);
 		sq->stats.stopped++;
 	}
+	ts->ts = rdtsc();
+	ts->flag |= (skb->xmit_more) ? 0x1 : 0;
+	ts->flag |= netif_xmit_stopped(sq->txq) ? 0x2 : 0;
 
 	if (!skb->xmit_more || netif_xmit_stopped(sq->txq))
 		mlx5e_notify_hw(wq, sq->pc, sq->uar_map, cseg);

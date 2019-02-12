@@ -345,6 +345,17 @@ struct mlx5e_sq_wqe_info {
 	u8  opcode;
 };
 
+struct mlx5e_ts {
+	union {
+		char cb[48];
+		struct {
+			unsigned long long 	ts;
+			char 			flag;
+		};
+	};
+
+};
+
 struct mlx5e_txqsq {
 	/* data path */
 
@@ -454,6 +465,7 @@ struct mlx5e_dma_info {
 
 struct mlx5e_wqe_frag_info {
 	struct mlx5e_dma_info di;
+	unsigned long long ts;
 	u32 offset;
 };
 
