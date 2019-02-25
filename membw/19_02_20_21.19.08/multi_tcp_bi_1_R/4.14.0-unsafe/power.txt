@@ -1,0 +1,108 @@
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+
+----------------------------------------------------------------------------------------------
+Time elapsed: 6008 ms
+Called sleep function for 1000 ms
+S0P0; QPIClocks: 14422531490; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S0P1; QPIClocks: 14422542750; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S0CH0; DRAMClocks: 7211278818; Rank0 CKE Off Residency: 100.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH0; DRAMClocks: 7211278818; Rank1 CKE Off Residency: 100.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0CH1; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH1; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0CH2; DRAMClocks: 7211401812; Rank0 CKE Off Residency: 0.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH2; DRAMClocks: 7211401812; Rank1 CKE Off Residency: 0.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0CH3; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH3; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0; PCUClocks: 6009496345; Freq band 0/1/2 cycles: 0.00%; 0.00%; 0.00%
+S0; Consumed energy units: 4318415; Consumed Joules: 263.58; Watts: 43.87; Thermal headroom below TjMax: 61
+S0; Consumed DRAM energy units: 696468; Consumed DRAM Joules: 10.66; DRAM Watts: 1.77
+S1P0; QPIClocks: 14422621450; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S1P1; QPIClocks: 14422640350; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S1CH0; DRAMClocks: 7211439344; Rank0 CKE Off Residency: 0.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH0; DRAMClocks: 7211439344; Rank1 CKE Off Residency: 0.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1CH1; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH1; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1CH2; DRAMClocks: 7211345521; Rank0 CKE Off Residency: 100.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH2; DRAMClocks: 7211345521; Rank1 CKE Off Residency: 100.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1CH3; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH3; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1; PCUClocks: 6009768354; Freq band 0/1/2 cycles: 0.00%; 0.00%; 0.00%
+S1; Consumed energy units: 6193619; Consumed Joules: 378.03; Watts: 62.92; Thermal headroom below TjMax: 51
+S1; Consumed DRAM energy units: 1725268; Consumed DRAM Joules: 26.40; DRAM Watts: 4.39
+----------------------------------------------------------------------------------------------
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+
+----------------------------------------------------------------------------------------------
+Time elapsed: 6006 ms
+Called sleep function for 1000 ms
+S0P0; QPIClocks: 14414735226; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S0P1; QPIClocks: 14414759782; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S0CH0; DRAMClocks: 7207391002; Rank0 CKE Off Residency: 100.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH0; DRAMClocks: 7207391002; Rank1 CKE Off Residency: 100.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0CH1; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH1; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0CH2; DRAMClocks: 7207517437; Rank0 CKE Off Residency: 0.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH2; DRAMClocks: 7207517437; Rank1 CKE Off Residency: 0.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0CH3; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH3; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0; PCUClocks: 6006269407; Freq band 0/1/2 cycles: 0.00%; 0.00%; 0.00%
+S0; Consumed energy units: 4230067; Consumed Joules: 258.18; Watts: 42.99; Thermal headroom below TjMax: 61
+S0; Consumed DRAM energy units: 699316; Consumed DRAM Joules: 10.70; DRAM Watts: 1.78
+S1P0; QPIClocks: 14414913374; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S1P1; QPIClocks: 14414929058; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S1CH0; DRAMClocks: 7207601080; Rank0 CKE Off Residency: 0.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH0; DRAMClocks: 7207601080; Rank1 CKE Off Residency: 0.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1CH1; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH1; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1CH2; DRAMClocks: 7207495535; Rank0 CKE Off Residency: 100.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH2; DRAMClocks: 7207495535; Rank1 CKE Off Residency: 100.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1CH3; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH3; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1; PCUClocks: 6006386971; Freq band 0/1/2 cycles: 0.00%; 0.00%; 0.00%
+S1; Consumed energy units: 6011938; Consumed Joules: 366.94; Watts: 61.10; Thermal headroom below TjMax: 52
+S1; Consumed DRAM energy units: 1712693; Consumed DRAM Joules: 26.20; DRAM Watts: 4.36
+----------------------------------------------------------------------------------------------
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+
+----------------------------------------------------------------------------------------------
+Time elapsed: 6006 ms
+Called sleep function for 1000 ms
+S0P0; QPIClocks: 14415653554; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S0P1; QPIClocks: 14415672010; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S0CH0; DRAMClocks: 7207843176; Rank0 CKE Off Residency: 100.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH0; DRAMClocks: 7207843176; Rank1 CKE Off Residency: 100.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0CH1; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH1; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0CH2; DRAMClocks: 7207961762; Rank0 CKE Off Residency: 0.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH2; DRAMClocks: 7207961762; Rank1 CKE Off Residency: 0.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0CH3; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH3; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0; PCUClocks: 6006662333; Freq band 0/1/2 cycles: 0.00%; 0.00%; 0.00%
+S0; Consumed energy units: 4308058; Consumed Joules: 262.94; Watts: 43.78; Thermal headroom below TjMax: 60
+S0; Consumed DRAM energy units: 705375; Consumed DRAM Joules: 10.79; DRAM Watts: 1.80
+S1P0; QPIClocks: 14415840306; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S1P1; QPIClocks: 14415857782; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S1CH0; DRAMClocks: 7208062057; Rank0 CKE Off Residency: 0.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH0; DRAMClocks: 7208062057; Rank1 CKE Off Residency: 0.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1CH1; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH1; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1CH2; DRAMClocks: 7207962180; Rank0 CKE Off Residency: 100.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH2; DRAMClocks: 7207962180; Rank1 CKE Off Residency: 100.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1CH3; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH3; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1; PCUClocks: 6011966837; Freq band 0/1/2 cycles: 0.00%; 0.00%; 0.00%
+S1; Consumed energy units: 6124557; Consumed Joules: 373.81; Watts: 62.24; Thermal headroom below TjMax: 52
+S1; Consumed DRAM energy units: 1726595; Consumed DRAM Joules: 26.42; DRAM Watts: 4.40
+----------------------------------------------------------------------------------------------

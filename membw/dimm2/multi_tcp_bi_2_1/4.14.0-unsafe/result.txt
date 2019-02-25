@@ -1,0 +1,1911 @@
+<Results/membw/dimm2/multi_tcp_bi_2_1/4.14.0-unsafe>
+ in collect mem bw
+
+ Processor Counter Monitor: Memory Bandwidth Monitoring Utility  ($Format:%ci ID=%h$)
+
+ This utility measures memory bandwidth per channel or per DIMM rank in real-time
+
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+	LANGUAGE = "en_US:en,",
+	LC_ALL = (unset),
+	LC_PAPER = "he_IL.UTF-8",
+	LC_ADDRESS = "he_IL.UTF-8",
+	LC_MONETARY = "he_IL.UTF-8",
+	LC_NUMERIC = "C",
+	LC_TELEPHONE = "he_IL.UTF-8",
+	LC_IDENTIFICATION = "he_IL.UTF-8",
+	LC_COLLATE = "C",
+	LC_MEASUREMENT = "he_IL.UTF-8",
+	LC_CTYPE = "en_US.UTF-8",
+	LC_NAME = "he_IL.UTF-8",
+	LANG = "en_US.UTF-8"
+    are supported and installed on your system.
+perl: warning: Falling back to a fallback locale ("en_US.UTF-8").
+Number of physical cores: 28
+Number of logical cores: 28
+Number of online logical cores: 28
+Threads (logical cores) per physical core: 1
+Num sockets: 2
+Physical cores per socket: 14
+Core PMU (perfmon) version: 3
+Number of core PMU generic (programmable) counters: 8
+Width of generic (programmable) counters: 48 bits
+Number of core PMU fixed counters: 3
+Width of fixed counters: 48 bits
+Nominal core frequency: 2000000000 Hz
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Package thermal spec power: 105 Watt; Package minimum power: 55 Watt; Package maximum power: 210 Watt; 
+Socket 0: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+Socket 1: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+
+Detected Intel(R) Xeon(R) CPU E5-2660 v4 @ 2.00GHz "Intel(r) microarchitecture codename Broadwell-EP/EX" stepping 1 microcode level 0xb00002e
+Update every 1 seconds
+
+Executing "sleep" command:
+keys on reference is experimental at DataCollector/collect_net_cpu.pl line 37.
+DEBUG: caught signal to interrupt (Child exited).
+Program sleep launched with PID: 1df3
+Program exited with status 0
+|---------------------------------------||---------------------------------------|
+|--             Socket  0             --||--             Socket  1             --|
+|---------------------------------------||---------------------------------------|
+|--     Memory Channel Monitoring     --||--     Memory Channel Monitoring     --|
+|---------------------------------------||---------------------------------------|
+|-- Mem Ch  0: Reads (MB/s):    -1.00 --||-- Mem Ch  0: Reads (MB/s):  4767.44 --|
+|--            Writes(MB/s):    -1.00 --||--            Writes(MB/s):  5178.90 --|
+|-- Mem Ch  1: Reads (MB/s):  4712.08 --||-- Mem Ch  1: Reads (MB/s):    -1.00 --|
+|--            Writes(MB/s):  2796.76 --||--            Writes(MB/s):    -1.00 --|
+|-- Mem Ch  2: Reads (MB/s):  4695.98 --||-- Mem Ch  2: Reads (MB/s):    -1.00 --|
+|--            Writes(MB/s):  2774.71 --||--            Writes(MB/s):    -1.00 --|
+|-- Mem Ch  3: Reads (MB/s):    -1.00 --||-- Mem Ch  3: Reads (MB/s):  4830.85 --|
+|--            Writes(MB/s):    -1.00 --||--            Writes(MB/s):  5172.75 --|
+|-- NODE 0 Mem Read (MB/s) :  9408.06 --||-- NODE 1 Mem Read (MB/s) :  9598.29 --|
+|-- NODE 0 Mem Write(MB/s) :  5571.47 --||-- NODE 1 Mem Write(MB/s) : 10351.65 --|
+|-- NODE 0 P. Write (T/s):      95270 --||-- NODE 1 P. Write (T/s):     133907 --|
+|-- NODE 0 Memory (MB/s):    14979.52 --||-- NODE 1 Memory (MB/s):    19949.95 --|
+|---------------------------------------||---------------------------------------|
+            |---------------------------------------||---------------------------------------|
+            |--                 System Read Throughput(MB/s):      19006.35                --|
+            |--                System Write Throughput(MB/s):      15923.12                --|
+            |--               System Memory Throughput(MB/s):      34929.47                --|
+            |---------------------------------------||---------------------------------------|
+Cleaning up
+ Zeroed uncore PMU registers
+ Freeing up all RMIDs
+ out collect mem bw
+ in collect pcm
+
+ Processor Counter Monitor: PCIe Bandwidth Monitoring Utility 
+ This utility measures PCIe bandwidth in real-time
+
+ PCIe event definitions (each event counts as a transfer): 
+   PCIe read events (PCI devices reading from memory - application writes to disk/network/PCIe device):
+     PCIePRd   - PCIe UC read transfer (partial cache line)
+     PCIeRdCur* - PCIe read current transfer (full cache line)
+         On Haswell Server PCIeRdCur counts both full/partial cache lines
+     RFO*      - Demand Data RFO
+     CRd*      - Demand Code Read
+     DRd       - Demand Data Read
+     PCIeNSWr  - PCIe Non-snoop write transfer (partial cache line)
+   PCIe write events (PCI devices writing to memory - application reads from disk/network/PCIe device):
+     PCIeWiLF  - PCIe Write transfer (non-allocating) (full cache line)
+     PCIeItoM  - PCIe Write transfer (allocating) (full cache line)
+     PCIeNSWr  - PCIe Non-snoop write transfer (partial cache line)
+     PCIeNSWrF - PCIe Non-snoop write transfer (full cache line)
+     ItoM      - PCIe write full cache line
+     RFO       - PCIe parial Write
+   CPU MMIO events (CPU reading/writing to PCIe devices):
+     PRd       - MMIO Read [Haswell Server only] (Partial Cache Line)
+     WiL       - MMIO Write (Full/Partial)
+
+ * - NOTE: Depending on the configuration of your BIOS, this tool may report '0' if the message
+           has not been selected.
+
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+Number of physical cores: 28
+Number of logical cores: 28
+Number of online logical cores: 28
+Threads (logical cores) per physical core: 1
+Num sockets: 2
+Physical cores per socket: 14
+Core PMU (perfmon) version: 3
+Number of core PMU generic (programmable) counters: 8
+Width of generic (programmable) counters: 48 bits
+Number of core PMU fixed counters: 3
+Width of fixed counters: 48 bits
+Nominal core frequency: 2000000000 Hz
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Package thermal spec power: 105 Watt; Package minimum power: 55 Watt; Package maximum power: 210 Watt; 
+Socket 0: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+Socket 1: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+Trying to use Linux perf events...
+Successfully programmed on-core PMU using Linux perf
+Socket 0
+Max QPI link 0 speed: 19.2 GBytes/second (9.6 GT/second)
+Max QPI link 1 speed: 19.2 GBytes/second (9.6 GT/second)
+Socket 1
+Max QPI link 0 speed: 19.2 GBytes/second (9.6 GT/second)
+Max QPI link 1 speed: 19.2 GBytes/second (9.6 GT/second)
+
+Detected Intel(R) Xeon(R) CPU E5-2660 v4 @ 2.00GHz "Intel(r) microarchitecture codename Broadwell-EP/EX" stepping 1 microcode level 0xb00002e
+Update every 1.0 seconds
+delay_ms: 54
+
+Executing "sleep" command:
+DEBUG: caught signal to interrupt (Child exited).
+Program sleep launched with PID: 1f2d
+Program exited with status 0
+Skt | PCIeRdCur |  RFO  |  CRd  |  DRd  |  ItoM  |  PRd  |  WiL
+ 0      16 K        24      32 M   228 M     48     372    1198 K
+ 1     197 M       521 K    40 M   284 M    205 M     0    1131 K
+-----------------------------------------------------------------------
+ *     197 M       521 K    73 M   512 M    205 M   372    2330 K
+
+Cleaning up
+ Zeroed uncore PMU registers
+ Freeing up all RMIDs
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+Number of physical cores: 28
+Number of logical cores: 28
+Number of online logical cores: 28
+Threads (logical cores) per physical core: 1
+Num sockets: 2
+Physical cores per socket: 14
+Core PMU (perfmon) version: 3
+Number of core PMU generic (programmable) counters: 8
+Width of generic (programmable) counters: 48 bits
+Number of core PMU fixed counters: 3
+Width of fixed counters: 48 bits
+Nominal core frequency: 2000000000 Hz
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Package thermal spec power: 105 Watt; Package minimum power: 55 Watt; Package maximum power: 210 Watt; 
+Socket 0: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+Socket 1: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+
+ Processor Counter Monitor  ($Format:%ci ID=%h$)
+ Zeroed PMU registers
+ This utility measures Latency information
+
+
+Trying to use Linux perf events...
+Successfully programmed on-core PMU using Linux perf
+Socket 0
+Max QPI link 0 speed: 19.2 GBytes/second (9.6 GT/second)
+Max QPI link 1 speed: 19.2 GBytes/second (9.6 GT/second)
+Socket 1
+Max QPI link 0 speed: 19.2 GBytes/second (9.6 GT/second)
+Max QPI link 1 speed: 19.2 GBytes/second (9.6 GT/second)
+
+Detected Intel(R) Xeon(R) CPU E5-2660 v4 @ 2.00GHz "Intel(r) microarchitecture codename Broadwell-EP/EX" stepping 1 microcode level 0xb00002e
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0 Thread0     Socket1 Thread0     
+-----------------------------------------------------------------------------
+Core0: 16.66        Core1: 35.18        
+Core2: 36.23        Core3: 18.43        
+Core4: 16.80        Core5: 18.24        
+Core6: 28.32        Core7: 16.12        
+Core8: 28.84        Core9: 38.47        
+Core10: 36.85        Core11: 36.57        
+Core12: 26.69        Core13: 13.03        
+Core14: 21.02        Core15: 34.77        
+Core16: 29.16        Core17: 18.15        
+Core18: 12.64        Core19: 22.31        
+Core20: 14.03        Core21: 17.75        
+Core22: 29.62        Core23: 12.75        
+Core24: 35.32        Core25: 16.15        
+Core26: 20.71        Core27: 15.41        
+
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0: 24.43
+Socket1: 16.15
+DDR read Latency(ns)
+Socket0: 582.65
+Socket1: 416.17
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0 Thread0     Socket1 Thread0     
+-----------------------------------------------------------------------------
+Core0: 16.82        Core1: 37.44        
+Core2: 36.57        Core3: 18.76        
+Core4: 16.78        Core5: 18.26        
+Core6: 29.15        Core7: 16.10        
+Core8: 29.51        Core9: 41.55        
+Core10: 36.81        Core11: 36.62        
+Core12: 27.27        Core13: 13.45        
+Core14: 21.21        Core15: 36.87        
+Core16: 29.16        Core17: 18.53        
+Core18: 12.59        Core19: 24.21        
+Core20: 14.13        Core21: 17.73        
+Core22: 29.43        Core23: 13.08        
+Core24: 34.40        Core25: 16.05        
+Core26: 21.61        Core27: 15.41        
+
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0: 24.40
+Socket1: 16.29
+DDR read Latency(ns)
+Socket0: 582.24
+Socket1: 414.72
+irq_total: 462711.996843679
+cpu_total: 32.20
+cpu_0: 31.72
+cpu_1: 10.97
+cpu_2: 14.43
+cpu_3: 33.18
+cpu_4: 39.23
+cpu_5: 41.29
+cpu_6: 30.72
+cpu_7: 43.28
+cpu_8: 11.90
+cpu_9: 1.86
+cpu_10: 62.03
+cpu_11: 23.54
+cpu_12: 2.66
+cpu_13: 44.55
+cpu_14: 7.25
+cpu_15: 1.00
+cpu_16: 43.75
+cpu_17: 34.11
+cpu_18: 47.74
+cpu_19: 19.15
+cpu_20: 45.35
+cpu_21: 68.62
+cpu_22: 43.22
+cpu_23: 46.14
+cpu_24: 19.48
+cpu_25: 38.96
+cpu_26: 24.40
+cpu_27: 70.94
+enp130s0f0_tx_packets: 798212
+enp130s0f1_tx_packets: 807670
+enp4s0f0_tx_packets: 0
+enp4s0f1_tx_packets: 0
+Total_tx_packets: 1605882
+enp130s0f0_rx_bytes_phy: 6584395987
+enp130s0f1_rx_bytes_phy: 6311932981
+enp4s0f0_rx_bytes_phy: 0
+enp4s0f1_rx_bytes_phy: 0
+Total_rx_bytes_phy: 12896328968
+enp130s0f0_rx_packets: 842163
+enp130s0f1_rx_packets: 808167
+enp4s0f0_rx_packets: 0
+enp4s0f1_rx_packets: 0
+Total_rx_packets: 1650330
+enp130s0f0_rx_packets_phy: 842161
+enp130s0f1_rx_packets_phy: 808173
+enp4s0f0_rx_packets_phy: 0
+enp4s0f1_rx_packets_phy: 0
+Total_rx_packets_phy: 1650334
+enp130s0f0_rx_bytes: 6567016763
+enp130s0f1_rx_bytes: 6286212087
+enp4s0f0_rx_bytes: 0
+enp4s0f1_rx_bytes: 0
+Total_rx_bytes: 12853228850
+enp130s0f0_tx_bytes_phy: 6172842576
+enp130s0f1_tx_bytes_phy: 6195033504
+enp4s0f0_tx_bytes_phy: 0
+enp4s0f1_tx_bytes_phy: 0
+Total_tx_bytes_phy: 12367876080
+enp130s0f0_tx_packets_phy: 861466
+enp130s0f1_tx_packets_phy: 868252
+enp4s0f0_tx_packets_phy: 0
+enp4s0f1_tx_packets_phy: 0
+Total_tx_packets_phy: 1729718
+enp130s0f0_tx_bytes: 6165612628
+enp130s0f1_tx_bytes: 6187940193
+enp4s0f0_tx_bytes: 0
+enp4s0f1_tx_bytes: 0
+Total_tx_bytes: 12353552821
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0 Thread0     Socket1 Thread0     
+-----------------------------------------------------------------------------
+Core0: 16.93        Core1: 37.19        
+Core2: 36.40        Core3: 19.03        
+Core4: 16.85        Core5: 18.73        
+Core6: 28.27        Core7: 16.15        
+Core8: 29.21        Core9: 18.16        
+Core10: 37.10        Core11: 36.34        
+Core12: 20.84        Core13: 13.45        
+Core14: 21.40        Core15: 36.42        
+Core16: 29.39        Core17: 18.25        
+Core18: 12.63        Core19: 24.18        
+Core20: 13.93        Core21: 17.96        
+Core22: 29.43        Core23: 13.47        
+Core24: 35.75        Core25: 15.98        
+Core26: 21.99        Core27: 15.52        
+
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0: 24.47
+Socket1: 16.43
+DDR read Latency(ns)
+Socket0: 584.61
+Socket1: 410.85
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0 Thread0     Socket1 Thread0     
+-----------------------------------------------------------------------------
+Core0: 17.04        Core1: 37.08        
+Core2: 35.86        Core3: 18.44        
+Core4: 16.97        Core5: 18.98        
+Core6: 27.25        Core7: 15.97        
+Core8: 29.29        Core9: 37.77        
+Core10: 36.85        Core11: 36.26        
+Core12: 27.00        Core13: 13.41        
+Core14: 21.29        Core15: 33.28        
+Core16: 29.39        Core17: 18.31        
+Core18: 12.48        Core19: 22.66        
+Core20: 14.18        Core21: 17.72        
+Core22: 29.40        Core23: 13.07        
+Core24: 34.27        Core25: 15.70        
+Core26: 21.81        Core27: 15.49        
+
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0: 24.45
+Socket1: 16.25
+DDR read Latency(ns)
+Socket0: 584.24
+Socket1: 423.68
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0 Thread0     Socket1 Thread0     
+-----------------------------------------------------------------------------
+Core0: 17.06        Core1: 35.92        
+Core2: 36.10        Core3: 18.64        
+Core4: 16.71        Core5: 18.62        
+Core6: 27.45        Core7: 15.93        
+Core8: 27.98        Core9: 37.10        
+Core10: 36.97        Core11: 32.14        
+Core12: 25.34        Core13: 13.40        
+Core14: 21.40        Core15: 35.01        
+Core16: 29.38        Core17: 18.73        
+Core18: 12.54        Core19: 24.18        
+Core20: 13.94        Core21: 17.79        
+Core22: 29.35        Core23: 12.99        
+Core24: 35.88        Core25: 16.09        
+Core26: 21.48        Core27: 15.40        
+
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0: 24.41
+Socket1: 16.29
+DDR read Latency(ns)
+Socket0: 584.60
+Socket1: 417.30
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0 Thread0     Socket1 Thread0     
+-----------------------------------------------------------------------------
+Core0: 16.85        Core1: 37.38        
+Core2: 36.54        Core3: 19.06        
+Core4: 16.76        Core5: 18.74        
+Core6: 28.42        Core7: 15.91        
+Core8: 29.68        Core9: 37.73        
+Core10: 37.04        Core11: 37.01        
+Core12: 20.11        Core13: 13.03        
+Core14: 21.48        Core15: 35.27        
+Core16: 29.39        Core17: 18.46        
+Core18: 12.52        Core19: 23.52        
+Core20: 14.02        Core21: 17.48        
+Core22: 29.59        Core23: 13.09        
+Core24: 35.70        Core25: 16.06        
+Core26: 20.95        Core27: 15.39        
+
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0: 24.44
+Socket1: 16.20
+DDR read Latency(ns)
+Socket0: 582.27
+Socket1: 416.14
+Cleaning up
+ Zeroed uncore PMU registers
+ Freeing up all RMIDs
+
+ Processor Counter Monitor  ($Format:%ci ID=%h$)
+
+ Power Monitoring Utility
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+Number of physical cores: 28
+Number of logical cores: 28
+Number of online logical cores: 28
+Threads (logical cores) per physical core: 1
+Num sockets: 2
+Physical cores per socket: 14
+Core PMU (perfmon) version: 3
+Number of core PMU generic (programmable) counters: 8
+Width of generic (programmable) counters: 48 bits
+Number of core PMU fixed counters: 3
+Width of fixed counters: 48 bits
+Nominal core frequency: 2000000000 Hz
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Package thermal spec power: 105 Watt; Package minimum power: 55 Watt; Package maximum power: 210 Watt; 
+Socket 0: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+Socket 1: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+
+
+MC counter group: 
+0
+PCU counter group: 0
+Freq bands [0/1/2]: 1200 MHz; 2000 MHz; 4000 MHz; 
+Update every -1.00 seconds
+
+Executing "sleep" command:
+DEBUG: caught signal to interrupt (Child exited).
+Program sleep launched with PID: 8602
+Program exited with status 0
+----------------------------------------------------------------------------------------------
+Time elapsed: 6006 ms
+Called sleep function for 1000 ms
+S0P0; QPIClocks: 14415473978; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S0P1; QPIClocks: 14415480510; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S0CH0; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH0; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0CH1; DRAMClocks: 7207840835; Rank0 CKE Off Residency: 0.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH1; DRAMClocks: 7207840835; Rank1 CKE Off Residency: 0.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0CH2; DRAMClocks: 7207846048; Rank0 CKE Off Residency: 0.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH2; DRAMClocks: 7207846048; Rank1 CKE Off Residency: 0.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0CH3; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH3; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0; PCUClocks: 6006514256; Freq band 0/1/2 cycles: 0.00%; 0.00%; 0.00%
+S0; Consumed energy units: 5383714; Consumed Joules: 328.60; Watts: 54.71; Thermal headroom below TjMax: 59
+S0; Consumed DRAM energy units: 2527195; Consumed DRAM Joules: 38.67; DRAM Watts: 6.44
+S1P0; QPIClocks: 14415479670; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S1P1; QPIClocks: 14415466178; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S1CH0; DRAMClocks: 7207825636; Rank0 CKE Off Residency: 0.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH0; DRAMClocks: 7207825636; Rank1 CKE Off Residency: 0.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1CH1; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH1; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1CH2; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH2; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1CH3; DRAMClocks: 7207816158; Rank0 CKE Off Residency: 0.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH3; DRAMClocks: 7207816158; Rank1 CKE Off Residency: 0.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1; PCUClocks: 6006363968; Freq band 0/1/2 cycles: 0.00%; 0.00%; 0.00%
+S1; Consumed energy units: 6001404; Consumed Joules: 366.30; Watts: 60.99; Thermal headroom below TjMax: 52
+S1; Consumed DRAM energy units: 2905022; Consumed DRAM Joules: 44.45; DRAM Watts: 7.40
+----------------------------------------------------------------------------------------------
+Cleaning up
+ Zeroed uncore PMU registers
+ Freeing up all RMIDs
+
+ Processor Counter Monitor  ($Format:%ci ID=%h$)
+
+
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+Number of physical cores: 28
+Number of logical cores: 28
+Number of online logical cores: 28
+Threads (logical cores) per physical core: 1
+Num sockets: 2
+Physical cores per socket: 14
+Core PMU (perfmon) version: 3
+Number of core PMU generic (programmable) counters: 8
+Width of generic (programmable) counters: 48 bits
+Number of core PMU fixed counters: 3
+Width of fixed counters: 48 bits
+Nominal core frequency: 2000000000 Hz
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Package thermal spec power: 105 Watt; Package minimum power: 55 Watt; Package maximum power: 210 Watt; 
+Socket 0: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+Socket 1: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+Trying to use Linux perf events...
+Successfully programmed on-core PMU using Linux perf
+Socket 0
+Max QPI link 0 speed: 19.2 GBytes/second (9.6 GT/second)
+Max QPI link 1 speed: 19.2 GBytes/second (9.6 GT/second)
+Socket 1
+Max QPI link 0 speed: 19.2 GBytes/second (9.6 GT/second)
+Max QPI link 1 speed: 19.2 GBytes/second (9.6 GT/second)
+
+Detected Intel(R) Xeon(R) CPU E5-2660 v4 @ 2.00GHz "Intel(r) microarchitecture codename Broadwell-EP/EX" stepping 1 microcode level 0xb00002e
+
+Executing "sleep" command:
+DEBUG: caught signal to interrupt (Child exited).
+Program sleep launched with PID: 22c0
+Program exited with status 0
+
+ EXEC  : instructions per nominal CPU cycle
+ IPC   : instructions per CPU cycle
+ FREQ  : relation to nominal CPU frequency='unhalted clock ticks'/'invariant timer ticks' (includes Intel Turbo Boost)
+ AFREQ : relation to nominal CPU frequency while in active state (not in power-saving C state)='unhalted clock ticks'/'invariant timer ticks while in C0-state'  (includes Intel Turbo Boost)
+ L3MISS: L3 (read) cache misses 
+ L2MISS: L2 (read) cache misses (including other core's L2 cache *hits*) 
+ L3HIT : L3 (read) cache hit ratio (0.00-1.00)
+ L2HIT : L2 cache hit ratio (0.00-1.00)
+ L3MPI : number of L3 (read) cache misses per instruction
+ L2MPI : number of L2 (read) cache misses per instruction
+ READ  : bytes read from main memory controller (in GBytes)
+ WRITE : bytes written to main memory controller (in GBytes)
+LLCRDMISSLAT: average latency of last level cache miss for reads and prefetches (in ns)
+ L3OCC : L3 occupancy (in KBytes)
+ LMB   : L3 cache external bandwidth satisfied by local memory (in MBytes)
+ RMB   : L3 cache external bandwidth satisfied by remote memory (in MBytes)
+ TEMP  : Temperature reading in 1 degree Celsius relative to the TjMax temperature (thermal headroom): 0 corresponds to the max temperature
+ energy: Energy in Joules
+
+
+ Core (SKT) | EXEC | IPC  | FREQ  | AFREQ | L3MISS | L2MISS | L3HIT | L2HIT | L3MPI | L2MPI |   L3OCC |   LMB  |   RMB  | TEMP
+
+   0    0     0.05   0.24   0.21    0.63      18 M     26 M    0.29    0.59    0.04    0.05     4480     1097       14     66
+   1    1     0.11   0.75   0.15    0.63    6640 K   7947 K    0.16    0.36    0.01    0.01      336       94       67     61
+   2    0     0.09   0.79   0.12    0.61    8251 K   9344 K    0.12    0.25    0.01    0.01      616      127      220     65
+   3    1     0.05   0.22   0.23    0.66      23 M     31 M    0.26    0.54    0.05    0.06     4144      583       13     60
+   4    0     0.13   0.43   0.31    0.77      24 M     35 M    0.32    0.52    0.02    0.03     5376     1072      249     66
+   5    1     0.43   0.93   0.46    0.93    6670 K     23 M    0.72    0.45    0.00    0.01      112      107        4     60
+   6    0     0.22   0.60   0.37    0.83      12 M     14 M    0.10    0.42    0.01    0.01      280       67      246     65
+   7    1     0.15   0.38   0.41    0.88      24 M     38 M    0.37    0.52    0.02    0.02     4312      695        8     59
+   8    0     0.08   0.52   0.16    0.68    3687 K   4595 K    0.20    0.11    0.00    0.01      168       33       33     65
+   9    1     0.01   0.36   0.02    0.85     380 K    477 K    0.20    0.17    0.00    0.01      168       30        2     59
+  10    0     0.18   0.23   0.79    1.20     157 M    174 M    0.10    0.20    0.09    0.09      336        0      161     63
+  11    1     0.15   0.74   0.20    0.66      12 M     14 M    0.11    0.28    0.01    0.01      448      167      192     58
+  12    0     0.03   0.52   0.05    0.69     983 K   1583 K    0.38    0.09    0.00    0.01       56       35       11     65
+  13    1     0.17   0.38   0.45    0.93      29 M     60 M    0.51    0.55    0.02    0.04      224       20       18     58
+  14    0     0.05   0.75   0.07    0.60    1556 K   4742 K    0.67    0.28    0.00    0.01      224       24       10     66
+  15    1     0.00   0.45   0.01    0.60     547 K    795 K    0.31    0.14    0.01    0.02       56       12        9     58
+  16    0     0.12   0.27   0.45    0.93     133 M    149 M    0.11    0.21    0.11    0.13     7616    16630        0     65
+  17    1     0.09   0.32   0.27    0.72      24 M     34 M    0.29    0.51    0.03    0.04     3248      582        9     59
+  18    0     0.21   0.40   0.51    1.01      19 M     42 M    0.55    0.57    0.01    0.02     3864     1337       27     65
+  19    1     0.14   0.84   0.16    0.63    4459 K   7378 K    0.40    0.48    0.00    0.01      392      155        2     59
+  20    0     0.18   0.36   0.49    1.00      21 M     40 M    0.46    0.56    0.01    0.02     3920     1145      293     65
+  21    1     0.25   0.28   0.87    1.20      68 M    108 M    0.37    0.44    0.03    0.04     4816      669      138     58
+  22    0     0.13   0.32   0.41    0.90     102 M    111 M    0.08    0.25    0.08    0.08     4536       60    15336     66
+  23    1     0.28   0.42   0.66    1.20      32 M     60 M    0.47    0.56    0.01    0.02      168       34       45     58
+  24    0     0.13   0.66   0.19    0.62      10 M     10 M    0.05    0.25    0.01    0.01       56        7      199     66
+  25    1     0.07   0.24   0.31    0.77      24 M     34 M    0.29    0.58    0.03    0.05     3472      585       16     58
+  26    0     0.18   0.79   0.23    0.66    5822 K   9393 K    0.38    0.51    0.00    0.01      448       15      369     66
+  27    1     0.60   0.66   0.91    1.20      34 M     66 M    0.48    0.50    0.01    0.01     3080       21      200     58
+---------------------------------------------------------------------------------------------------------------
+ SKT    0     0.13   0.41   0.31    0.86     520 M    634 M    0.18    0.34    0.03    0.04    31976    21649    17168     59
+ SKT    1     0.18   0.49   0.37    0.94     293 M    489 M    0.40    0.51    0.01    0.02    24976     3754      723     52
+---------------------------------------------------------------------------------------------------------------
+ TOTAL  *     0.15   0.45   0.34    0.90     813 M   1124 M    0.28    0.43    0.02    0.03     N/A     N/A     N/A      N/A
+
+ Instructions retired:   43 G ; Active cycles:   95 G ; Time (TSC):   10 Gticks ; C0 (active,non-halted) core residency: 37.51 %
+
+ C1 core residency: 48.85 %; C3 core residency: 2.32 %; C6 core residency: 11.31 %; C7 core residency: 0.00 %;
+ C2 package residency: 0.00 %; C3 package residency: 0.00 %; C6 package residency: 0.00 %; C7 package residency: 0.00 %;
+
+ PHYSICAL CORE IPC                 : 0.45 => corresponds to 11.31 % utilization for cores in active state
+ Instructions per nominal CPU cycle: 0.15 => corresponds to 3.83 % core utilization over time interval
+ SMI count: 0
+---------------------------------------------------------------------------------------------------------------
+
+Intel(r) QPI traffic estimation in bytes (data and non-data traffic outgoing from CPU/socket through QPI links):
+
+               QPI0     QPI1    |  QPI0   QPI1  
+---------------------------------------------------------------------------------------------------------------
+ SKT    0       38 G     38 G   |   40%    40%   
+ SKT    1       35 G     35 G   |   37%    37%   
+---------------------------------------------------------------------------------------------------------------
+Total QPI outgoing data and non-data traffic:  148 G
+MEM (GB)->|  READ |  WRITE | CPU energy | DIMM energy | LLCRDMISSLAT (ns)
+---------------------------------------------------------------------------------------------------------------
+ SKT   0    46.88    28.31     277.20      32.10         130.63
+ SKT   1    48.11    51.54     305.63      37.01         135.58
+---------------------------------------------------------------------------------------------------------------
+       *    94.99    79.85     582.84      69.11         132.24
+Cleaning up
+ Zeroed uncore PMU registers
+ Freeing up all RMIDs
+ out collect pcm
+Data collected
+<Results/membw/dimm2/multi_tcp_bi_2_1/4.14.0-unsafe>
+ in collect mem bw
+
+ Processor Counter Monitor: Memory Bandwidth Monitoring Utility  ($Format:%ci ID=%h$)
+perl: warning: Setting locale failed.
+
+ This utility measures memory bandwidth per channel or per DIMM rank in real-timeperl: warning: Please check that your locale settings:
+
+
+	LANGUAGE = "en_US:en,",
+	LC_ALL = (unset),
+	LC_PAPER = "he_IL.UTF-8",
+	LC_ADDRESS = "he_IL.UTF-8",
+	LC_MONETARY = "he_IL.UTF-8",
+	LC_NUMERIC = "C",
+	LC_TELEPHONE = "he_IL.UTF-8",
+	LC_IDENTIFICATION = "he_IL.UTF-8",
+	LC_COLLATE = "C",
+	LC_MEASUREMENT = "he_IL.UTF-8",
+	LC_CTYPE = "en_US.UTF-8",
+	LC_NAME = "he_IL.UTF-8",
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+	LANG = "en_US.UTF-8"
+Spec arch caps supported : no
+    are supported and installed on your system.
+perl: warning: Falling back to a fallback locale ("en_US.UTF-8").
+Number of physical cores: 28
+Number of logical cores: 28
+Number of online logical cores: 28
+Threads (logical cores) per physical core: 1
+Num sockets: 2
+Physical cores per socket: 14
+Core PMU (perfmon) version: 3
+Number of core PMU generic (programmable) counters: 8
+Width of generic (programmable) counters: 48 bits
+Number of core PMU fixed counters: 3
+Width of fixed counters: 48 bits
+Nominal core frequency: 2000000000 Hz
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Package thermal spec power: 105 Watt; Package minimum power: 55 Watt; Package maximum power: 210 Watt; 
+Socket 0: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+Socket 1: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+
+Detected Intel(R) Xeon(R) CPU E5-2660 v4 @ 2.00GHz "Intel(r) microarchitecture codename Broadwell-EP/EX" stepping 1 microcode level 0xb00002e
+Update every 1 seconds
+
+Executing "sleep" command:
+keys on reference is experimental at DataCollector/collect_net_cpu.pl line 37.
+DEBUG: caught signal to interrupt (Child exited).
+Program sleep launched with PID: 24aa
+Program exited with status 0
+|---------------------------------------||---------------------------------------|
+|--             Socket  0             --||--             Socket  1             --|
+|---------------------------------------||---------------------------------------|
+|--     Memory Channel Monitoring     --||--     Memory Channel Monitoring     --|
+|---------------------------------------||---------------------------------------|
+|-- Mem Ch  0: Reads (MB/s):    -1.00 --||-- Mem Ch  0: Reads (MB/s):  6567.40 --|
+|--            Writes(MB/s):    -1.00 --||--            Writes(MB/s):  6862.69 --|
+|-- Mem Ch  1: Reads (MB/s):  4257.55 --||-- Mem Ch  1: Reads (MB/s):    -1.00 --|
+|--            Writes(MB/s):  2377.87 --||--            Writes(MB/s):    -1.00 --|
+|-- Mem Ch  2: Reads (MB/s):  4265.68 --||-- Mem Ch  2: Reads (MB/s):    -1.00 --|
+|--            Writes(MB/s):  2372.85 --||--            Writes(MB/s):    -1.00 --|
+|-- Mem Ch  3: Reads (MB/s):    -1.00 --||-- Mem Ch  3: Reads (MB/s):  6605.18 --|
+|--            Writes(MB/s):    -1.00 --||--            Writes(MB/s):  6865.00 --|
+|-- NODE 0 Mem Read (MB/s) :  8523.23 --||-- NODE 1 Mem Read (MB/s) : 13172.58 --|
+|-- NODE 0 Mem Write(MB/s) :  4750.72 --||-- NODE 1 Mem Write(MB/s) : 13727.68 --|
+|-- NODE 0 P. Write (T/s):      90168 --||-- NODE 1 P. Write (T/s):     203177 --|
+|-- NODE 0 Memory (MB/s):    13273.96 --||-- NODE 1 Memory (MB/s):    26900.26 --|
+|---------------------------------------||---------------------------------------|
+            |---------------------------------------||---------------------------------------|
+            |--                 System Read Throughput(MB/s):      21695.81                --|
+            |--                System Write Throughput(MB/s):      18478.41                --|
+            |--               System Memory Throughput(MB/s):      40174.22                --|
+            |---------------------------------------||---------------------------------------|
+Cleaning up
+ Zeroed uncore PMU registers
+ Freeing up all RMIDs
+ out collect mem bw
+ in collect pcm
+
+ Processor Counter Monitor: PCIe Bandwidth Monitoring Utility 
+ This utility measures PCIe bandwidth in real-time
+
+ PCIe event definitions (each event counts as a transfer): 
+   PCIe read events (PCI devices reading from memory - application writes to disk/network/PCIe device):
+     PCIePRd   - PCIe UC read transfer (partial cache line)
+     PCIeRdCur* - PCIe read current transfer (full cache line)
+         On Haswell Server PCIeRdCur counts both full/partial cache lines
+     RFO*      - Demand Data RFO
+     CRd*      - Demand Code Read
+     DRd       - Demand Data Read
+     PCIeNSWr  - PCIe Non-snoop write transfer (partial cache line)
+   PCIe write events (PCI devices writing to memory - application reads from disk/network/PCIe device):
+     PCIeWiLF  - PCIe Write transfer (non-allocating) (full cache line)
+     PCIeItoM  - PCIe Write transfer (allocating) (full cache line)
+     PCIeNSWr  - PCIe Non-snoop write transfer (partial cache line)
+     PCIeNSWrF - PCIe Non-snoop write transfer (full cache line)
+     ItoM      - PCIe write full cache line
+     RFO       - PCIe parial Write
+   CPU MMIO events (CPU reading/writing to PCIe devices):
+     PRd       - MMIO Read [Haswell Server only] (Partial Cache Line)
+     WiL       - MMIO Write (Full/Partial)
+
+ * - NOTE: Depending on the configuration of your BIOS, this tool may report '0' if the message
+           has not been selected.
+
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+Number of physical cores: 28
+Number of logical cores: 28
+Number of online logical cores: 28
+Threads (logical cores) per physical core: 1
+Num sockets: 2
+Physical cores per socket: 14
+Core PMU (perfmon) version: 3
+Number of core PMU generic (programmable) counters: 8
+Width of generic (programmable) counters: 48 bits
+Number of core PMU fixed counters: 3
+Width of fixed counters: 48 bits
+Nominal core frequency: 2000000000 Hz
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Package thermal spec power: 105 Watt; Package minimum power: 55 Watt; Package maximum power: 210 Watt; 
+Socket 0: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+Socket 1: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+Trying to use Linux perf events...
+Successfully programmed on-core PMU using Linux perf
+Socket 0
+Max QPI link 0 speed: 19.2 GBytes/second (9.6 GT/second)
+Max QPI link 1 speed: 19.2 GBytes/second (9.6 GT/second)
+Socket 1
+Max QPI link 0 speed: 19.2 GBytes/second (9.6 GT/second)
+Max QPI link 1 speed: 19.2 GBytes/second (9.6 GT/second)
+
+Detected Intel(R) Xeon(R) CPU E5-2660 v4 @ 2.00GHz "Intel(r) microarchitecture codename Broadwell-EP/EX" stepping 1 microcode level 0xb00002e
+Update every 1.0 seconds
+delay_ms: 54
+
+Executing "sleep" command:
+DEBUG: caught signal to interrupt (Child exited).
+Program sleep launched with PID: 25e9
+Program exited with status 0
+Skt | PCIeRdCur |  RFO  |  CRd  |  DRd  |  ItoM  |  PRd  |  WiL
+ 0    8676          48      25 M   206 M    264       0     781 K
+ 1     169 M       686 K    30 M   218 M    192 M     0     595 K
+-----------------------------------------------------------------------
+ *     169 M       686 K    55 M   425 M    192 M     0    1377 K
+
+Cleaning up
+ Zeroed uncore PMU registers
+ Freeing up all RMIDs
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+Number of physical cores: 28
+Number of logical cores: 28
+Number of online logical cores: 28
+Threads (logical cores) per physical core: 1
+Num sockets: 2
+Physical cores per socket: 14
+Core PMU (perfmon) version: 3
+Number of core PMU generic (programmable) counters: 8
+Width of generic (programmable) counters: 48 bits
+Number of core PMU fixed counters: 3
+Width of fixed counters: 48 bits
+Nominal core frequency: 2000000000 Hz
+Package thermal spec power: 105 Watt; Package minimum power: 55IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+ Watt; Package maximum power: 210 Watt; 
+Socket 0: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+Socket 1: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+
+ Processor Counter Monitor  ($Format:%ci ID=%h$)
+ Zeroed PMU registers
+ This utility measures Latency information
+
+
+Trying to use Linux perf events...
+Successfully programmed on-core PMU using Linux perf
+Socket 0
+Max QPI link 0 speed: 19.2 GBytes/second (9.6 GT/second)
+Max QPI link 1 speed: 19.2 GBytes/second (9.6 GT/second)
+Socket 1
+Max QPI link 0 speed: 19.2 GBytes/second (9.6 GT/second)
+Max QPI link 1 speed: 19.2 GBytes/second (9.6 GT/second)
+
+Detected Intel(R) Xeon(R) CPU E5-2660 v4 @ 2.00GHz "Intel(r) microarchitecture codename Broadwell-EP/EX" stepping 1 microcode level 0xb00002e
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0 Thread0     Socket1 Thread0     
+-----------------------------------------------------------------------------
+Core0: 17.92        Core1: 53.59        
+Core2: 38.22        Core3: 23.76        
+Core4: 16.21        Core5: 24.67        
+Core6: 27.83        Core7: 22.75        
+Core8: 25.17        Core9: 26.65        
+Core10: 34.00        Core11: 47.60        
+Core12: 40.02        Core13: 49.04        
+Core14: 36.87        Core15: 31.61        
+Core16: 56.00        Core17: 23.92        
+Core18: 13.78        Core19: 36.66        
+Core20: 14.73        Core21: 22.44        
+Core22: 38.08        Core23: 36.33        
+Core24: 22.94        Core25: 17.25        
+Core26: 35.97        Core27: 52.71        
+
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0: 30.78
+Socket1: 31.36
+DDR read Latency(ns)
+Socket0: 666.95
+Socket1: 235.23
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0 Thread0     Socket1 Thread0     
+-----------------------------------------------------------------------------
+Core0: 18.18        Core1: 46.50        
+Core2: 38.16        Core3: 24.84        
+Core4: 16.57        Core5: 23.18        
+Core6: 27.24        Core7: 23.90        
+Core8: 24.87        Core9: 29.15        
+Core10: 34.53        Core11: 19.91        
+Core12: 41.37        Core13: 49.82        
+Core14: 42.94        Core15: 32.31        
+Core16: 57.72        Core17: 25.76        
+Core18: 14.11        Core19: 34.29        
+Core20: 14.64        Core21: 23.91        
+Core22: 38.19        Core23: 42.34        
+Core24: 20.26        Core25: 17.38        
+Core26: 33.43        Core27: 55.21        
+
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0: 31.42
+Socket1: 33.28
+DDR read Latency(ns)
+Socket0: 687.49
+Socket1: 222.72
+irq_total: 305426.148436322
+cpu_total: 28.33
+cpu_0: 30.85
+cpu_1: 0.66
+cpu_2: 1.53
+cpu_3: 38.43
+cpu_4: 39.10
+cpu_5: 10.51
+cpu_6: 11.37
+cpu_7: 73.80
+cpu_8: 9.51
+cpu_9: 7.85
+cpu_10: 42.09
+cpu_11: 0.60
+cpu_12: 15.56
+cpu_13: 48.47
+cpu_14: 1.20
+cpu_15: 2.79
+cpu_16: 64.23
+cpu_17: 35.57
+cpu_18: 38.50
+cpu_19: 8.11
+cpu_20: 37.97
+cpu_21: 69.61
+cpu_22: 61.24
+cpu_23: 50.47
+cpu_24: 7.85
+cpu_25: 39.36
+cpu_26: 10.37
+cpu_27: 35.51
+enp130s0f0_tx_bytes_phy: 5390993918
+enp130s0f1_tx_bytes_phy: 5399397475
+enp4s0f0_tx_bytes_phy: 0
+enp4s0f1_tx_bytes_phy: 0
+Total_tx_bytes_phy: 10790391393
+enp130s0f0_rx_bytes: 6196660293
+enp130s0f1_rx_bytes: 5850675046
+enp4s0f0_rx_bytes: 0
+enp4s0f1_rx_bytes: 0
+Total_rx_bytes: 12047335339
+enp130s0f0_tx_bytes: 5384535881
+enp130s0f1_tx_bytes: 5392880752
+enp4s0f0_tx_bytes: 0
+enp4s0f1_tx_bytes: 0
+Total_tx_bytes: 10777416633
+enp130s0f0_rx_bytes_phy: 6238154201
+enp130s0f1_rx_bytes_phy: 5875950333
+enp4s0f0_rx_bytes_phy: 0
+enp4s0f1_rx_bytes_phy: 0
+Total_rx_bytes_phy: 12114104534
+enp130s0f0_tx_packets_phy: 675965
+enp130s0f1_tx_packets_phy: 723514
+enp4s0f0_tx_packets_phy: 0
+enp4s0f1_tx_packets_phy: 0
+Total_tx_packets_phy: 1399479
+enp130s0f0_rx_packets: 734592
+enp130s0f1_rx_packets: 698699
+enp4s0f0_rx_packets: 0
+enp4s0f1_rx_packets: 0
+Total_rx_packets: 1433291
+enp130s0f0_rx_packets_phy: 734607
+enp130s0f1_rx_packets_phy: 698714
+enp4s0f0_rx_packets_phy: 0
+enp4s0f1_rx_packets_phy: 0
+Total_rx_packets_phy: 1433321
+enp130s0f0_tx_packets: 613121
+enp130s0f1_tx_packets: 663194
+enp4s0f0_tx_packets: 0
+enp4s0f1_tx_packets: 0
+Total_tx_packets: 1276315
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0 Thread0     Socket1 Thread0     
+-----------------------------------------------------------------------------
+Core0: 17.53        Core1: 38.74        
+Core2: 35.84        Core3: 22.78        
+Core4: 16.10        Core5: 20.73        
+Core6: 23.62        Core7: 21.47        
+Core8: 23.54        Core9: 35.41        
+Core10: 34.82        Core11: 36.88        
+Core12: 38.68        Core13: 23.48        
+Core14: 29.73        Core15: 33.06        
+Core16: 54.56        Core17: 22.61        
+Core18: 13.88        Core19: 32.64        
+Core20: 14.28        Core21: 20.74        
+Core22: 36.90        Core23: 48.69        
+Core24: 26.26        Core25: 16.72        
+Core26: 31.25        Core27: 45.89        
+
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0: 30.00
+Socket1: 27.25
+DDR read Latency(ns)
+Socket0: 679.10
+Socket1: 253.76
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0 Thread0     Socket1 Thread0     
+-----------------------------------------------------------------------------
+Core0: 18.00        Core1: 47.31        
+Core2: 36.00        Core3: 23.31        
+Core4: 16.50        Core5: 23.99        
+Core6: 25.03        Core7: 20.71        
+Core8: 24.49        Core9: 32.95        
+Core10: 34.22        Core11: 19.89        
+Core12: 35.91        Core13: 48.54        
+Core14: 30.49        Core15: 33.07        
+Core16: 56.12        Core17: 22.94        
+Core18: 13.66        Core19: 30.19        
+Core20: 14.74        Core21: 21.37        
+Core22: 38.31        Core23: 47.87        
+Core24: 23.86        Core25: 16.15        
+Core26: 33.80        Core27: 31.61        
+
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0: 31.30
+Socket1: 30.36
+DDR read Latency(ns)
+Socket0: 661.14
+Socket1: 232.55
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0 Thread0     Socket1 Thread0     
+-----------------------------------------------------------------------------
+Core0: 18.01        Core1: 40.54        
+Core2: 37.32        Core3: 21.88        
+Core4: 16.57        Core5: 25.10        
+Core6: 25.49        Core7: 20.93        
+Core8: 29.05        Core9: 35.00        
+Core10: 34.64        Core11: 45.80        
+Core12: 39.24        Core13: 48.73        
+Core14: 33.72        Core15: 32.43        
+Core16: 55.34        Core17: 23.49        
+Core18: 13.80        Core19: 27.29        
+Core20: 14.58        Core21: 20.41        
+Core22: 37.79        Core23: 48.69        
+Core24: 23.80        Core25: 15.72        
+Core26: 32.92        Core27: 29.58        
+
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0: 31.33
+Socket1: 30.02
+DDR read Latency(ns)
+Socket0: 666.35
+Socket1: 235.91
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0 Thread0     Socket1 Thread0     
+-----------------------------------------------------------------------------
+Core0: 18.06        Core1: 38.75        
+Core2: 38.14        Core3: 21.90        
+Core4: 16.30        Core5: 24.56        
+Core6: 25.78        Core7: 20.33        
+Core8: 27.61        Core9: 34.57        
+Core10: 34.19        Core11: 50.07        
+Core12: 39.36        Core13: 47.96        
+Core14: 37.57        Core15: 31.07        
+Core16: 55.74        Core17: 23.35        
+Core18: 13.74        Core19: 32.55        
+Core20: 14.42        Core21: 20.18        
+Core22: 37.42        Core23: 48.39        
+Core24: 23.61        Core25: 15.25        
+Core26: 33.30        Core27: 29.21        
+
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0: 31.04
+Socket1: 29.64
+DDR read Latency(ns)
+Socket0: 657.76
+Socket1: 238.03
+Cleaning up
+ Zeroed uncore PMU registers
+ Freeing up all RMIDs
+
+ Processor Counter Monitor  ($Format:%ci ID=%h$)
+
+ Power Monitoring Utility
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+Number of physical cores: 28
+Number of logical cores: 28
+Number of online logical cores: 28
+Threads (logical cores) per physical core: 1
+Num sockets: 2
+Physical cores per socket: 14
+Core PMU (perfmon) version: 3
+Number of core PMU generic (programmable) counters: 8
+Width of generic (programmable) counters: 48 bits
+Number of core PMU fixed counters: 3
+Width of fixed counters: 48 bits
+Nominal core frequency: 2000000000 Hz
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Package thermal spec power: 105 Watt; Package minimum power: 55 Watt; Package maximum power: 210 Watt; 
+Socket 0: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+Socket 1: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+
+
+MC counter group: 0
+PCU counter group: 0
+Freq bands [0/1/2]: 1200 MHz; 2000 MHz; 4000 MHz; 
+Update every 
+-1.00 seconds
+
+Executing "sleep" command:
+DEBUG: caught signal to interrupt (Child exited).
+Program sleep launched with PID: 10306
+Program exited with status 0
+----------------------------------------------------------------------------------------------
+Time elapsed: 6006 ms
+Called sleep function for 1000 ms
+S0P0; QPIClocks: 14416808326; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S0P1; QPIClocks: 14416831498; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S0CH0; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH0; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0CH1; DRAMClocks: 7208489992; Rank0 CKE Off Residency: 0.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH1; DRAMClocks: 7208489992; Rank1 CKE Off Residency: 0.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0CH2; DRAMClocks: 7208494068; Rank0 CKE Off Residency: 0.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH2; DRAMClocks: 7208494068; Rank1 CKE Off Residency: 0.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0CH3; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH3; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0; PCUClocks: 6007097874; Freq band 0/1/2 cycles: 0.00%; 0.00%; 0.00%
+S0; Consumed energy units: 5203602; Consumed Joules: 317.60; Watts: 52.88; Thermal headroom below TjMax: 58
+S0; Consumed DRAM energy units: 2366101; Consumed DRAM Joules: 36.20; DRAM Watts: 6.03
+S1P0; QPIClocks: 14416852054; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S1P1; QPIClocks: 14416857118; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S1CH0; DRAMClocks: 7208543026; Rank0 CKE Off Residency: 0.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH0; DRAMClocks: 7208543026; Rank1 CKE Off Residency: 0.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1CH1; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH1; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1CH2; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH2; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1CH3; DRAMClocks: 7208550592; Rank0 CKE Off Residency: 0.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH3; DRAMClocks: 7208550592; Rank1 CKE Off Residency: 0.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1; PCUClocks: 6007183848; Freq band 0/1/2 cycles: 0.00%; 0.00%; 0.00%
+S1; Consumed energy units: 5885929; Consumed Joules: 359.25; Watts: 59.81; Thermal headroom below TjMax: 52
+S1; Consumed DRAM energy units: 3215503; Consumed DRAM Joules: 49.20; DRAM Watts: 8.19
+----------------------------------------------------------------------------------------------
+Cleaning up
+ Zeroed uncore PMU registers
+ Freeing up all RMIDs
+
+ Processor Counter Monitor  ($Format:%ci ID=%h$)
+
+
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+Number of physical cores: 28
+Number of logical cores: 28
+Number of online logical cores: 28
+Threads (logical cores) per physical core: 1
+Num sockets: 2
+Physical cores per socket: 14
+Core PMU (perfmon) version: 3
+Number of core PMU generic (programmable) counters: 8
+Width of generic (programmable) counters: 48 bits
+Number of core PMU fixed counters: 3
+Width of fixed counters: 48 bits
+Nominal core frequency: 2000000000 Hz
+Package thermal spec power: IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+105 Watt; Package minimum power: 55 Watt; Package maximum power: 210 Watt; 
+Socket 0: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+Socket 1: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+Trying to use Linux perf events...
+Successfully programmed on-core PMU using Linux perf
+Socket 0
+Max QPI link 0 speed: 19.2 GBytes/second (9.6 GT/second)
+Max QPI link 1 speed: 19.2 GBytes/second (9.6 GT/second)
+Socket 1
+Max QPI link 0 speed: 19.2 GBytes/second (9.6 GT/second)
+Max QPI link 1 speed: 19.2 GBytes/second (9.6 GT/second)
+
+Detected Intel(R) Xeon(R) CPU E5-2660 v4 @ 2.00GHz "Intel(r) microarchitecture codename Broadwell-EP/EX" stepping 1 microcode level 0xb00002e
+
+Executing "sleep" command:
+DEBUG: caught signal to interrupt (Child exited).
+Program sleep launched with PID: 2974
+Program exited with status 0
+
+ EXEC  : instructions per nominal CPU cycle
+ IPC   : instructions per CPU cycle
+ FREQ  : relation to nominal CPU frequency='unhalted clock ticks'/'invariant timer ticks' (includes Intel Turbo Boost)
+ AFREQ : relation to nominal CPU frequency while in active state (not in power-saving C state)='unhalted clock ticks'/'invariant timer ticks while in C0-state'  (includes Intel Turbo Boost)
+ L3MISS: L3 (read) cache misses 
+ L2MISS: L2 (read) cache misses (including other core's L2 cache *hits*) 
+ L3HIT : L3 (read) cache hit ratio (0.00-1.00)
+ L2HIT : L2 cache hit ratio (0.00-1.00)
+ L3MPI : number of L3 (read) cache misses per instruction
+ L2MPI : number of L2 (read) cache misses per instruction
+ READ  : bytes read from main memory controller (in GBytes)
+ WRITE : bytes written to main memory controller (in GBytes)
+LLCRDMISSLAT: average latency of last level cache miss for reads and prefetches (in ns)
+ L3OCC : L3 occupancy (in KBytes)
+ LMB   : L3 cache external bandwidth satisfied by local memory (in MBytes)
+ RMB   : L3 cache external bandwidth satisfied by remote memory (in MBytes)
+ TEMP  : Temperature reading in 1 degree Celsius relative to the TjMax temperature (thermal headroom): 0 corresponds to the max temperature
+ energy: Energy in Joules
+
+
+ Core (SKT) | EXEC | IPC  | FREQ  | AFREQ | L3MISS | L2MISS | L3HIT | L2HIT | L3MPI | L2MPI |   L3OCC |   LMB  |   RMB  | TEMP
+
+   0    0     0.04   0.22   0.20    0.62      21 M     28 M    0.25    0.54    0.05    0.06     5152     3820       30     67
+   1    1     0.00   0.48   0.00    0.60     301 K    390 K    0.23    0.15    0.01    0.02      168       27        3     61
+   2    0     0.01   0.53   0.01    0.60     818 K   1216 K    0.33    0.14    0.01    0.02       56       56       23     65
+   3    1     0.08   0.25   0.31    0.76      28 M     39 M    0.27    0.44    0.04    0.05     4032     4583       59     60
+   4    0     0.15   0.45   0.34    0.81      26 M     38 M    0.33    0.49    0.02    0.03     4760     3902       46     66
+   5    1     0.09   0.68   0.14    0.65    2108 K   3515 K    0.40    0.39    0.00    0.00       56       78       36     60
+   6    0     0.10   0.70   0.14    0.65    2837 K   3761 K    0.25    0.36    0.00    0.00      112      138       41     66
+   7    1     0.42   0.47   0.91    1.20      43 M     65 M    0.34    0.41    0.01    0.02     3976     4704      146     58
+   8    0     0.08   0.56   0.13    0.65    2552 K   3740 K    0.32    0.14    0.00    0.00      112       97       34     65
+   9    1     0.05   0.73   0.07    0.60    1669 K   3626 K    0.54    0.26    0.00    0.01      224      118        2     59
+  10    0     0.04   0.11   0.36    0.83     141 M    151 M    0.07    0.13    0.36    0.39     4144    10831       40     63
+  11    1     0.00   0.33   0.01    0.90     217 K    283 K    0.23    0.17    0.01    0.01       56       28        3     59
+  12    0     0.09   0.66   0.14    0.63    7973 K   8518 K    0.06    0.27    0.01    0.01      336        6      265     65
+  13    1     0.04   0.07   0.51    1.04     108 M    121 M    0.11    0.16    0.29    0.32     3360     8312       28     58
+  14    0     0.00   0.42   0.01    0.61     237 K    336 K    0.29    0.20    0.01    0.01       56        7        4     65
+  15    1     0.02   0.43   0.05    0.69     931 K   2138 K    0.56    0.18    0.00    0.01        0       37        7     58
+  16    0     0.11   0.15   0.78    1.20     120 M    138 M    0.13    0.14    0.11    0.12     6216       78    16123     64
+  17    1     0.05   0.20   0.26    0.70      28 M     35 M    0.21    0.46    0.05    0.07     5488     4479       12     59
+  18    0     0.11   0.33   0.33    0.80      15 M     29 M    0.47    0.60    0.01    0.03     5264     4387       24     64
+  19    1     0.08   0.70   0.11    0.67    2866 K   3576 K    0.20    0.30    0.00    0.00       56      173       29     59
+  20    0     0.10   0.32   0.33    0.79      20 M     32 M    0.39    0.56    0.02    0.03     6440     4265      118     65
+  21    1     0.20   0.24   0.84    1.20      55 M     87 M    0.37    0.43    0.03    0.04     4592     5119      253     59
+  22    0     0.22   0.28   0.79    1.20     138 M    156 M    0.12    0.21    0.06    0.07     2240      130     9766     65
+  23    1     0.13   0.21   0.62    1.19      87 M    102 M    0.15    0.19    0.07    0.08     3696     9091       22     59
+  24    0     0.07   0.92   0.08    0.65    2185 K   3996 K    0.45    0.35    0.00    0.01      168       36       27     66
+  25    1     0.06   0.18   0.31    0.77      21 M     30 M    0.31    0.56    0.04    0.05     5376     5461       19     60
+  26    0     0.09   0.62   0.14    0.71    3516 K   4227 K    0.17    0.30    0.00    0.00      112      343      440     66
+  27    1     0.10   0.40   0.24    0.68      29 M     39 M    0.24    0.41    0.03    0.04     1008     1730        0     60
+---------------------------------------------------------------------------------------------------------------
+ SKT    0     0.09   0.32   0.27    0.88     503 M    602 M    0.16    0.30    0.04    0.05    35168    28096    26981     58
+ SKT    1     0.09   0.30   0.31    0.96     410 M    536 M    0.24    0.35    0.03    0.04    32088    43940      619     53
+---------------------------------------------------------------------------------------------------------------
+ TOTAL  *     0.09   0.31   0.29    0.92     914 M   1139 M    0.20    0.32    0.04    0.04     N/A     N/A     N/A      N/A
+
+ Instructions retired:   25 G ; Active cycles:   81 G ; Time (TSC):   10 Gticks ; C0 (active,non-halted) core residency: 31.75 %
+
+ C1 core residency: 47.94 %; C3 core residency: 3.55 %; C6 core residency: 16.77 %; C7 core residency: 0.00 %;
+ C2 package residency: 0.00 %; C3 package residency: 0.00 %; C6 package residency: 0.00 %; C7 package residency: 0.00 %;
+
+ PHYSICAL CORE IPC                 : 0.31 => corresponds to 7.77 % utilization for cores in active state
+ Instructions per nominal CPU cycle: 0.09 => corresponds to 2.27 % core utilization over time interval
+ SMI count: 0
+---------------------------------------------------------------------------------------------------------------
+
+Intel(r) QPI traffic estimation in bytes (data and non-data traffic outgoing from CPU/socket through QPI links):
+
+               QPI0     QPI1    |  QPI0   QPI1  
+---------------------------------------------------------------------------------------------------------------
+ SKT    0       34 G     34 G   |   35%    35%   
+ SKT    1       32 G     32 G   |   33%    33%   
+---------------------------------------------------------------------------------------------------------------
+Total QPI outgoing data and non-data traffic:  133 G
+MEM (GB)->|  READ |  WRITE | CPU energy | DIMM energy | LLCRDMISSLAT (ns)
+---------------------------------------------------------------------------------------------------------------
+ SKT   0    42.77    23.34     269.55      30.58         151.91
+ SKT   1    64.76    68.88     300.56      41.41         168.68
+---------------------------------------------------------------------------------------------------------------
+       *    107.54    92.22     570.11      72.00         159.10
+Cleaning up
+ Zeroed uncore PMU registers
+ Freeing up all RMIDs
+ out collect pcm
+Data collected
+<Results/membw/dimm2/multi_tcp_bi_2_1/4.14.0-unsafe>
+ in collect mem bw
+perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+	LANGUAGE = "en_US:en,",
+	LC_ALL = (unset),
+	LC_PAPER = "he_IL.UTF-8",
+	LC_ADDRESS = "he_IL.UTF-8",
+	LC_MONETARY = "he_IL.UTF-8",
+	LC_NUMERIC = "C",
+	LC_TELEPHONE = "he_IL.UTF-8",
+	LC_IDENTIFICATION = "he_IL.UTF-8",
+	LC_COLLATE = "C",
+	LC_MEASUREMENT = "he_IL.UTF-8",
+	LC_CTYPE = "en_US.UTF-8",
+	LC_NAME = "he_IL.UTF-8",
+	LANG = "en_US.UTF-8"
+    are supported and installed on your system.
+perl: warning: Falling back to a fallback locale ("en_US.UTF-8").
+
+ Processor Counter Monitor: Memory Bandwidth Monitoring Utility  ($Format:%ci ID=%h$)
+
+ This utility measures memory bandwidth per channel or per DIMM rank in real-time
+
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+Number of physical cores: 28
+Number of logical cores: 28
+Number of online logical cores: 28
+Threads (logical cores) per physical core: 1
+Num sockets: 2
+Physical cores per socket: 14
+Core PMU (perfmon) version: 3
+Number of core PMU generic (programmable) counters: 8
+Width of generic (programmable) counters: 48 bits
+Number of core PMU fixed counters: 3
+Width of fixed counters: 48 bits
+Nominal core frequency: 2000000000 Hz
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Package thermal spec power: 105 Watt; Package minimum power: 55 Watt; Package maximum power: 210 Watt; 
+Socket 0: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+Socket 1: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+
+Detected Intel(R) Xeon(R) CPU E5-2660 v4 @ 2.00GHz "Intel(r) microarchitecture codename Broadwell-EP/EX" stepping 1 microcode level 0xb00002e
+Update every 1 seconds
+
+Executing "sleep" command:
+keys on reference is experimental at DataCollector/collect_net_cpu.pl line 37.
+DEBUG: caught signal to interrupt (Child exited).
+Program sleep launched with PID: 2b69
+Program exited with status 0
+|---------------------------------------||---------------------------------------|
+|--             Socket  0             --||--             Socket  1             --|
+|---------------------------------------||---------------------------------------|
+|--     Memory Channel Monitoring     --||--     Memory Channel Monitoring     --|
+|---------------------------------------||---------------------------------------|
+|-- Mem Ch  0: Reads (MB/s):    -1.00 --||-- Mem Ch  0: Reads (MB/s):  4013.07 --|
+|--            Writes(MB/s):    -1.00 --||--            Writes(MB/s):  3147.32 --|
+|-- Mem Ch  1: Reads (MB/s):  7291.39 --||-- Mem Ch  1: Reads (MB/s):    -1.00 --|
+|--            Writes(MB/s):  6381.48 --||--            Writes(MB/s):    -1.00 --|
+|-- Mem Ch  2: Reads (MB/s):  7292.69 --||-- Mem Ch  2: Reads (MB/s):    -1.00 --|
+|--            Writes(MB/s):  6373.22 --||--            Writes(MB/s):    -1.00 --|
+|-- Mem Ch  3: Reads (MB/s):    -1.00 --||-- Mem Ch  3: Reads (MB/s):  4053.42 --|
+|--            Writes(MB/s):    -1.00 --||--            Writes(MB/s):  3151.51 --|
+|-- NODE 0 Mem Read (MB/s) : 14584.08 --||-- NODE 1 Mem Read (MB/s) :  8066.49 --|
+|-- NODE 0 Mem Write(MB/s) : 12754.70 --||-- NODE 1 Mem Write(MB/s) :  6298.83 --|
+|-- NODE 0 P. Write (T/s):     215789 --||-- NODE 1 P. Write (T/s):      91979 --|
+|-- NODE 0 Memory (MB/s):    27338.79 --||-- NODE 1 Memory (MB/s):    14365.32 --|
+|---------------------------------------||---------------------------------------|
+            |---------------------------------------||---------------------------------------|
+            |--                 System Read Throughput(MB/s):      22650.57                --|
+            |--                System Write Throughput(MB/s):      19053.53                --|
+            |--               System Memory Throughput(MB/s):      41704.11                --|
+            |---------------------------------------||---------------------------------------|
+Cleaning up
+ Zeroed uncore PMU registers
+ Freeing up all RMIDs
+ out collect mem bw
+ in collect pcm
+
+ Processor Counter Monitor: PCIe Bandwidth Monitoring Utility 
+ This utility measures PCIe bandwidth in real-time
+
+ PCIe event definitions (each event counts as a transfer): 
+   PCIe read events (PCI devices reading from memory - application writes to disk/network/PCIe device):
+     PCIePRd   - PCIe UC read transfer (partial cache line)
+     PCIeRdCur* - PCIe read current transfer (full cache line)
+         On Haswell Server PCIeRdCur counts both full/partial cache lines
+     RFO*      - Demand Data RFO
+     CRd*      - Demand Code Read
+     DRd       - Demand Data Read
+     PCIeNSWr  - PCIe Non-snoop write transfer (partial cache line)
+   PCIe write events (PCI devices writing to memory - application reads from disk/network/PCIe device):
+     PCIeWiLF  - PCIe Write transfer (non-allocating) (full cache line)
+     PCIeItoM  - PCIe Write transfer (allocating) (full cache line)
+     PCIeNSWr  - PCIe Non-snoop write transfer (partial cache line)
+     PCIeNSWrF - PCIe Non-snoop write transfer (full cache line)
+     ItoM      - PCIe write full cache line
+     RFO       - PCIe parial Write
+   CPU MMIO events (CPU reading/writing to PCIe devices):
+     PRd       - MMIO Read [Haswell Server only] (Partial Cache Line)
+     WiL       - MMIO Write (Full/Partial)
+
+ * - NOTE: Depending on the configuration of your BIOS, this tool may report '0' if the message
+           has not been selected.
+
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+Number of physical cores: 28
+Number of logical cores: 28
+Number of online logical cores: 28
+Threads (logical cores) per physical core: 1
+Num sockets: 2
+Physical cores per socket: 14
+Core PMU (perfmon) version: 3
+Number of core PMU generic (programmable) counters: 8
+Width of generic (programmable) counters: 48 bits
+Number of core PMU fixed counters: 3
+Width of fixed counters: 48 bits
+Nominal core frequency: 2000000000 Hz
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Package thermal spec power: 105 Watt; Package minimum power: 55 Watt; Package maximum power: 210 Watt; 
+Socket 0: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+Socket 1: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+Trying to use Linux perf events...
+Successfully programmed on-core PMU using Linux perf
+Socket 0
+Max QPI link 0 speed: 19.2 GBytes/second (9.6 GT/second)
+Max QPI link 1 speed: 19.2 GBytes/second (9.6 GT/second)
+Socket 1
+Max QPI link 0 speed: 19.2 GBytes/second (9.6 GT/second)
+Max QPI link 1 speed: 19.2 GBytes/second (9.6 GT/second)
+
+Detected Intel(R) Xeon(R) CPU E5-2660 v4 @ 2.00GHz "Intel(r) microarchitecture codename Broadwell-EP/EX" stepping 1 microcode level 0xb00002e
+Update every 1.0 seconds
+delay_ms: 54
+
+Executing "sleep" command:
+DEBUG: caught signal to interrupt (Child exited).
+Program sleep launched with PID: 2c93
+Program exited with status 0
+Cleaning upSkt | PCIeRdCur |  RFO  |  CRd  |  DRd  |  ItoM  |  PRd  |  WiL
+ 0    8580          24      25 M   191 M    504       0     802 K
+ 1     159 M       671 K    25 M   238 M    194 M     0     629 K
+-----------------------------------------------------------------------
+ *     159 M       671 K    50 M   429 M    194 M     0    1431 K
+
+
+ Zeroed uncore PMU registers
+ Freeing up all RMIDs
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+Number of physical cores: 28
+Number of logical cores: 28
+Number of online logical cores: 28
+Threads (logical cores) per physical core: 1
+Num sockets: 2
+Physical cores per socket: 14
+Core PMU (perfmon) version: 3
+Number of core PMU generic (programmable) counters: 8
+Width of generic (programmable) counters: 48 bits
+Number of core PMU fixed counters: 3
+Width of fixed counters: 48 bits
+Nominal core frequency: 2000000000 Hz
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Package thermal spec power: 105 Watt; Package minimum power: 55 Watt; Package maximum power: 210 Watt; 
+Socket 0: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+Socket 1: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+
+ Processor Counter Monitor  ($Format:%ci ID=%h$)
+ Zeroed PMU registers
+ This utility measures Latency information
+
+
+Trying to use Linux perf events...
+Successfully programmed on-core PMU using Linux perf
+Socket 0
+Max QPI link 0 speed: 19.2 GBytes/second (9.6 GT/second)
+Max QPI link 1 speed: 19.2 GBytes/second (9.6 GT/second)
+Socket 1
+Max QPI link 0 speed: 19.2 GBytes/second (9.6 GT/second)
+Max QPI link 1 speed: 19.2 GBytes/second (9.6 GT/second)
+
+Detected Intel(R) Xeon(R) CPU E5-2660 v4 @ 2.00GHz "Intel(r) microarchitecture codename Broadwell-EP/EX" stepping 1 microcode level 0xb00002e
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0 Thread0     Socket1 Thread0     
+-----------------------------------------------------------------------------
+Core0: 19.94        Core1: 21.92        
+Core2: 43.07        Core3: 22.14        
+Core4: 21.94        Core5: 26.00        
+Core6: 34.82        Core7: 20.90        
+Core8: 40.64        Core9: 36.36        
+Core10: 46.31        Core11: 44.71        
+Core12: 38.99        Core13: 58.15        
+Core14: 27.31        Core15: 34.48        
+Core16: 38.99        Core17: 22.38        
+Core18: 15.10        Core19: 37.94        
+Core20: 14.60        Core21: 41.18        
+Core22: 61.09        Core23: 67.52        
+Core24: 44.68        Core25: 18.02        
+Core26: 34.42        Core27: 58.48        
+
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0: 33.89
+Socket1: 43.17
+DDR read Latency(ns)
+Socket0: 219.67
+Socket1: 645.83
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0 Thread0     Socket1 Thread0     
+-----------------------------------------------------------------------------
+Core0: 19.93        Core1: 47.03        
+Core2: 41.72        Core3: 22.66        
+Core4: 21.74        Core5: 22.52        
+Core6: 33.62        Core7: 20.88        
+Core8: 47.55        Core9: 39.97        
+Core10: 46.35        Core11: 44.54        
+Core12: 41.00        Core13: 52.49        
+Core14: 32.61        Core15: 34.07        
+Core16: 39.16        Core17: 22.13        
+Core18: 15.07        Core19: 31.47        
+Core20: 14.52        Core21: 41.03        
+Core22: 61.86        Core23: 68.13        
+Core24: 45.09        Core25: 18.26        
+Core26: 33.61        Core27: 70.26        
+
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0: 34.03
+Socket1: 43.44
+DDR read Latency(ns)
+Socket0: 223.92
+Socket1: 653.93
+irq_total: 274296.740300857
+cpu_total: 29.51
+cpu_0: 35.24
+cpu_1: 1.40
+cpu_2: 1.46
+cpu_3: 42.55
+cpu_4: 37.63
+cpu_5: 8.71
+cpu_6: 11.30
+cpu_7: 44.15
+cpu_8: 4.45
+cpu_9: 0.33
+cpu_10: 48.47
+cpu_11: 2.46
+cpu_12: 28.12
+cpu_13: 66.02
+cpu_14: 3.92
+cpu_15: 2.33
+cpu_16: 53.86
+cpu_17: 32.38
+cpu_18: 38.90
+cpu_19: 15.29
+cpu_20: 47.14
+cpu_21: 88.76
+cpu_22: 41.36
+cpu_23: 58.64
+cpu_24: 10.64
+cpu_25: 36.90
+cpu_26: 18.28
+cpu_27: 45.68
+enp130s0f0_rx_packets_phy: 777754
+enp130s0f1_rx_packets_phy: 725442
+enp4s0f0_rx_packets_phy: 0
+enp4s0f1_rx_packets_phy: 0
+Total_rx_packets_phy: 1503196
+enp130s0f0_rx_bytes_phy: 6385771943
+enp130s0f1_rx_bytes_phy: 5942965945
+enp4s0f0_rx_bytes_phy: 0
+enp4s0f1_rx_bytes_phy: 0
+Total_rx_bytes_phy: 12328737888
+enp130s0f0_tx_bytes: 5039159625
+enp130s0f1_tx_bytes: 5054929443
+enp4s0f0_tx_bytes: 0
+enp4s0f1_tx_bytes: 0
+Total_tx_bytes: 10094089068
+enp130s0f0_rx_packets: 777756
+enp130s0f1_rx_packets: 725432
+enp4s0f0_rx_packets: 0
+enp4s0f1_rx_packets: 0
+Total_rx_packets: 1503188
+enp130s0f0_rx_bytes: 6343050128
+enp130s0f1_rx_bytes: 5904897746
+enp4s0f0_rx_bytes: 0
+enp4s0f1_rx_bytes: 0
+Total_rx_bytes: 12247947874
+enp130s0f0_tx_bytes_phy: 5045442620
+enp130s0f1_tx_bytes_phy: 5061057357
+enp4s0f0_tx_bytes_phy: 0
+enp4s0f1_tx_bytes_phy: 0
+Total_tx_bytes_phy: 10106499977
+enp130s0f0_tx_packets_phy: 662188
+enp130s0f1_tx_packets_phy: 639975
+enp4s0f0_tx_packets_phy: 0
+enp4s0f1_tx_packets_phy: 0
+Total_tx_packets_phy: 1302163
+enp130s0f0_tx_packets: 601122
+enp130s0f1_tx_packets: 581035
+enp4s0f0_tx_packets: 0
+enp4s0f1_tx_packets: 0
+Total_tx_packets: 1182157
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0 Thread0     Socket1 Thread0     
+-----------------------------------------------------------------------------
+Core0: 19.72        Core1: 42.72        
+Core2: 38.67        Core3: 21.75        
+Core4: 21.89        Core5: 25.48        
+Core6: 31.27        Core7: 20.02        
+Core8: 42.29        Core9: 35.15        
+Core10: 46.36        Core11: 42.70        
+Core12: 38.68        Core13: 57.76        
+Core14: 31.55        Core15: 34.91        
+Core16: 39.22        Core17: 22.19        
+Core18: 14.97        Core19: 36.22        
+Core20: 14.41        Core21: 40.77        
+Core22: 60.42        Core23: 67.04        
+Core24: 45.24        Core25: 17.82        
+Core26: 29.46        Core27: 52.91        
+
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0: 33.69
+Socket1: 42.10
+DDR read Latency(ns)
+Socket0: 222.46
+Socket1: 653.37
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0 Thread0     Socket1 Thread0     
+-----------------------------------------------------------------------------
+Core0: 19.82        Core1: 49.16        
+Core2: 35.46        Core3: 22.56        
+Core4: 21.72        Core5: 22.16        
+Core6: 34.50        Core7: 20.58        
+Core8: 38.41        Core9: 41.94        
+Core10: 46.11        Core11: 33.86        
+Core12: 41.06        Core13: 50.65        
+Core14: 32.81        Core15: 34.07        
+Core16: 39.18        Core17: 22.56        
+Core18: 15.17        Core19: 36.04        
+Core20: 14.71        Core21: 41.69        
+Core22: 62.05        Core23: 68.34        
+Core24: 44.33        Core25: 18.04        
+Core26: 34.07        Core27: 72.48        
+
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0: 34.03
+Socket1: 43.47
+DDR read Latency(ns)
+Socket0: 224.62
+Socket1: 660.40
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0 Thread0     Socket1 Thread0     
+-----------------------------------------------------------------------------
+Core0: 19.39        Core1: 44.76        
+Core2: 39.96        Core3: 21.41        
+Core4: 21.44        Core5: 24.57        
+Core6: 33.49        Core7: 19.61        
+Core8: 43.28        Core9: 43.17        
+Core10: 45.84        Core11: 43.56        
+Core12: 39.89        Core13: 51.77        
+Core14: 33.16        Core15: 33.49        
+Core16: 38.15        Core17: 21.22        
+Core18: 14.79        Core19: 35.56        
+Core20: 14.34        Core21: 40.09        
+Core22: 59.50        Core23: 65.99        
+Core24: 44.12        Core25: 17.32        
+Core26: 32.62        Core27: 44.51        
+
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0: 33.12
+Socket1: 39.50
+DDR read Latency(ns)
+Socket0: 228.77
+Socket1: 669.41
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0 Thread0     Socket1 Thread0     
+-----------------------------------------------------------------------------
+Core0: 19.72        Core1: 49.74        
+Core2: 38.25        Core3: 22.37        
+Core4: 22.31        Core5: 26.39        
+Core6: 34.81        Core7: 20.64        
+Core8: 41.13        Core9: 38.07        
+Core10: 46.79        Core11: 47.97        
+Core12: 41.37        Core13: 58.60        
+Core14: 34.63        Core15: 34.54        
+Core16: 39.74        Core17: 22.83        
+Core18: 15.34        Core19: 38.15        
+Core20: 14.70        Core21: 41.41        
+Core22: 61.47        Core23: 68.19        
+Core24: 34.02        Core25: 17.90        
+Core26: 32.70        Core27: 60.15        
+
+
+
+L1 Cache Miss Latency(ns) [Adding 5 clocks for L1 Miss]
+
+Socket0: 34.24
+Socket1: 43.70
+DDR read Latency(ns)
+Socket0: 217.34
+Socket1: 649.16
+Cleaning up
+ Zeroed uncore PMU registers
+ Freeing up all RMIDs
+
+ Processor Counter Monitor  ($Format:%ci ID=%h$)
+
+ Power Monitoring Utility
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+Number of physical cores: 28
+Number of logical cores: 28
+Number of online logical cores: 28
+Threads (logical cores) per physical core: 1
+Num sockets: 2
+Physical cores per socket: 14
+Core PMU (perfmon) version: 3
+Number of core PMU generic (programmable) counters: 8
+Width of generic (programmable) counters: 48 bits
+Number of core PMU fixed counters: 3
+Width of fixed counters: 48 bits
+Nominal core frequency: 2000000000 Hz
+Package thermal spec power: 105IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+ Watt; Package minimum power: 55 Watt; Package maximum power: 210 Watt; 
+Socket 0: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+Socket 1: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+
+
+MC counter group: 0
+PCU counter group: 0
+Freq bands [0/1/2]: 1200 MHz; 2000 MHz; 4000 MHz; 
+Update every 
+-1.00 seconds
+
+Executing "sleep" command:
+DEBUG: caught signal to interrupt (Child exited).
+Program sleep launched with PID: 12022
+Program exited with status 0
+----------------------------------------------------------------------------------------------
+Cleaning upTime elapsed: 6007 ms
+Called sleep function for 1000 ms
+S0P0; QPIClocks: 14416875298; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S0P1; QPIClocks: 14416881342; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S0CH0; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH0; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0CH1; DRAMClocks: 7208510248; Rank0 CKE Off Residency: 0.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH1; DRAMClocks: 7208510248; Rank1 CKE Off Residency: 0.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0CH2; DRAMClocks: 7208513746; Rank0 CKE Off Residency: 0.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH2; DRAMClocks: 7208513746; Rank1 CKE Off Residency: 0.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0CH3; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S0CH3; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S0; PCUClocks: 6007121940; Freq band 0/1/2 cycles: 0.00%; 0.00%; 0.00%
+S0; Consumed energy units: 5478893; Consumed Joules: 334.41; Watts: 55.67; Thermal headroom below TjMax: 58
+S0; Consumed DRAM energy units: 3108774; Consumed DRAM Joules: 47.56; DRAM Watts: 7.92
+S1P0; QPIClocks: 14416948530; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S1P1; QPIClocks: 14416958050; L0p Tx Cycles: 0.00%; L1 Cycles: 0.00%
+S1CH0; DRAMClocks: 7208603848; Rank0 CKE Off Residency: 0.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH0; DRAMClocks: 7208603848; Rank1 CKE Off Residency: 0.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1CH1; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH1; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1CH2; DRAMClocks: 0; Rank0 CKE Off Residency: -nan%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH2; DRAMClocks: 0; Rank1 CKE Off Residency: -nan%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1CH3; DRAMClocks: 7208675971; Rank0 CKE Off Residency: 0.00%; Rank0 CKE Off Average Cycles: -1; Rank0 Cycles per transition: -1
+S1CH3; DRAMClocks: 7208675971; Rank1 CKE Off Residency: 0.00%; Rank1 CKE Off Average Cycles: -1; Rank1 Cycles per transition: -1
+S1; PCUClocks: 6007298404; Freq band 0/1/2 cycles: 0.00%; 0.00%; 0.00%
+S1; Consumed energy units: 5830223; Consumed Joules: 355.85; Watts: 59.24; Thermal headroom below TjMax: 53
+S1; Consumed DRAM energy units: 2619105; Consumed DRAM Joules: 40.07; DRAM Watts: 6.67
+----------------------------------------------------------------------------------------------
+
+ Zeroed uncore PMU registers
+ Freeing up all RMIDs
+
+ Processor Counter Monitor  ($Format:%ci ID=%h$)
+
+
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+Number of physical cores: 28
+Number of logical cores: 28
+Number of online logical cores: 28
+Threads (logical cores) per physical core: 1
+Num sockets: 2
+Physical cores per socket: 14
+Core PMU (perfmon) version: 3
+Number of core PMU generic (programmable) counters: 8
+Width of generic (programmable) counters: 48 bits
+Number of core PMU fixed counters: 3
+Width of fixed counters: 48 bits
+Nominal core frequency: 2000000000 Hz
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Package thermal spec power: 105 Watt; Package minimum power: 55 Watt; Package maximum power: 210 Watt; 
+Socket 0: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+Socket 1: 2 memory controllers detected with total number of 4 channels. 2 QPI ports detected. 0 M2M (mesh to memory) blocks detected.
+Trying to use Linux perf events...
+Successfully programmed on-core PMU using Linux perf
+Socket 0
+Max QPI link 0 speed: 19.2 GBytes/second (9.6 GT/second)
+Max QPI link 1 speed: 19.2 GBytes/second (9.6 GT/second)
+Socket 1
+Max QPI link 0 speed: 19.2 GBytes/second (9.6 GT/second)
+Max QPI link 1 speed: 19.2 GBytes/second (9.6 GT/second)
+
+Detected Intel(R) Xeon(R) CPU E5-2660 v4 @ 2.00GHz "Intel(r) microarchitecture codename Broadwell-EP/EX" stepping 1 microcode level 0xb00002e
+
+Executing "sleep" command:
+DEBUG: caught signal to interrupt (Child exited).
+Program sleep launched with PID: 302b
+Program exited with status 0
+
+ EXEC  : instructions per nominal CPU cycle
+ IPC   : instructions per CPU cycle
+ FREQ  : relation to nominal CPU frequency='unhalted clock ticks'/'invariant timer ticks' (includes Intel Turbo Boost)
+ AFREQ : relation to nominal CPU frequency while in active state (not in power-saving C state)='unhalted clock ticks'/'invariant timer ticks while in C0-state'  (includes Intel Turbo Boost)
+ L3MISS: L3 (read) cache misses 
+ L2MISS: L2 (read) cache misses (including other core's L2 cache *hits*) 
+ L3HIT : L3 (read) cache hit ratio (0.00-1.00)
+ L2HIT : L2 cache hit ratio (0.00-1.00)
+ L3MPI : number of L3 (read) cache misses per instruction
+ L2MPI : number of L2 (read) cache misses per instruction
+ READ  : bytes read from main memory controller (in GBytes)
+ WRITE : bytes written to main memory controller (in GBytes)
+LLCRDMISSLAT: average latency of last level cache miss for reads and prefetches (in ns)
+ L3OCC : L3 occupancy (in KBytes)
+ LMB   : L3 cache external bandwidth satisfied by local memory (in MBytes)
+ RMB   : L3 cache external bandwidth satisfied by remote memory (in MBytes)
+ TEMP  : Temperature reading in 1 degree Celsius relative to the TjMax temperature (thermal headroom): 0 corresponds to the max temperature
+ energy: Energy in Joules
+
+
+ Core (SKT) | EXEC | IPC  | FREQ  | AFREQ | L3MISS | L2MISS | L3HIT | L2HIT | L3MPI | L2MPI |   L3OCC |   LMB  |   RMB  | TEMP
+
+   0    0     0.09   0.32   0.27    0.72      21 M     29 M    0.29    0.51    0.02    0.03     4760     3418       41     66
+   1    1     0.00   0.19   0.02    0.60     483 K    880 K    0.45    0.08    0.01    0.03      280       19        3     61
+   2    0     0.01   0.51   0.01    0.60     587 K    955 K    0.38    0.13    0.01    0.01        0       47       17     64
+   3    1     0.12   0.33   0.37    0.84      42 M     53 M    0.21    0.35    0.03    0.04     5376     5731      199     60
+   4    0     0.11   0.34   0.33    0.81      27 M     35 M    0.24    0.46    0.02    0.03     4592     3496       64     65
+   5    1     0.07   0.68   0.10    0.63    1822 K   2678 K    0.32    0.34    0.00    0.00        0       59       18     60
+   6    0     0.09   0.74   0.12    0.63    3104 K   3683 K    0.16    0.34    0.00    0.00      168      123       35     65
+   7    1     0.15   0.31   0.48    0.98      42 M     53 M    0.20    0.38    0.03    0.04     3584     6096       98     59
+   8    0     0.04   0.54   0.07    0.61    2450 K   2723 K    0.10    0.11    0.01    0.01      112       69       26     65
+   9    1     0.00   0.39   0.00    0.61     136 K    177 K    0.23    0.15    0.02    0.02        0       16        1     60
+  10    0     0.08   0.16   0.51    1.03     115 M    128 M    0.10    0.13    0.14    0.15     3584      128    15957     63
+  11    1     0.02   0.51   0.03    0.73     825 K   1241 K    0.34    0.24    0.00    0.01       56       59       21     58
+  12    0     0.18   0.90   0.21    0.64      13 M     15 M    0.16    0.23    0.01    0.01      224      332      258     64
+  13    1     0.06   0.07   0.80    1.21     123 M    141 M    0.13    0.17    0.22    0.25     4648       42    12643     57
+  14    0     0.04   0.51   0.07    0.66    1051 K   1783 K    0.41    0.13    0.00    0.00        0       13       15     64
+  15    1     0.01   0.32   0.03    0.62     678 K   1533 K    0.56    0.09    0.01    0.01        0       27        6     59
+  16    0     0.16   0.24   0.67    1.20     116 M    135 M    0.14    0.20    0.07    0.08     5544    17380       26     63
+  17    1     0.05   0.22   0.22    0.65      39 M     45 M    0.14    0.37    0.08    0.09     3024     5532        4     60
+  18    0     0.10   0.29   0.34    0.81      16 M     28 M    0.43    0.59    0.02    0.03     4872     3750       18     64
+  19    1     0.11   0.74   0.16    0.67    6293 K   7846 K    0.20    0.37    0.01    0.01      112      178      163     60
+  20    0     0.18   0.36   0.49    0.98      18 M     37 M    0.50    0.55    0.01    0.02     5320     3784       97     65
+  21    1     0.18   0.18   1.04    1.21     114 M    143 M    0.20    0.26    0.06    0.08     7504     6307     7721     58
+  22    0     0.03   0.09   0.35    0.81      84 M     94 M    0.10    0.14    0.26    0.29     4256     9373        1     65
+  23    1     0.12   0.18   0.70    1.20      79 M     92 M    0.14    0.16    0.06    0.07     2688       82     7304     59
+  24    0     0.06   0.63   0.09    0.62    5158 K   6077 K    0.15    0.21    0.01    0.01        0       18      210     65
+  25    1     0.05   0.18   0.28    0.73      30 M     39 M    0.21    0.48    0.06    0.08     4200     6294       19     60
+  26    0     0.11   0.65   0.17    0.63    5710 K   6674 K    0.14    0.40    0.00    0.01      672      103      431     65
+  27    1     0.08   0.18   0.46    0.97      51 M     61 M    0.16    0.37    0.06    0.07      336       19     4604     60
+---------------------------------------------------------------------------------------------------------------
+ SKT    0     0.09   0.34   0.27    0.85     431 M    528 M    0.18    0.30    0.03    0.04    34104    42034    17196     58
+ SKT    1     0.07   0.22   0.34    0.99     535 M    646 M    0.17    0.29    0.05    0.06    31808    30461    32804     53
+---------------------------------------------------------------------------------------------------------------
+ TOTAL  *     0.08   0.28   0.30    0.92     967 M   1174 M    0.18    0.30    0.04    0.05     N/A     N/A     N/A      N/A
+
+ Instructions retired:   23 G ; Active cycles:   84 G ; Time (TSC):   10 Gticks ; C0 (active,non-halted) core residency: 32.64 %
+
+ C1 core residency: 45.49 %; C3 core residency: 3.91 %; C6 core residency: 17.96 %; C7 core residency: 0.00 %;
+ C2 package residency: 0.00 %; C3 package residency: 0.00 %; C6 package residency: 0.00 %; C7 package residency: 0.00 %;
+
+ PHYSICAL CORE IPC                 : 0.28 => corresponds to 6.88 % utilization for cores in active state
+ Instructions per nominal CPU cycle: 0.08 => corresponds to 2.06 % core utilization over time interval
+ SMI count: 0
+---------------------------------------------------------------------------------------------------------------
+
+Intel(r) QPI traffic estimation in bytes (data and non-data traffic outgoing from CPU/socket through QPI links):
+
+               QPI0     QPI1    |  QPI0   QPI1  
+---------------------------------------------------------------------------------------------------------------
+ SKT    0       47 G     47 G   |   49%    49%   
+ SKT    1       52 G     52 G   |   53%    53%   
+---------------------------------------------------------------------------------------------------------------
+Total QPI outgoing data and non-data traffic:  199 G
+MEM (GB)->|  READ |  WRITE | CPU energy | DIMM energy | LLCRDMISSLAT (ns)
+---------------------------------------------------------------------------------------------------------------
+ SKT   0    74.10    64.53     282.55      40.06         173.35
+ SKT   1    40.38    31.43     297.24      33.29         193.83
+---------------------------------------------------------------------------------------------------------------
+       *    114.48    95.96     579.80      73.35         184.45
+Cleaning up
+ Zeroed uncore PMU registers
+ Freeing up all RMIDs
+ out collect pcm
+Data collected

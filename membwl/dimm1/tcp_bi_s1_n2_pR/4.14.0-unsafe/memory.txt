@@ -1,0 +1,240 @@
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+|---------------------------------------||---------------------------------------|
+|--             Socket  0             --||--             Socket  1             --|
+|---------------------------------------||---------------------------------------|
+|--     Memory Channel Monitoring     --||--     Memory Channel Monitoring     --|
+|---------------------------------------||---------------------------------------|
+|-- Mem Ch  0: Reads (MB/s):    -1.00 --||-- Mem Ch  0: Reads (MB/s):  9802.38 --|
+|--            Writes(MB/s):    -1.00 --||--            Writes(MB/s):  6492.88 --|
+|-- Mem Ch  2: Reads (MB/s):    54.90 --||-- Mem Ch  2: Reads (MB/s):    -1.00 --|
+|--            Writes(MB/s):    26.66 --||--            Writes(MB/s):    -1.00 --|
+|-- NODE 0 Mem Read (MB/s) :    54.90 --||-- NODE 1 Mem Read (MB/s) :  9802.38 --|
+|-- NODE 0 Mem Write(MB/s) :    26.66 --||-- NODE 1 Mem Write(MB/s) :  6492.88 --|
+|-- NODE 0 P. Write (T/s):      31138 --||-- NODE 1 P. Write (T/s):     164715 --|
+|-- NODE 0 Memory (MB/s):       81.56 --||-- NODE 1 Memory (MB/s):    16295.26 --|
+|---------------------------------------||---------------------------------------|
+            |---------------------------------------||---------------------------------------|
+            |--                 System Read Throughput(MB/s):       9857.29                --|
+            |--                System Write Throughput(MB/s):       6519.53                --|
+            |--               System Memory Throughput(MB/s):      16376.82                --|
+            |---------------------------------------||---------------------------------------|
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+|---------------------------------------||---------------------------------------|
+|--             Socket  0             --||--             Socket  1             --|
+|---------------------------------------||---------------------------------------|
+|--     Memory Channel Monitoring     --||--     Memory Channel Monitoring     --|
+|---------------------------------------||---------------------------------------|
+|-- Mem Ch  0: Reads (MB/s):    -1.00 --||-- Mem Ch  0: Reads (MB/s):  9815.65 --|
+|--            Writes(MB/s):    -1.00 --||--            Writes(MB/s):  6493.81 --|
+|-- Mem Ch  2: Reads (MB/s):    55.07 --||-- Mem Ch  2: Reads (MB/s):    -1.00 --|
+|--            Writes(MB/s):    23.31 --||--            Writes(MB/s):    -1.00 --|
+|-- NODE 0 Mem Read (MB/s) :    55.07 --||-- NODE 1 Mem Read (MB/s) :  9815.65 --|
+|-- NODE 0 Mem Write(MB/s) :    23.31 --||-- NODE 1 Mem Write(MB/s) :  6493.81 --|
+|-- NODE 0 P. Write (T/s):      31154 --||-- NODE 1 P. Write (T/s):     163556 --|
+|-- NODE 0 Memory (MB/s):       78.38 --||-- NODE 1 Memory (MB/s):    16309.46 --|
+|---------------------------------------||---------------------------------------|
+            |---------------------------------------||---------------------------------------|
+            |--                 System Read Throughput(MB/s):       9870.72                --|
+            |--                System Write Throughput(MB/s):       6517.12                --|
+            |--               System Memory Throughput(MB/s):      16387.84                --|
+            |---------------------------------------||---------------------------------------|
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+|---------------------------------------||---------------------------------------|
+|--             Socket  0             --||--             Socket  1             --|
+|---------------------------------------||---------------------------------------|
+|--     Memory Channel Monitoring     --||--     Memory Channel Monitoring     --|
+|---------------------------------------||---------------------------------------|
+|-- Mem Ch  0: Reads (MB/s):    -1.00 --||-- Mem Ch  0: Reads (MB/s):  9809.30 --|
+|--            Writes(MB/s):    -1.00 --||--            Writes(MB/s):  6496.95 --|
+|-- Mem Ch  2: Reads (MB/s):    55.30 --||-- Mem Ch  2: Reads (MB/s):    -1.00 --|
+|--            Writes(MB/s):    24.65 --||--            Writes(MB/s):    -1.00 --|
+|-- NODE 0 Mem Read (MB/s) :    55.30 --||-- NODE 1 Mem Read (MB/s) :  9809.30 --|
+|-- NODE 0 Mem Write(MB/s) :    24.65 --||-- NODE 1 Mem Write(MB/s) :  6496.95 --|
+|-- NODE 0 P. Write (T/s):      31148 --||-- NODE 1 P. Write (T/s):     164552 --|
+|-- NODE 0 Memory (MB/s):       79.95 --||-- NODE 1 Memory (MB/s):    16306.26 --|
+|---------------------------------------||---------------------------------------|
+            |---------------------------------------||---------------------------------------|
+            |--                 System Read Throughput(MB/s):       9864.60                --|
+            |--                System Write Throughput(MB/s):       6521.61                --|
+            |--               System Memory Throughput(MB/s):      16386.21                --|
+            |---------------------------------------||---------------------------------------|
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+|---------------------------------------||---------------------------------------|
+|--             Socket  0             --||--             Socket  1             --|
+|---------------------------------------||---------------------------------------|
+|--     Memory Channel Monitoring     --||--     Memory Channel Monitoring     --|
+|---------------------------------------||---------------------------------------|
+|-- Mem Ch  0: Reads (MB/s):    -1.00 --||-- Mem Ch  0: Reads (MB/s):  9802.82 --|
+|--            Writes(MB/s):    -1.00 --||--            Writes(MB/s):  6487.88 --|
+|-- Mem Ch  2: Reads (MB/s):    50.42 --||-- Mem Ch  2: Reads (MB/s):    -1.00 --|
+|--            Writes(MB/s):    22.09 --||--            Writes(MB/s):    -1.00 --|
+|-- NODE 0 Mem Read (MB/s) :    50.42 --||-- NODE 1 Mem Read (MB/s) :  9802.82 --|
+|-- NODE 0 Mem Write(MB/s) :    22.09 --||-- NODE 1 Mem Write(MB/s) :  6487.88 --|
+|-- NODE 0 P. Write (T/s):      31137 --||-- NODE 1 P. Write (T/s):     163543 --|
+|-- NODE 0 Memory (MB/s):       72.50 --||-- NODE 1 Memory (MB/s):    16290.70 --|
+|---------------------------------------||---------------------------------------|
+            |---------------------------------------||---------------------------------------|
+            |--                 System Read Throughput(MB/s):       9853.24                --|
+            |--                System Write Throughput(MB/s):       6509.97                --|
+            |--               System Memory Throughput(MB/s):      16363.21                --|
+            |---------------------------------------||---------------------------------------|
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+|---------------------------------------||---------------------------------------|
+|--             Socket  0             --||--             Socket  1             --|
+|---------------------------------------||---------------------------------------|
+|--     Memory Channel Monitoring     --||--     Memory Channel Monitoring     --|
+|---------------------------------------||---------------------------------------|
+|-- Mem Ch  0: Reads (MB/s):    -1.00 --||-- Mem Ch  0: Reads (MB/s):  9816.11 --|
+|--            Writes(MB/s):    -1.00 --||--            Writes(MB/s):  6492.82 --|
+|-- Mem Ch  2: Reads (MB/s):    57.03 --||-- Mem Ch  2: Reads (MB/s):    -1.00 --|
+|--            Writes(MB/s):    25.59 --||--            Writes(MB/s):    -1.00 --|
+|-- NODE 0 Mem Read (MB/s) :    57.03 --||-- NODE 1 Mem Read (MB/s) :  9816.11 --|
+|-- NODE 0 Mem Write(MB/s) :    25.59 --||-- NODE 1 Mem Write(MB/s) :  6492.82 --|
+|-- NODE 0 P. Write (T/s):      31128 --||-- NODE 1 P. Write (T/s):     165041 --|
+|-- NODE 0 Memory (MB/s):       82.62 --||-- NODE 1 Memory (MB/s):    16308.93 --|
+|---------------------------------------||---------------------------------------|
+            |---------------------------------------||---------------------------------------|
+            |--                 System Read Throughput(MB/s):       9873.14                --|
+            |--                System Write Throughput(MB/s):       6518.41                --|
+            |--               System Memory Throughput(MB/s):      16391.55                --|
+            |---------------------------------------||---------------------------------------|
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+|---------------------------------------||---------------------------------------|
+|--             Socket  0             --||--             Socket  1             --|
+|---------------------------------------||---------------------------------------|
+|--     Memory Channel Monitoring     --||--     Memory Channel Monitoring     --|
+|---------------------------------------||---------------------------------------|
+|-- Mem Ch  0: Reads (MB/s):    -1.00 --||-- Mem Ch  0: Reads (MB/s):  9798.75 --|
+|--            Writes(MB/s):    -1.00 --||--            Writes(MB/s):  6508.60 --|
+|-- Mem Ch  2: Reads (MB/s):    46.83 --||-- Mem Ch  2: Reads (MB/s):    -1.00 --|
+|--            Writes(MB/s):    21.99 --||--            Writes(MB/s):    -1.00 --|
+|-- NODE 0 Mem Read (MB/s) :    46.83 --||-- NODE 1 Mem Read (MB/s) :  9798.75 --|
+|-- NODE 0 Mem Write(MB/s) :    21.99 --||-- NODE 1 Mem Write(MB/s) :  6508.60 --|
+|-- NODE 0 P. Write (T/s):      31177 --||-- NODE 1 P. Write (T/s):     163412 --|
+|-- NODE 0 Memory (MB/s):       68.82 --||-- NODE 1 Memory (MB/s):    16307.35 --|
+|---------------------------------------||---------------------------------------|
+            |---------------------------------------||---------------------------------------|
+            |--                 System Read Throughput(MB/s):       9845.58                --|
+            |--                System Write Throughput(MB/s):       6530.59                --|
+            |--               System Memory Throughput(MB/s):      16376.17                --|
+            |---------------------------------------||---------------------------------------|
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+|---------------------------------------||---------------------------------------|
+|--             Socket  0             --||--             Socket  1             --|
+|---------------------------------------||---------------------------------------|
+|--     Memory Channel Monitoring     --||--     Memory Channel Monitoring     --|
+|---------------------------------------||---------------------------------------|
+|-- Mem Ch  0: Reads (MB/s):    -1.00 --||-- Mem Ch  0: Reads (MB/s):  9797.90 --|
+|--            Writes(MB/s):    -1.00 --||--            Writes(MB/s):  6493.29 --|
+|-- Mem Ch  2: Reads (MB/s):    48.68 --||-- Mem Ch  2: Reads (MB/s):    -1.00 --|
+|--            Writes(MB/s):    23.69 --||--            Writes(MB/s):    -1.00 --|
+|-- NODE 0 Mem Read (MB/s) :    48.68 --||-- NODE 1 Mem Read (MB/s) :  9797.90 --|
+|-- NODE 0 Mem Write(MB/s) :    23.69 --||-- NODE 1 Mem Write(MB/s) :  6493.29 --|
+|-- NODE 0 P. Write (T/s):      31141 --||-- NODE 1 P. Write (T/s):     163602 --|
+|-- NODE 0 Memory (MB/s):       72.36 --||-- NODE 1 Memory (MB/s):    16291.19 --|
+|---------------------------------------||---------------------------------------|
+            |---------------------------------------||---------------------------------------|
+            |--                 System Read Throughput(MB/s):       9846.58                --|
+            |--                System Write Throughput(MB/s):       6516.98                --|
+            |--               System Memory Throughput(MB/s):      16363.56                --|
+            |---------------------------------------||---------------------------------------|
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+|---------------------------------------||---------------------------------------|
+|--             Socket  0             --||--             Socket  1             --|
+|---------------------------------------||---------------------------------------|
+|--     Memory Channel Monitoring     --||--     Memory Channel Monitoring     --|
+|---------------------------------------||---------------------------------------|
+|-- Mem Ch  0: Reads (MB/s):    -1.00 --||-- Mem Ch  0: Reads (MB/s):  9815.80 --|
+|--            Writes(MB/s):    -1.00 --||--            Writes(MB/s):  6487.53 --|
+|-- Mem Ch  2: Reads (MB/s):    60.40 --||-- Mem Ch  2: Reads (MB/s):    -1.00 --|
+|--            Writes(MB/s):    27.67 --||--            Writes(MB/s):    -1.00 --|
+|-- NODE 0 Mem Read (MB/s) :    60.40 --||-- NODE 1 Mem Read (MB/s) :  9815.80 --|
+|-- NODE 0 Mem Write(MB/s) :    27.67 --||-- NODE 1 Mem Write(MB/s) :  6487.53 --|
+|-- NODE 0 P. Write (T/s):      31147 --||-- NODE 1 P. Write (T/s):     163978 --|
+|-- NODE 0 Memory (MB/s):       88.07 --||-- NODE 1 Memory (MB/s):    16303.33 --|
+|---------------------------------------||---------------------------------------|
+            |---------------------------------------||---------------------------------------|
+            |--                 System Read Throughput(MB/s):       9876.20                --|
+            |--                System Write Throughput(MB/s):       6515.19                --|
+            |--               System Memory Throughput(MB/s):      16391.39                --|
+            |---------------------------------------||---------------------------------------|
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+|---------------------------------------||---------------------------------------|
+|--             Socket  0             --||--             Socket  1             --|
+|---------------------------------------||---------------------------------------|
+|--     Memory Channel Monitoring     --||--     Memory Channel Monitoring     --|
+|---------------------------------------||---------------------------------------|
+|-- Mem Ch  0: Reads (MB/s):    -1.00 --||-- Mem Ch  0: Reads (MB/s):  9798.57 --|
+|--            Writes(MB/s):    -1.00 --||--            Writes(MB/s):  6500.68 --|
+|-- Mem Ch  2: Reads (MB/s):    60.55 --||-- Mem Ch  2: Reads (MB/s):    -1.00 --|
+|--            Writes(MB/s):    26.72 --||--            Writes(MB/s):    -1.00 --|
+|-- NODE 0 Mem Read (MB/s) :    60.55 --||-- NODE 1 Mem Read (MB/s) :  9798.57 --|
+|-- NODE 0 Mem Write(MB/s) :    26.72 --||-- NODE 1 Mem Write(MB/s) :  6500.68 --|
+|-- NODE 0 P. Write (T/s):      31157 --||-- NODE 1 P. Write (T/s):     163332 --|
+|-- NODE 0 Memory (MB/s):       87.27 --||-- NODE 1 Memory (MB/s):    16299.25 --|
+|---------------------------------------||---------------------------------------|
+            |---------------------------------------||---------------------------------------|
+            |--                 System Read Throughput(MB/s):       9859.12                --|
+            |--                System Write Throughput(MB/s):       6527.40                --|
+            |--               System Memory Throughput(MB/s):      16386.52                --|
+            |---------------------------------------||---------------------------------------|
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+|---------------------------------------||---------------------------------------|
+|--             Socket  0             --||--             Socket  1             --|
+|---------------------------------------||---------------------------------------|
+|--     Memory Channel Monitoring     --||--     Memory Channel Monitoring     --|
+|---------------------------------------||---------------------------------------|
+|-- Mem Ch  0: Reads (MB/s):    -1.00 --||-- Mem Ch  0: Reads (MB/s):  9795.94 --|
+|--            Writes(MB/s):    -1.00 --||--            Writes(MB/s):  6486.88 --|
+|-- Mem Ch  2: Reads (MB/s):    52.93 --||-- Mem Ch  2: Reads (MB/s):    -1.00 --|
+|--            Writes(MB/s):    24.26 --||--            Writes(MB/s):    -1.00 --|
+|-- NODE 0 Mem Read (MB/s) :    52.93 --||-- NODE 1 Mem Read (MB/s) :  9795.94 --|
+|-- NODE 0 Mem Write(MB/s) :    24.26 --||-- NODE 1 Mem Write(MB/s) :  6486.88 --|
+|-- NODE 0 P. Write (T/s):      31134 --||-- NODE 1 P. Write (T/s):     163320 --|
+|-- NODE 0 Memory (MB/s):       77.19 --||-- NODE 1 Memory (MB/s):    16282.81 --|
+|---------------------------------------||---------------------------------------|
+            |---------------------------------------||---------------------------------------|
+            |--                 System Read Throughput(MB/s):       9848.87                --|
+            |--                System Write Throughput(MB/s):       6511.14                --|
+            |--               System Memory Throughput(MB/s):      16360.01                --|
+            |---------------------------------------||---------------------------------------|

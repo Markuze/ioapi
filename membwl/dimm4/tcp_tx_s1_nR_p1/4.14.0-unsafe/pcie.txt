@@ -1,0 +1,110 @@
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Skt | PCIeRdCur |  RFO  |  CRd  |  DRd  |  ItoM  |  PRd  |  WiL
+ 0     191 M        72     991 K   466 K   1050 K    36      36  
+ 1     492          12      31 M   234 M    252       0    1198 K
+-----------------------------------------------------------------------
+ *     191 M        84      32 M   234 M   1051 K    36    1199 K
+
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Skt | PCIeRdCur |  RFO  |  CRd  |  DRd  |  ItoM  |  PRd  |  WiL
+ 0     193 M        12     861 K   347 K   1189 K     0     108  
+ 1    1008          12      36 M   239 M    252      12    1314 K
+-----------------------------------------------------------------------
+ *     193 M        24      37 M   240 M   1189 K    12    1314 K
+
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Skt | PCIeRdCur |  RFO  |  CRd  |  DRd  |  ItoM  |  PRd  |  WiL
+ 0     191 M        24    1026 K   391 K   1179 K     0     144  
+ 1     984          24      38 M   241 M      0      12    1437 K
+-----------------------------------------------------------------------
+ *     191 M        48      39 M   241 M   1179 K    12    1437 K
+
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Skt | PCIeRdCur |  RFO  |  CRd  |  DRd  |  ItoM  |  PRd  |  WiL
+ 0     192 M        72    1163 K   425 K   1265 K     0       0  
+ 1     504          24      35 M   241 M      0      12    1389 K
+-----------------------------------------------------------------------
+ *     192 M        96      36 M   241 M   1265 K    12    1389 K
+
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Skt | PCIeRdCur |  RFO  |  CRd  |  DRd  |  ItoM  |  PRd  |  WiL
+ 0     194 M        24     634 K   453 K   1125 K     0      36  
+ 1       0          12      35 M   236 M      0       0    1315 K
+-----------------------------------------------------------------------
+ *     194 M        36      36 M   237 M   1125 K     0    1315 K
+
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Skt | PCIeRdCur |  RFO  |  CRd  |  DRd  |  ItoM  |  PRd  |  WiL
+ 0     193 M        48     782 K   374 K   1011 K     0       0  
+ 1       0          12      33 M   237 M      0     372    1277 K
+-----------------------------------------------------------------------
+ *     193 M        60      34 M   237 M   1011 K   372    1277 K
+
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Skt | PCIeRdCur |  RFO  |  CRd  |  DRd  |  ItoM  |  PRd  |  WiL
+ 0     191 M         0     680 K   483 K   1055 K     0     180  
+ 1       0           0      33 M   235 M    252       0    1358 K
+-----------------------------------------------------------------------
+ *     191 M         0      33 M   236 M   1055 K     0    1358 K
+
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Skt | PCIeRdCur |  RFO  |  CRd  |  DRd  |  ItoM  |  PRd  |  WiL
+ 0     194 M        12     872 K   459 K   1026 K     0      36  
+ 1       0           0      34 M   238 M    504       0    1308 K
+-----------------------------------------------------------------------
+ *     194 M        12      35 M   239 M   1026 K     0    1308 K
+
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Skt | PCIeRdCur |  RFO  |  CRd  |  DRd  |  ItoM  |  PRd  |  WiL
+ 0     192 M        12     783 K   507 K   1052 K     0      36  
+ 1       0           0      34 M   239 M    504      36    1384 K
+-----------------------------------------------------------------------
+ *     192 M        12      35 M   239 M   1053 K    36    1384 K
+
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+Skt | PCIeRdCur |  RFO  |  CRd  |  DRd  |  ItoM  |  PRd  |  WiL
+ 0     194 M       168     608 K   401 K   1083 K     0       0  
+ 1    1008           0      35 M   236 M    252       0    1288 K
+-----------------------------------------------------------------------
+ *     194 M       168      35 M   236 M   1083 K     0    1288 K
+

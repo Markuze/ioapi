@@ -1,0 +1,258 @@
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+
+ EXEC  : instructions per nominal CPU cycle
+ IPC   : instructions per CPU cycle
+ FREQ  : relation to nominal CPU frequency='unhalted clock ticks'/'invariant timer ticks' (includes Intel Turbo Boost)
+ AFREQ : relation to nominal CPU frequency while in active state (not in power-saving C state)='unhalted clock ticks'/'invariant timer ticks while in C0-state'  (includes Intel Turbo Boost)
+ L3MISS: L3 (read) cache misses 
+ L2MISS: L2 (read) cache misses (including other core's L2 cache *hits*) 
+ L3HIT : L3 (read) cache hit ratio (0.00-1.00)
+ L2HIT : L2 cache hit ratio (0.00-1.00)
+ L3MPI : number of L3 (read) cache misses per instruction
+ L2MPI : number of L2 (read) cache misses per instruction
+ READ  : bytes read from main memory controller (in GBytes)
+ WRITE : bytes written to main memory controller (in GBytes)
+LLCRDMISSLAT: average latency of last level cache miss for reads and prefetches (in ns)
+ L3OCC : L3 occupancy (in KBytes)
+ LMB   : L3 cache external bandwidth satisfied by local memory (in MBytes)
+ RMB   : L3 cache external bandwidth satisfied by remote memory (in MBytes)
+ TEMP  : Temperature reading in 1 degree Celsius relative to the TjMax temperature (thermal headroom): 0 corresponds to the max temperature
+ energy: Energy in Joules
+
+
+ Core (SKT) | EXEC | IPC  | FREQ  | AFREQ | L3MISS | L2MISS | L3HIT | L2HIT | L3MPI | L2MPI |   L3OCC |   LMB  |   RMB  | TEMP
+
+   0    0     0.14   0.13   1.07    1.20      24 M     38 M    0.37    0.43    0.02    0.03     4704     3137       92     62
+   1    1     0.13   0.12   1.14    1.20      24 M     39 M    0.37    0.48    0.02    0.03     3360     1597       11     58
+   2    0     0.02   0.39   0.05    0.61     905 K   2219 K    0.59    0.12    0.00    0.01      112       45        5     61
+   3    1     0.05   0.40   0.13    0.64    2784 K   3542 K    0.21    0.20    0.01    0.01       56       30      131     58
+   4    0     0.03   0.02   1.13    1.20      59 M     67 M    0.12    0.18    0.21    0.24     3416     7278        0     62
+   5    1     0.08   0.07   1.19    1.20      71 M     83 M    0.15    0.19    0.08    0.10     5040      145     7594     58
+   6    0     0.08   0.61   0.13    0.69    3002 K   3918 K    0.23    0.20    0.00    0.00        0       41       82     62
+   7    1     0.08   0.08   1.00    1.20      22 M     35 M    0.37    0.44    0.03    0.04     4144     1557       59     57
+   8    0     0.12   0.12   0.99    1.20      18 M     33 M    0.43    0.52    0.02    0.03     5880     3067       62     61
+   9    1     0.01   0.63   0.01    0.63     464 K    684 K    0.32    0.14    0.00    0.01        0       22       10     59
+  10    0     0.00   0.28   0.01    0.60     397 K    558 K    0.29    0.14    0.01    0.02      112       19        3     61
+  11    1     0.03   0.03   1.15    1.20      82 M     94 M    0.12    0.15    0.24    0.28     5096       10    10245     57
+  12    0     0.04   0.03   1.20    1.20      61 M     70 M    0.13    0.19    0.17    0.19     3360     6502       75     62
+  13    1     0.01   0.45   0.01    0.63     413 K    584 K    0.29    0.12    0.01    0.01      280       27       38     57
+  14    0     0.10   0.11   0.96    1.20      21 M     33 M    0.37    0.47    0.02    0.03     3920     3325       14     62
+  15    1     0.14   0.13   1.09    1.20      24 M     38 M    0.36    0.44    0.02    0.03     3192     1378       29     57
+  16    0     0.02   0.60   0.04    0.88     793 K   1124 K    0.29    0.38    0.00    0.00        0       79        5     62
+  17    1     0.01   0.47   0.02    0.79     626 K    893 K    0.30    0.31    0.01    0.01        0       51       21     59
+  18    0     0.03   0.03   1.08    1.20      74 M     85 M    0.13    0.15    0.21    0.24     2464       15     5488     62
+  19    1     0.06   0.05   1.20    1.20      57 M     67 M    0.14    0.19    0.10    0.12     2912     5309       11     58
+  20    0     0.04   0.50   0.09    0.61    1239 K   2710 K    0.54    0.28    0.00    0.01      112       41        6     62
+  21    1     0.06   0.07   0.89    1.20      20 M     32 M    0.37    0.45    0.03    0.05     3024     1618       70     58
+  22    0     0.12   0.12   1.04    1.20      24 M     36 M    0.33    0.41    0.02    0.03     4592     3138       12     62
+  23    1     0.11   0.40   0.28    0.76    3012 K   4298 K    0.30    0.31    0.00    0.00      280       53      366     60
+  24    0     0.09   0.49   0.18    0.62    2986 K   4411 K    0.32    0.34    0.00    0.00      168       70       98     63
+  25    1     0.06   0.05   1.20    1.20      57 M     66 M    0.14    0.21    0.10    0.11     2408     5679       40     58
+  26    0     0.06   0.05   1.20    1.20      78 M     90 M    0.14    0.19    0.14    0.16     2688       58     4009     61
+  27    1     0.06   0.40   0.16    0.62    3668 K   4629 K    0.21    0.28    0.01    0.01      112       73      761     61
+---------------------------------------------------------------------------------------------------------------
+ SKT    0     0.06   0.10   0.65    1.15     371 M    471 M    0.21    0.29    0.04    0.05    31528    26815     9951     56
+ SKT    1     0.06   0.10   0.68    1.15     372 M    472 M    0.21    0.29    0.04    0.05    29904    17549    19386     53
+---------------------------------------------------------------------------------------------------------------
+ TOTAL  *     0.06   0.10   0.67    1.15     744 M    943 M    0.21    0.29    0.04    0.05     N/A     N/A     N/A      N/A
+
+ Instructions retired:   18 G ; Active cycles:  188 G ; Time (TSC):   10 Gticks ; C0 (active,non-halted) core residency: 58.03 %
+
+ C1 core residency: 23.79 %; C3 core residency: 2.17 %; C6 core residency: 16.00 %; C7 core residency: 0.00 %;
+ C2 package residency: 0.00 %; C3 package residency: 0.00 %; C6 package residency: 0.00 %; C7 package residency: 0.00 %;
+
+ PHYSICAL CORE IPC                 : 0.10 => corresponds to 2.42 % utilization for cores in active state
+ Instructions per nominal CPU cycle: 0.06 => corresponds to 1.61 % core utilization over time interval
+ SMI count: 0
+---------------------------------------------------------------------------------------------------------------
+
+Intel(r) QPI traffic estimation in bytes (data and non-data traffic outgoing from CPU/socket through QPI links):
+
+               QPI0     QPI1    |  QPI0   QPI1  
+---------------------------------------------------------------------------------------------------------------
+ SKT    0       25 G     25 G   |   26%    26%   
+ SKT    1       25 G     25 G   |   26%    26%   
+---------------------------------------------------------------------------------------------------------------
+Total QPI outgoing data and non-data traffic:  103 G
+MEM (GB)->|  READ |  WRITE | CPU energy | DIMM energy | LLCRDMISSLAT (ns)
+---------------------------------------------------------------------------------------------------------------
+ SKT   0    44.12    37.15     327.37      20.79         373.73
+ SKT   1    44.70    36.92     338.18      22.16         376.16
+---------------------------------------------------------------------------------------------------------------
+       *    88.82    74.07     665.54      42.95         374.94
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+
+ EXEC  : instructions per nominal CPU cycle
+ IPC   : instructions per CPU cycle
+ FREQ  : relation to nominal CPU frequency='unhalted clock ticks'/'invariant timer ticks' (includes Intel Turbo Boost)
+ AFREQ : relation to nominal CPU frequency while in active state (not in power-saving C state)='unhalted clock ticks'/'invariant timer ticks while in C0-state'  (includes Intel Turbo Boost)
+ L3MISS: L3 (read) cache misses 
+ L2MISS: L2 (read) cache misses (including other core's L2 cache *hits*) 
+ L3HIT : L3 (read) cache hit ratio (0.00-1.00)
+ L2HIT : L2 cache hit ratio (0.00-1.00)
+ L3MPI : number of L3 (read) cache misses per instruction
+ L2MPI : number of L2 (read) cache misses per instruction
+ READ  : bytes read from main memory controller (in GBytes)
+ WRITE : bytes written to main memory controller (in GBytes)
+LLCRDMISSLAT: average latency of last level cache miss for reads and prefetches (in ns)
+ L3OCC : L3 occupancy (in KBytes)
+ LMB   : L3 cache external bandwidth satisfied by local memory (in MBytes)
+ RMB   : L3 cache external bandwidth satisfied by remote memory (in MBytes)
+ TEMP  : Temperature reading in 1 degree Celsius relative to the TjMax temperature (thermal headroom): 0 corresponds to the max temperature
+ energy: Energy in Joules
+
+
+ Core (SKT) | EXEC | IPC  | FREQ  | AFREQ | L3MISS | L2MISS | L3HIT | L2HIT | L3MPI | L2MPI |   L3OCC |   LMB  |   RMB  | TEMP
+
+   0    0     0.12   0.12   1.03    1.20      20 M     36 M    0.43    0.48    0.02    0.03     4592     3913        2     62
+   1    1     0.09   0.10   0.94    1.20      22 M     35 M    0.36    0.47    0.03    0.04     3640     2878        6     58
+   2    0     0.02   0.38   0.06    0.63     800 K   1761 K    0.55    0.12    0.00    0.01       56       41        4     61
+   3    1     0.09   0.42   0.21    0.68    4747 K   5499 K    0.14    0.28    0.01    0.01      448       37      195     58
+   4    0     0.05   0.04   1.20    1.20      62 M     70 M    0.12    0.14    0.13    0.15     1400     2717       43     61
+   5    1     0.06   0.05   1.20    1.20      79 M     90 M    0.12    0.13    0.13    0.15     1512       54     3926     58
+   6    0     0.01   0.74   0.02    0.72     664 K    817 K    0.19    0.18    0.00    0.01      392       48       12     62
+   7    1     0.10   0.10   0.97    1.20      22 M     36 M    0.37    0.43    0.02    0.04     4536     2849       42     57
+   8    0     0.12   0.12   1.02    1.20      20 M     34 M    0.41    0.51    0.02    0.03     4704     3616       52     60
+   9    1     0.00   0.24   0.02    0.60     501 K    884 K    0.43    0.12    0.01    0.02      112        6       22     59
+  10    0     0.08   0.50   0.16    0.67    3524 K   5223 K    0.33    0.33    0.00    0.01       56       83       39     60
+  11    1     0.04   0.03   1.20    1.20      83 M     94 M    0.12    0.16    0.20    0.22     3752       10     8144     56
+  12    0     0.04   0.03   1.20    1.20      61 M     71 M    0.13    0.19    0.15    0.17     3472     6383        0     60
+  13    1     0.05   0.52   0.09    0.65    1500 K   3041 K    0.51    0.25    0.00    0.01       56       25       41     56
+  14    0     0.20   0.18   1.14    1.20      33 M     44 M    0.25    0.26    0.02    0.02     4592     3482        7     61
+  15    1     0.09   0.10   0.91    1.20      17 M     34 M    0.50    0.54    0.02    0.04     7672     3775       69     57
+  16    0     0.00   0.24   0.01    0.61     416 K    525 K    0.21    0.14    0.02    0.02        0       44        2     62
+  17    1     0.01   0.47   0.02    0.80     530 K    847 K    0.37    0.31    0.00    0.01       56       46       16     58
+  18    0     0.06   0.05   1.17    1.20      76 M     89 M    0.14    0.15    0.13    0.15     3360       46     7446     61
+  19    1     0.05   0.04   1.20    1.20      62 M     72 M    0.14    0.19    0.12    0.14     3416     6685       12     57
+  20    0     0.02   0.71   0.03    0.83     705 K    954 K    0.26    0.33    0.00    0.00      112       66        6     62
+  21    1     0.16   0.14   1.10    1.20      26 M     39 M    0.34    0.40    0.02    0.03     3976     2875      415     58
+  22    0     0.11   0.11   1.00    1.20      21 M     35 M    0.39    0.47    0.02    0.03     5264     3952       15     62
+  23    1     0.10   0.41   0.26    0.74    2232 K   3544 K    0.37    0.30    0.00    0.00      168       61      150     59
+  24    0     0.10   0.46   0.21    0.68    4571 K   5194 K    0.12    0.20    0.00    0.01       56       45       98     62
+  25    1     0.07   0.06   1.20    1.20      58 M     68 M    0.15    0.23    0.08    0.09     2632     5236       46     58
+  26    0     0.06   0.05   1.20    1.20      79 M     91 M    0.13    0.19    0.14    0.16     4760       51     9010     61
+  27    1     0.04   0.39   0.09    0.73    1039 K   1690 K    0.38    0.13    0.00    0.00       56       38       11     60
+---------------------------------------------------------------------------------------------------------------
+ SKT    0     0.07   0.11   0.67    1.15     387 M    488 M    0.21    0.28    0.04    0.05    32816    24487    16736     55
+ SKT    1     0.07   0.10   0.67    1.14     383 M    487 M    0.21    0.29    0.04    0.05    32032    24575    13095     52
+---------------------------------------------------------------------------------------------------------------
+ TOTAL  *     0.07   0.10   0.67    1.15     770 M    976 M    0.21    0.29    0.04    0.05     N/A     N/A     N/A      N/A
+
+ Instructions retired:   19 G ; Active cycles:  189 G ; Time (TSC):   10 Gticks ; C0 (active,non-halted) core residency: 58.66 %
+
+ C1 core residency: 23.20 %; C3 core residency: 1.79 %; C6 core residency: 16.34 %; C7 core residency: 0.00 %;
+ C2 package residency: 0.00 %; C3 package residency: 0.00 %; C6 package residency: 0.00 %; C7 package residency: 0.00 %;
+
+ PHYSICAL CORE IPC                 : 0.10 => corresponds to 2.60 % utilization for cores in active state
+ Instructions per nominal CPU cycle: 0.07 => corresponds to 1.75 % core utilization over time interval
+ SMI count: 0
+---------------------------------------------------------------------------------------------------------------
+
+Intel(r) QPI traffic estimation in bytes (data and non-data traffic outgoing from CPU/socket through QPI links):
+
+               QPI0     QPI1    |  QPI0   QPI1  
+---------------------------------------------------------------------------------------------------------------
+ SKT    0       24 G     24 G   |   25%    25%   
+ SKT    1       25 G     25 G   |   26%    26%   
+---------------------------------------------------------------------------------------------------------------
+Total QPI outgoing data and non-data traffic:  100 G
+MEM (GB)->|  READ |  WRITE | CPU energy | DIMM energy | LLCRDMISSLAT (ns)
+---------------------------------------------------------------------------------------------------------------
+ SKT   0    44.17    36.06     323.36      20.65         372.60
+ SKT   1    43.97    36.59     336.51      21.86         371.92
+---------------------------------------------------------------------------------------------------------------
+       *    88.14    72.65     659.88      42.51         372.26
+IBRS and IBPB supported  : yes
+STIBP supported          : yes
+Spec arch caps supported : no
+IBRS enabled in the kernel   : no
+STIBP enabled in the kernel  : no
+
+ EXEC  : instructions per nominal CPU cycle
+ IPC   : instructions per CPU cycle
+ FREQ  : relation to nominal CPU frequency='unhalted clock ticks'/'invariant timer ticks' (includes Intel Turbo Boost)
+ AFREQ : relation to nominal CPU frequency while in active state (not in power-saving C state)='unhalted clock ticks'/'invariant timer ticks while in C0-state'  (includes Intel Turbo Boost)
+ L3MISS: L3 (read) cache misses 
+ L2MISS: L2 (read) cache misses (including other core's L2 cache *hits*) 
+ L3HIT : L3 (read) cache hit ratio (0.00-1.00)
+ L2HIT : L2 cache hit ratio (0.00-1.00)
+ L3MPI : number of L3 (read) cache misses per instruction
+ L2MPI : number of L2 (read) cache misses per instruction
+ READ  : bytes read from main memory controller (in GBytes)
+ WRITE : bytes written to main memory controller (in GBytes)
+LLCRDMISSLAT: average latency of last level cache miss for reads and prefetches (in ns)
+ L3OCC : L3 occupancy (in KBytes)
+ LMB   : L3 cache external bandwidth satisfied by local memory (in MBytes)
+ RMB   : L3 cache external bandwidth satisfied by remote memory (in MBytes)
+ TEMP  : Temperature reading in 1 degree Celsius relative to the TjMax temperature (thermal headroom): 0 corresponds to the max temperature
+ energy: Energy in Joules
+
+
+ Core (SKT) | EXEC | IPC  | FREQ  | AFREQ | L3MISS | L2MISS | L3HIT | L2HIT | L3MPI | L2MPI |   L3OCC |   LMB  |   RMB  | TEMP
+
+   0    0     0.16   0.15   1.12    1.20      25 M     40 M    0.38    0.47    0.02    0.02     5040     3067       65     62
+   1    1     0.10   0.10   1.01    1.20      21 M     34 M    0.37    0.47    0.02    0.04     4144     4457       43     58
+   2    0     0.06   0.48   0.12    0.63    1667 K   3079 K    0.46    0.33    0.00    0.01       56       51      129     61
+   3    1     0.05   0.38   0.14    0.65    2909 K   3665 K    0.21    0.20    0.01    0.01       56       96      125     58
+   4    0     0.03   0.03   1.19    1.20      62 M     71 M    0.12    0.18    0.20    0.23     4144     6712        0     61
+   5    1     0.07   0.06   1.15    1.20      71 M     82 M    0.13    0.16    0.10    0.12     4032      163     7725     57
+   6    0     0.04   0.94   0.04    0.76     866 K   1224 K    0.29    0.23    0.00    0.00      112       67       20     62
+   7    1     0.07   0.07   0.97    1.20      23 M     35 M    0.33    0.41    0.04    0.05     3864     4148       39     57
+   8    0     0.15   0.14   1.06    1.20      19 M     35 M    0.45    0.52    0.01    0.02     3808     2917       62     60
+   9    1     0.01   0.75   0.02    0.64     604 K    897 K    0.33    0.12    0.00    0.01        0       11       40     58
+  10    0     0.00   0.37   0.01    0.60     445 K    576 K    0.23    0.13    0.01    0.01      168       17        3     60
+  11    1     0.03   0.03   1.13    1.20      80 M     91 M    0.12    0.15    0.24    0.28     5768       14    10100     56
+  12    0     0.04   0.03   1.20    1.20      61 M     70 M    0.13    0.19    0.16    0.19     3416     6020        2     60
+  13    1     0.03   0.40   0.08    0.61    1249 K   2952 K    0.58    0.26    0.00    0.01      112       44       67     56
+  14    0     0.06   0.07   0.84    1.20      19 M     30 M    0.35    0.46    0.03    0.05     4592     3344        2     61
+  15    1     0.08   0.09   0.92    1.20      21 M     33 M    0.36    0.41    0.03    0.04     4760     4021       18     56
+  16    0     0.05   0.52   0.10    0.62    1679 K   2723 K    0.38    0.21    0.00    0.01      280      125        4     62
+  17    1     0.04   0.52   0.08    0.62    1263 K   2669 K    0.53    0.24    0.00    0.01       56       59       26     58
+  18    0     0.03   0.03   1.15    1.20      80 M     92 M    0.13    0.15    0.24    0.27     2576        6     7864     62
+  19    1     0.06   0.05   1.20    1.20      57 M     65 M    0.12    0.17    0.09    0.11     3416     2073       37     57
+  20    0     0.02   0.49   0.03    0.83     573 K    840 K    0.32    0.34    0.00    0.01      112       49        5     62
+  21    1     0.12   0.11   1.04    1.20      23 M     37 M    0.38    0.42    0.02    0.03     4536     4224      720     57
+  22    0     0.09   0.09   0.99    1.20      24 M     36 M    0.34    0.42    0.03    0.04     4648     2920      178     61
+  23    1     0.12   0.44   0.28    0.72    3541 K   5577 K    0.36    0.45    0.00    0.00      168       63      529     58
+  24    0     0.07   0.47   0.14    0.70    2912 K   3551 K    0.18    0.26    0.00    0.01      112       69      127     62
+  25    1     0.03   0.02   1.20    1.20      61 M     70 M    0.12    0.17    0.22    0.25     1680     3481       39     58
+  26    0     0.09   0.07   1.18    1.20      69 M     81 M    0.14    0.21    0.08    0.09     2352      223     4796     60
+  27    1     0.03   0.36   0.09    0.70    1104 K   1818 K    0.39    0.14    0.00    0.01       56       66       30     59
+---------------------------------------------------------------------------------------------------------------
+ SKT    0     0.06   0.10   0.66    1.16     371 M    469 M    0.21    0.30    0.04    0.05    31416    25587    13257     55
+ SKT    1     0.06   0.09   0.67    1.13     371 M    467 M    0.21    0.27    0.04    0.05    32648    22920    19538     52
+---------------------------------------------------------------------------------------------------------------
+ TOTAL  *     0.06   0.09   0.66    1.14     742 M    937 M    0.21    0.29    0.04    0.05     N/A     N/A     N/A      N/A
+
+ Instructions retired:   17 G ; Active cycles:  186 G ; Time (TSC):   10 Gticks ; C0 (active,non-halted) core residency: 57.69 %
+
+ C1 core residency: 24.90 %; C3 core residency: 2.92 %; C6 core residency: 14.49 %; C7 core residency: 0.00 %;
+ C2 package residency: 0.00 %; C3 package residency: 0.00 %; C6 package residency: 0.00 %; C7 package residency: 0.00 %;
+
+ PHYSICAL CORE IPC                 : 0.09 => corresponds to 2.35 % utilization for cores in active state
+ Instructions per nominal CPU cycle: 0.06 => corresponds to 1.55 % core utilization over time interval
+ SMI count: 0
+---------------------------------------------------------------------------------------------------------------
+
+Intel(r) QPI traffic estimation in bytes (data and non-data traffic outgoing from CPU/socket through QPI links):
+
+               QPI0     QPI1    |  QPI0   QPI1  
+---------------------------------------------------------------------------------------------------------------
+ SKT    0       25 G     25 G   |   26%    26%   
+ SKT    1       25 G     25 G   |   26%    26%   
+---------------------------------------------------------------------------------------------------------------
+Total QPI outgoing data and non-data traffic:  102 G
+MEM (GB)->|  READ |  WRITE | CPU energy | DIMM energy | LLCRDMISSLAT (ns)
+---------------------------------------------------------------------------------------------------------------
+ SKT   0    43.77    36.73     321.67      20.60         374.14
+ SKT   1    44.20    36.60     338.19      21.88         375.86
+---------------------------------------------------------------------------------------------------------------
+       *    87.96    73.33     659.86      42.49         375.00
