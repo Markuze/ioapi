@@ -868,6 +868,48 @@ struct sk_buff *skb_from_cqe(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe,
 	return skb;
 }
 
+#define PAUSE_P_SIZE 	46
+struct pause_frame {
+	struct ethhdr	hdr;
+	union {
+		unsigned char bytes[PAUSE_P_SIZE];
+		struct {
+			__be16		type;
+			__be16		time;
+		};
+	} payload;
+} __attribute__((packed));
+
+static void test_pause(struct net_device *netdev, struct sk_buff *skb_src)
+{
+	struct sk_buff *skb;
+	struct ethhdr *hsrc;
+	struct pause_frame *pause;
+	unsigned int i;
+	int err;
+
+	/* build the pkt before xmit */
+	skb = netdev_alloc_skb(priv->dev, PAUSE_P_SIZE + ETH_HLEN + NET_IP_ALIGN);
+	if (!skb) {
+		pr_err("Failed to alloc mem!\n");
+		return;
+	}
+
+	skb_reserve(skb, NET_IP_ALIGN);
+
+	hsrc = skb_src->data + ETH_HLEN;
+	pause = skb_put(skb, sizeof(struct pause_frame));
+	memcpy(pause->hdr.h_dest, hsrc->h_source, ETH_ALEN);
+	memcpy(pause->hdr.h_source, hsrc->h_dest, ETH_ALEN);
+	ethh->h_proto = htons(ETH_P_PAUSE);
+	//skb_reset_mac_header(skb);
+	memset(hsrc->payload, 0, packet_size);
+	ethh->payload.type = htons(0x1);
+	ethh->payload.time = htons(0x1000);
+	skb_set_queue_mapping(skb, 0);
+	mlx5e_xmit(skb, netdev);
+}
+
 void mlx5e_handle_rx_cqe(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe)
 {
 	struct mlx5e_wqe_frag_info *wi;
@@ -896,6 +938,7 @@ void mlx5e_handle_rx_cqe(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe)
 		mlx5e_free_rx_wqe(rq, wi);
 		goto wq_ll_pop;
 	}
+	test_pause(rq->netdev, skb);
 
 	mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb);
 	/* MARK: Post processing here*/
