@@ -1918,7 +1918,7 @@ static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
 	if (err)
 		goto err_close_icosq_cq;
 
-	err = mlx5e_open_cq(c, params->tx_cq_moderation, &cparam->tx_cq, &c->xdpsq.cq, false);
+	err = mlx5e_open_cq(c, params->tx_cq_moderation, &cparam->tx_cq, &c->xdpsq.cq, true);
 	if (err)
 		goto err_close_tx_cqs;
 
@@ -1928,7 +1928,7 @@ static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
 
 	/* XDP SQ CQ params are same as normal TXQ sq CQ params */
 	err = c->xdp ? mlx5e_open_cq(c, params->tx_cq_moderation,
-				     &cparam->tx_cq, &c->rq.xdpsq.cq, false) : 0;
+				     &cparam->tx_cq, &c->rq.xdpsq.cq, true) : 0;
 	if (err)
 		goto err_close_rx_cq;
 
