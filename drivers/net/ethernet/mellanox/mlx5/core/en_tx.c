@@ -430,11 +430,13 @@ err_drop:
 	return NETDEV_TX_OK;
 }
 
+#define MLX5_POLL_LIMIT 128
 netdev_tx_t mlx5e_xmit(struct sk_buff *skb, struct net_device *dev)
 {
 	struct mlx5e_priv *priv = netdev_priv(dev);
 	struct mlx5e_tx_wqe *wqe;
 	struct mlx5e_txqsq *sq;
+	netdev_tx_t rc = NETDEV_TX_OK;
 	u16 pi;
 
 	sq = priv->txq2sq[skb_get_queue_mapping(skb)];
@@ -442,10 +444,32 @@ netdev_tx_t mlx5e_xmit(struct sk_buff *skb, struct net_device *dev)
 
 	/* might send skbs and update wqe and pi */
 	skb = mlx5e_accel_handle_tx(skb, sq, dev, &wqe, &pi);
-	if (unlikely(!skb))
-		return NETDEV_TX_OK;
+	if (unlikely(!skb)) {
+		goto out;
+	}
 
-	return mlx5e_sq_xmit(sq, skb, wqe, pi);
+	rc =  mlx5e_sq_xmit(sq, skb, wqe, pi);
+
+out:
+	if (likely(rc == NETDEV_TX_OK))
+		skb_orphan(skb);
+	/// DEBUG START
+	if (!(pi & 0x7f)) {
+		trace_printk("%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
+	}
+	/// DEBUG END
+	if ((sq->pc - sq->cc) >= MLX5_POLL_LIMIT && in_task()) {
+	/// DEBUG START
+		trace_printk("%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
+	/// DEBUG END
+	/*TODO: In production
+		! in_task should trigger kthread_worker with sq context.
+	*/
+		local_bh_disable();
+		mlx5e_poll_tx_cq(&sq->cq, MLX5_POLL_LIMIT);
+		local_bh_enable();
+	}
+	return rc;
 }
 
 static void mlx5e_dump_error_cqe(struct mlx5e_txqsq *sq,

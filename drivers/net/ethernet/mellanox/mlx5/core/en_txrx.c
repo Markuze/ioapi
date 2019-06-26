@@ -82,10 +82,10 @@ int mlx5e_napi_poll(struct napi_struct *napi, int budget)
 	int i;
 
 	ch_stats->poll++;
-
+/*
 	for (i = 0; i < c->num_tc; i++)
 		busy |= mlx5e_poll_tx_cq(&c->sq[i].cq, budget);
-
+*/
 	busy |= mlx5e_poll_xdpsq_cq(&c->xdpsq.cq, NULL);
 
 	if (c->xdp)
@@ -111,10 +111,12 @@ int mlx5e_napi_poll(struct napi_struct *napi, int budget)
 
 	ch_stats->arm++;
 
+/*
 	for (i = 0; i < c->num_tc; i++) {
 		mlx5e_handle_tx_dim(&c->sq[i]);
 		mlx5e_cq_arm(&c->sq[i].cq);
 	}
+*/
 
 	mlx5e_handle_rx_dim(rq);
 
