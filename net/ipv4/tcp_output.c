@@ -923,6 +923,7 @@ void tcp_wfree(struct sk_buff *skb)
 	struct tcp_sock *tp = tcp_sk(sk);
 	unsigned long flags, nval, oval;
 
+	trace_printk("%s\n", __FUNCTION__);
 	/* Keep one reference on sk_wmem_alloc.
 	 * Will be released by sk_free() from here or tcp_tasklet_func()
 	 */

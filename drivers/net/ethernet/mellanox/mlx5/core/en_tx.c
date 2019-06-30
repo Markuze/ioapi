@@ -424,6 +424,7 @@ netdev_tx_t mlx5e_sq_xmit(struct mlx5e_txqsq *sq, struct sk_buff *skb,
 	return NETDEV_TX_OK;
 
 err_drop:
+	trace_printk("Dropped %p\n", skb);
 	stats->dropped++;
 	dev_kfree_skb_any(skb);
 
@@ -451,16 +452,23 @@ netdev_tx_t mlx5e_xmit(struct sk_buff *skb, struct net_device *dev)
 	rc =  mlx5e_sq_xmit(sq, skb, wqe, pi);
 
 out:
-	if (likely(rc == NETDEV_TX_OK))
+	if (likely(rc == NETDEV_TX_OK)) {
+		trace_printk("Calling %p (skb_orphan)\n", skb->destructor);
 		skb_orphan(skb);
+	} else {
+		trace_printk("well Fuck\n");
+	}
+
 	/// DEBUG START
 	if (!(pi & 0x7f)) {
-		trace_printk("%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
+		trace_printk("%d > (%s)[%d] sq %p [cc %d pc %d]\n",
+			pi, dev->name, skb_get_queue_mapping(skb),
+			sq, sq->cc, sq->pc);
 	}
 	/// DEBUG END
 	if ((sq->pc - sq->cc) >= MLX5_POLL_LIMIT && in_task()) {
 	/// DEBUG START
-		trace_printk("%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
+		trace_printk("polliing :(%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
 	/// DEBUG END
 	/*TODO: In production
 		! in_task should trigger kthread_worker with sq context.
