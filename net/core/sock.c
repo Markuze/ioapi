@@ -1736,7 +1736,6 @@ void sk_destruct(struct sock *sk)
 
 static void __sk_free(struct sock *sk)
 {
-	trace_printk("%s\n", __FUNCTION__);
 	if (likely(sk->sk_net_refcnt))
 		sock_inuse_add(sock_net(sk), -1);
 
@@ -1939,7 +1938,6 @@ void sock_wfree(struct sk_buff *skb)
 	struct sock *sk = skb->sk;
 	unsigned int len = skb->truesize;
 
-	trace_printk("%s\n", __FUNCTION__);
 	if (!sock_flag(sk, SOCK_USE_WRITE_QUEUE)) {
 		/*
 		 * Keep a reference on sk_wmem_alloc, this will be released
@@ -1965,7 +1963,6 @@ void __sock_wfree(struct sk_buff *skb)
 {
 	struct sock *sk = skb->sk;
 
-	trace_printk("%s\n", __FUNCTION__);
 	if (refcount_sub_and_test(skb->truesize, &sk->sk_wmem_alloc))
 		__sk_free(sk);
 }
@@ -2028,7 +2025,6 @@ void sock_rfree(struct sk_buff *skb)
 	struct sock *sk = skb->sk;
 	unsigned int len = skb->truesize;
 
-	trace_printk("%s\n", __FUNCTION__);
 	atomic_sub(len, &sk->sk_rmem_alloc);
 	sk_mem_uncharge(sk, len);
 }
@@ -2040,7 +2036,6 @@ EXPORT_SYMBOL(sock_rfree);
  */
 void sock_efree(struct sk_buff *skb)
 {
-	trace_printk("%s\n", __FUNCTION__);
 	sock_put(skb->sk);
 }
 EXPORT_SYMBOL(sock_efree);

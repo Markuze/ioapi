@@ -309,7 +309,7 @@ mlx5e_txwqe_complete(struct mlx5e_txqsq *sq, struct sk_buff *skb,
 	cseg->opmod_idx_opcode = cpu_to_be32((sq->pc << 8) | opcode);
 	cseg->qpn_ds           = cpu_to_be32((sq->sqn << 8) | ds_cnt);
 
-	netdev_tx_sent_queue(sq->txq, num_bytes);
+	//netdev_tx_sent_queue(sq->txq, num_bytes);
 
 	if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP))
 		skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
@@ -453,8 +453,8 @@ netdev_tx_t mlx5e_xmit(struct sk_buff *skb, struct net_device *dev)
 
 out:
 	if (likely(rc == NETDEV_TX_OK)) {
-		trace_printk("Calling %p (skb_orphan)\n", skb->destructor);
 		skb_orphan(skb);
+		//netdev_tx_completed_queue(sq->txq, 1, nbytes);
 	} else {
 		trace_printk("well Fuck\n");
 	}
@@ -468,7 +468,7 @@ out:
 	/// DEBUG END
 	if ((sq->pc - sq->cc) >= MLX5_POLL_LIMIT && in_task()) {
 	/// DEBUG START
-		trace_printk("polliing :(%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
+		trace_printk("polling :(%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
 	/// DEBUG END
 	/*TODO: In production
 		! in_task should trigger kthread_worker with sq context.
@@ -598,7 +598,7 @@ bool mlx5e_poll_tx_cq(struct mlx5e_cq *cq, int napi_budget)
 	sq->dma_fifo_cc = dma_fifo_cc;
 	sq->cc = sqcc;
 
-	netdev_tx_completed_queue(sq->txq, npkts, nbytes);
+	//netdev_tx_completed_queue(sq->txq, npkts, nbytes);
 
 	if (netif_tx_queue_stopped(sq->txq) &&
 	    mlx5e_wqc_has_room_for(&sq->wq, sq->cc, sq->pc,

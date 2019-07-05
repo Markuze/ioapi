@@ -4204,7 +4204,6 @@ static void sock_rmem_free(struct sk_buff *skb)
 {
 	struct sock *sk = skb->sk;
 
-	trace_printk("%s\n", __FUNCTION__);
 	atomic_sub(skb->truesize, &sk->sk_rmem_alloc);
 }
 
