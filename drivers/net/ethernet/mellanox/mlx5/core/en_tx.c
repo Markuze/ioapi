@@ -466,7 +466,7 @@ out:
 	//		sq, sq->cc, sq->pc);
 	//}
 	/// DEBUG END
-	if ((sq->pc - sq->cc) >= MLX5_POLL_LIMIT && in_task()) {
+	if (((unsigned int)(sq->pc - sq->cc)) >= MLX5_POLL_LIMIT && in_task()) {
 	/// DEBUG START
 		trace_printk("polling :(%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
 	/// DEBUG END
@@ -477,8 +477,10 @@ out:
 		mlx5e_poll_tx_cq(&sq->cq, MLX5_POLL_LIMIT);
 		local_bh_enable();
 	} else if ((sq->pc - sq->cc) >= MLX5_POLL_LIMIT) {
-		trace_printk("NOT polling :(%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
-
+		trace_printk("NAPI polling :(%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
+		napi_schedule(sq->cq.napi);
+	} else if (unlikely(sq->cc > sq->pc)) {
+		trace_printk("Well shit... [%d]:(%s)[%d] sq %p [cc %d pc %d]\n", ((unsigned int)(sq->pc - sq->cc)),dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
 	}
 	return rc;
 }
