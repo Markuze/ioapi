@@ -79,13 +79,14 @@ int mlx5e_napi_poll(struct napi_struct *napi, int budget)
 	struct mlx5e_rq *rq = &c->rq;
 	bool busy = false;
 	int work_done = 0;
-	int i;
+	int i, line = 0;
 
 	ch_stats->poll++;
-/*
+
+
 	for (i = 0; i < c->num_tc; i++)
 		busy |= mlx5e_poll_tx_cq(&c->sq[i].cq, budget);
-*/
+
 	busy |= mlx5e_poll_xdpsq_cq(&c->xdpsq.cq, NULL);
 
 	if (c->xdp)
@@ -98,16 +99,20 @@ int mlx5e_napi_poll(struct napi_struct *napi, int budget)
 
 	busy |= c->rq.post_wqes(rq);
 
+	line = __LINE__;
 	if (busy) {
-		if (likely(mlx5e_channel_no_affinity_change(c)))
-			return budget;
+		if (likely(mlx5e_channel_no_affinity_change(c))) {
+			work_done = budget;
+			goto out;
+		}
 		ch_stats->aff_change++;
 		if (budget && work_done == budget)
 			work_done--;
 	}
+	line = __LINE__;
 
 	if (unlikely(!napi_complete_done(napi, work_done)))
-		return work_done;
+		goto out;
 
 	ch_stats->arm++;
 
@@ -123,7 +128,9 @@ int mlx5e_napi_poll(struct napi_struct *napi, int budget)
 	mlx5e_cq_arm(&rq->cq);
 	mlx5e_cq_arm(&c->icosq.cq);
 	mlx5e_cq_arm(&c->xdpsq.cq);
-
+	line = 1;
+out:
+	trace_printk("done %d (line = %d) %s\n", work_done, line, line==1 ? "IRQ REARMED": "POLLING");
 	return work_done;
 }
 

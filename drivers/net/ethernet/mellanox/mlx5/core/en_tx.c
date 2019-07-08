@@ -460,11 +460,11 @@ out:
 	}
 
 	/// DEBUG START
-	if (!(pi & 0x7f)) {
-		trace_printk("%d > (%s)[%d] sq %p [cc %d pc %d]\n",
-			pi, dev->name, skb_get_queue_mapping(skb),
-			sq, sq->cc, sq->pc);
-	}
+	//if (!(pi & 0x7f)) {
+	//	trace_printk("%d > (%s)[%d] sq %p [cc %d pc %d]\n",
+	//		pi, dev->name, skb_get_queue_mapping(skb),
+	//		sq, sq->cc, sq->pc);
+	//}
 	/// DEBUG END
 	if ((sq->pc - sq->cc) >= MLX5_POLL_LIMIT && in_task()) {
 	/// DEBUG START
@@ -476,6 +476,9 @@ out:
 		local_bh_disable();
 		mlx5e_poll_tx_cq(&sq->cq, MLX5_POLL_LIMIT);
 		local_bh_enable();
+	} else if ((sq->pc - sq->cc) >= MLX5_POLL_LIMIT) {
+		trace_printk("NOT polling :(%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
+
 	}
 	return rc;
 }
