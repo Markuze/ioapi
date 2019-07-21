@@ -182,7 +182,7 @@ static inline struct page *inc_mapping(struct device	*dev,
 	return page;
 }
 
-struct page *alloc_mapped_pages(struct device *dev, enum dma_data_direction dir)
+struct page *__alloc_mapped_pages(struct device *dev, enum dma_data_direction dir, const char *func)
 {
 	u64	idx = alloc_key(dir);
 	struct  mag_allocator *allocator = &dev->iova_mag->allocator[idx];
@@ -193,7 +193,7 @@ struct page *alloc_mapped_pages(struct device *dev, enum dma_data_direction dir)
 		elem = inc_mapping(dev, dir);
 		set_page_count(elem, 0x1000);
 	}
-
+	trace("[6]%s: page %lx (%d) %lx\n", func, (unsigned long)elem, atomic_read(&elem->_refcount), (unsigned long)page_address(elem));
 	assert(page_count(elem) == 0x1000);
 	init_page_count(elem);
 	assert(numa_mem_id() == numa_node_id());
@@ -254,8 +254,7 @@ void *__dma_cache_alloc(struct device *dev, size_t size, enum dma_data_direction
 						    (dir == DMA_TO_DEVICE) ? DMA_CACHE_FRAG_PARTIAL_R : DMA_CACHE_FRAG_PARTIAL_W);
 	assert(size <= DMA_CACHE_ELEM_SIZE);
 	va = alloc_mapped_frag(dev, nc, size, dir);
-	if (dir == DMA_TO_DEVICE)
-		trace("[1]%s: size %zu page %lx (%d) %lx\n", func, size, (unsigned long)virt_to_head_page(va), atomic_read(&(virt_to_head_page(va))->_refcount), (unsigned long)(va));
+	trace("[1]%s: size %zu page %lx (%d) %lx\n", func, size, (unsigned long)virt_to_head_page(va), atomic_read(&(virt_to_head_page(va))->_refcount), (unsigned long)(va));
 	return va;
 }
 EXPORT_SYMBOL(__dma_cache_alloc);
@@ -268,8 +267,7 @@ struct page *__dma_cache_alloc_page(struct device *dev, enum dma_data_direction 
 	void *va = alloc_mapped_frag(dev, nc, PAGE_SIZE, dir);
 
 	assert(virt_addr_valid(va));
-	if (dir == DMA_TO_DEVICE)
-		trace("[2]%s: size %u page %lx (%d)\n", func, 4096, (unsigned long)virt_to_head_page(va), atomic_read(&(virt_to_head_page(va))->_refcount));
+	trace("[2]%s: size %u page %lx (%d)\n", func, 4096, (unsigned long)virt_to_head_page(va), atomic_read(&(virt_to_head_page(va))->_refcount));
 	return virt_to_page(va);
 }
 EXPORT_SYMBOL(__dma_cache_alloc_page);
@@ -282,16 +280,14 @@ struct page *__dma_cache_alloc_pages(struct device *dev, int order, enum dma_dat
 		struct page *page;
 		WARN_ONCE((order != DMA_CACHE_MAX_ORDER), "order is %d", order);
 		page = alloc_mapped_pages(dev, dir);
-		if (dir == DMA_TO_DEVICE)
-			trace("[3]%s: size %u page %lx (%d)\n", func, 4096 << order, (unsigned long)page, atomic_read(&page->_refcount));
+		trace("[3]%s: size %u page %lx (%d)\n", func, 4096 << order, (unsigned long)page, atomic_read(&page->_refcount));
 		return page;
 	} else {
 		struct page_frag_cache *nc = get_frag_cache(dev->iova_mag, order + 1,
 						    (dir == DMA_TO_DEVICE) ? DMA_CACHE_FRAG_FULL_R : DMA_CACHE_FRAG_FULL_W);
 		void *va = alloc_mapped_frag(dev, nc, PAGE_SIZE << order, dir);
 
-		if (dir == DMA_TO_DEVICE)
-			trace("[4]%s: size %u page %lx (%d)\n", func, 4096 << order, (unsigned long)virt_to_head_page(va), atomic_read(&(virt_to_head_page(va))->_refcount));
+		trace("[4]%s: size %u page %lx (%d)\n", func, 4096 << order, (unsigned long)virt_to_head_page(va), atomic_read(&(virt_to_head_page(va))->_refcount));
 		assert(virt_addr_valid(va));
 		return virt_to_page(va);
 	}
