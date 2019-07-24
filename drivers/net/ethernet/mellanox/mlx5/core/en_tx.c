@@ -316,6 +316,7 @@ mlx5e_txwqe_complete(struct mlx5e_txqsq *sq, struct sk_buff *skb,
 
 	sq->pc += wi->num_wqebbs;
 	if (unlikely(!mlx5e_wqc_has_room_for(wq, sq->cc, sq->pc, MLX5E_SQ_STOP_ROOM))) {
+		//trace_printk("Q stopped :[%d] sq %p [cc %d pc %d]\n", skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
 		netif_tx_stop_queue(sq->txq);
 		sq->stats->stopped++;
 	}
@@ -446,35 +447,31 @@ netdev_tx_t mlx5e_xmit(struct sk_buff *skb, struct net_device *dev)
 	/* might send skbs and update wqe and pi */
 	skb = mlx5e_accel_handle_tx(skb, sq, dev, &wqe, &pi);
 	if (unlikely(!skb)) {
+		//trace_printk("accel_handle :(%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
 		goto out;
 	}
 
 	rc =  mlx5e_sq_xmit(sq, skb, wqe, pi);
 
 out:
-//	if (likely(rc == NETDEV_TX_OK)) {
-//		netdev_tx_completed_queue(sq->txq, 1, nbytes);
-//	}
 
 	if (((unsigned int)(sq->pc - sq->cc)) >= MLX5_POLL_LIMIT && in_task()) {
-	/// DEBUG START
-	//	trace_printk("polling :(%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
-	/// DEBUG END
-	/*TODO: In production
-		! in_task should trigger kthread_worker with sq context.
-	*/
-		local_bh_disable();
-		mlx5e_poll_tx_cq(&sq->cq, MLX5_POLL_LIMIT);
-		local_bh_enable();
-	} /*else if ((sq->pc - sq->cc) >= MLX5_POLL_LIMIT) {
-		//trace_printk("NAPI polling :(%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
-		napi_schedule(sq->cq.napi);
-	}*/
 #if 0
-	else if (unlikely(sq->cc > sq->pc)) {
-		trace_printk("Well shit... [%d]:(%s)[%d] sq %p [cc %d pc %d]\n", ((unsigned int)(sq->pc - sq->cc)),dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
-	}
+		local_bh_disable();
+		mlx5e_poll_tx_cq(&sq->cq, 0);
+		local_bh_enable();
+	} else if ((sq->pc - sq->cc) >= (MLX5_POLL_LIMIT << 1)) {
+		trace_printk("NAPI polling :(%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
 #endif
+		local_bh_disable();
+		mlx5e_poll_tx_cq(&sq->cq, 0);
+		local_bh_enable();
+	//	trace_printk("NAPI polling :(%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
+	}
+	if (unlikely(netif_tx_queue_stopped(sq->txq))) {
+		//trace_printk("Q stopped  - ARM CQ:(%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
+		mlx5e_cq_arm(&sq->cq);
+	}
 	return rc;
 }
 

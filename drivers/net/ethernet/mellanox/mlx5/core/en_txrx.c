@@ -86,8 +86,6 @@ int mlx5e_napi_poll(struct napi_struct *napi, int budget)
 
 	for (i = 0; i < c->num_tc; i++)
 		busy |= mlx5e_poll_tx_cq(&c->sq[i].cq, budget);
-	if (busy)
-		trace_printk("Polling collected TX packets...\n");
 
 	busy |= mlx5e_poll_xdpsq_cq(&c->xdpsq.cq, NULL);
 
