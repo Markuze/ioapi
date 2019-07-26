@@ -448,30 +448,35 @@ netdev_tx_t mlx5e_xmit(struct sk_buff *skb, struct net_device *dev)
 	skb = mlx5e_accel_handle_tx(skb, sq, dev, &wqe, &pi);
 	if (unlikely(!skb)) {
 		//trace_printk("accel_handle :(%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
-		goto out;
+		goto poll;
 	}
 
 	rc =  mlx5e_sq_xmit(sq, skb, wqe, pi);
-
-out:
+poll:
+	if (sq->napi_poll)
+		goto out;
 
 	if (((unsigned int)(sq->pc - sq->cc)) >= MLX5_POLL_LIMIT && in_task()) {
-#if 0
+		//TODO: throtle number of polls, under heavy load, cpu < nic. you might be polling to much. (slow completions)
 		local_bh_disable();
 		mlx5e_poll_tx_cq(&sq->cq, 0);
 		local_bh_enable();
-	} else if ((sq->pc - sq->cc) >= (MLX5_POLL_LIMIT << 1)) {
-		trace_printk("NAPI polling :(%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
-#endif
-		local_bh_disable();
-		mlx5e_poll_tx_cq(&sq->cq, 0);
-		local_bh_enable();
-	//	trace_printk("NAPI polling :(%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
+		//trace_printk("NAPI polling :(%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
 	}
+#if 0
+	else if ((sq->pc - sq->cc) >= (MLX5_POLL_LIMIT << 1)) {
+		trace_printk("NAPI polling :(%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
+		local_bh_disable();
+		mlx5e_poll_tx_cq(&sq->cq, 0);
+		local_bh_enable();
+	}
+#endif
 	if (unlikely(netif_tx_queue_stopped(sq->txq))) {
-		//trace_printk("Q stopped  - ARM CQ:(%s)[%d] sq %p [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->cc, sq->pc);
+		//trace_printk("ARM CQ:(%s)[%d] sq %p [%x] [cc %d pc %d]\n", dev->name, skb_get_queue_mapping(skb), sq, sq->sqn, sq->cc, sq->pc);
+		sq->napi_poll = true;
 		mlx5e_cq_arm(&sq->cq);
 	}
+out:
 	return rc;
 }
 
@@ -599,6 +604,8 @@ bool mlx5e_poll_tx_cq(struct mlx5e_cq *cq, int napi_budget)
 	    mlx5e_wqc_has_room_for(&sq->wq, sq->cc, sq->pc,
 				   MLX5E_SQ_STOP_ROOM) &&
 	    !test_bit(MLX5E_SQ_STATE_RECOVERING, &sq->state)) {
+
+		//trace_printk("Wake Q:(%s)[%d] sq %p [%x] [cc %d pc %d]\n", sq->channel->netdev->name, smp_processor_id(), sq, sq->sqn, sq->cc, sq->pc);
 		netif_tx_wake_queue(sq->txq);
 		stats->wake++;
 	}

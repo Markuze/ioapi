@@ -83,9 +83,24 @@ int mlx5e_napi_poll(struct napi_struct *napi, int budget)
 
 	ch_stats->poll++;
 
+	for (i = 0; i < c->num_tc; i++) {
+		struct mlx5e_txqsq *sq = &c->sq[i];
+		bool	q_free = false;
+		bool	q_busy = false;
 
-	for (i = 0; i < c->num_tc; i++)
-		busy |= mlx5e_poll_tx_cq(&c->sq[i].cq, budget);
+		if (unlikely(sq->napi_poll)) {
+			q_busy = mlx5e_poll_tx_cq(&sq->cq, budget);
+
+			q_free = mlx5e_wqc_has_room_for(&sq->wq, sq->cc, sq->pc,
+							(MLX5E_TX_CQ_POLL_BUDGET << 1));
+			//Re-enable tx poll only if the stress is down...
+			if (q_free && !q_busy && !netif_tx_queue_stopped(sq->txq))
+					sq->napi_poll = false;
+
+			//trace_printk("Polling on NAPI %p [%s]\n", sq, sq->napi_poll ? "napi poll":"in tx");
+			busy |= q_busy;
+		}
+	}
 
 	busy |= mlx5e_poll_xdpsq_cq(&c->xdpsq.cq, NULL);
 
@@ -116,12 +131,14 @@ int mlx5e_napi_poll(struct napi_struct *napi, int budget)
 
 	ch_stats->arm++;
 
-/*
 	for (i = 0; i < c->num_tc; i++) {
-		mlx5e_handle_tx_dim(&c->sq[i]);
-		mlx5e_cq_arm(&c->sq[i].cq);
+		struct mlx5e_txqsq *sq = &c->sq[i];
+		//mlx5e_handle_tx_dim(&c->sq[i]);
+		if (unlikely(sq->napi_poll)) {
+			//trace_printk("RE-ARM CQ:(%s)[%d] sq %p [%x] [cc %d pc %d]\n", sq->channel->netdev->name, smp_processor_id(), sq, sq->sqn, sq->cc, sq->pc);
+			mlx5e_cq_arm(&sq->cq);
+		}
 	}
-*/
 
 	mlx5e_handle_rx_dim(rq);
 

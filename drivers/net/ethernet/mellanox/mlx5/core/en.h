@@ -352,7 +352,7 @@ struct mlx5e_sq_wqe_info {
 
 struct mlx5e_txqsq {
 	/* data path */
-
+	bool 			   napi_poll;
 	/* dirtied @completion */
 	u16                        cc;
 	u32                        dma_fifo_cc;
