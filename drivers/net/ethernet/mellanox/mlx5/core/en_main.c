@@ -1180,6 +1180,7 @@ static int mlx5e_alloc_txqsq(struct mlx5e_channel *c,
 	struct mlx5_wq_cyc *wq = &sq->wq;
 	int err;
 
+	sq->napi_poll = false;
 	sq->pdev      = c->pdev;
 	sq->tstamp    = c->tstamp;
 	sq->clock     = &mdev->clock;
@@ -4672,7 +4673,7 @@ static void mlx5e_build_nic_netdev(struct net_device *netdev)
 		netdev->dcbnl_ops = &mlx5e_dcbnl_ops;
 #endif
 
-	netdev->watchdog_timeo    = 15 * HZ;
+	netdev->watchdog_timeo    = 1 * HZ;
 
 	netdev->ethtool_ops	  = &mlx5e_ethtool_ops;
 

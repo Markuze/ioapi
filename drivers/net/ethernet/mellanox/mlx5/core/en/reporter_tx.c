@@ -168,9 +168,13 @@ int mlx5e_tx_reporter_timeout(struct mlx5e_txqsq *sq)
 	err_ctx.sq       = sq;
 	err_ctx.recover  = mlx5e_tx_reporter_timeout_recover;
 	sprintf(err_str,
-		"TX timeout on queue: %d, SQ: 0x%x, CQ: 0x%x, SQ Cons: 0x%x SQ Prod: 0x%x, usecs since last trans: %u\n",
-		sq->channel->ix, sq->sqn, sq->cq.mcq.cqn, sq->cc, sq->pc,
+		"TX timeout on %p: %d, SQ: 0x%x, CQ: 0x%x, SQ Cons: %d SQ Prod: %d, usecs since last trans: %u\n",
+		sq, sq->channel->ix, sq->sqn, sq->cq.mcq.cqn, sq->cc, sq->pc,
 		jiffies_to_usecs(jiffies - sq->txq->trans_start));
+	trace_printk("TX timeout on %p: %d, SQ: 0x%x, Con: %d Pr: %d, poll: %s Q: %s\n",
+		sq, sq->channel->ix, sq->sqn, sq->cc, sq->pc,
+		sq->napi_poll ? "napi poll": "On TX",
+		netif_tx_queue_stopped(sq->txq) ? "stoped":"active");
 
 	return mlx5_tx_health_report(sq->channel->priv->tx_reporter, err_str,
 				     &err_ctx);
