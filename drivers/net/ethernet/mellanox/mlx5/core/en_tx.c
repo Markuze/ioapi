@@ -422,7 +422,7 @@ netdev_tx_t mlx5e_sq_xmit(struct mlx5e_txqsq *sq, struct sk_buff *skb,
 	mlx5e_txwqe_complete(sq, skb, opcode, ds_cnt, num_wqebbs, num_bytes,
 			     num_dma, wi, cseg);
 
-	skb_orphan(skb);
+	//skb_orphan(skb);
 	return NETDEV_TX_OK;
 
 err_drop:
@@ -432,7 +432,7 @@ err_drop:
 	return NETDEV_TX_OK;
 }
 
-#define MLX5_POLL_LIMIT 128
+#define MLX5_POLL_LIMIT 256
 netdev_tx_t mlx5e_xmit(struct sk_buff *skb, struct net_device *dev)
 {
 	struct mlx5e_priv *priv = netdev_priv(dev);
